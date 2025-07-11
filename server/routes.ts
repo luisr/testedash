@@ -222,7 +222,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/activities", async (req, res) => {
     try {
-      // Handle date string conversion for activities
+      // Handle date string conversion and numeric field conversion for activities
       const activityData = {
         ...req.body,
         plannedStartDate: req.body.plannedStartDate ? new Date(req.body.plannedStartDate) : null,
@@ -231,6 +231,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         actualEndDate: req.body.actualEndDate ? new Date(req.body.actualEndDate) : null,
         baselineStartDate: req.body.baselineStartDate ? new Date(req.body.baselineStartDate) : null,
         baselineEndDate: req.body.baselineEndDate ? new Date(req.body.baselineEndDate) : null,
+        // Convert numeric fields to strings for database storage
+        plannedValue: req.body.plannedValue !== undefined ? String(req.body.plannedValue) : "0",
+        actualCost: req.body.actualCost !== undefined ? String(req.body.actualCost) : "0",
+        earnedValue: req.body.earnedValue !== undefined ? String(req.body.earnedValue) : "0",
+        completionPercentage: req.body.completionPercentage !== undefined ? String(req.body.completionPercentage) : "0",
       };
       
       const validatedData = insertActivitySchema.parse(activityData);
@@ -268,7 +273,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       for (const activityData of activities) {
         try {
-          // Handle date string conversion for import
+          // Handle date string conversion and numeric field conversion for import
           const processedActivity = {
             ...activityData,
             dashboardId: dashboardId,
@@ -278,6 +283,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
             actualEndDate: activityData.actualEndDate ? new Date(activityData.actualEndDate) : null,
             baselineStartDate: activityData.baselineStartDate ? new Date(activityData.baselineStartDate) : null,
             baselineEndDate: activityData.baselineEndDate ? new Date(activityData.baselineEndDate) : null,
+            // Convert numeric fields to strings for database storage
+            plannedValue: activityData.plannedValue !== undefined ? String(activityData.plannedValue) : "0",
+            actualCost: activityData.actualCost !== undefined ? String(activityData.actualCost) : "0",
+            earnedValue: activityData.earnedValue !== undefined ? String(activityData.earnedValue) : "0",
+            completionPercentage: activityData.completionPercentage !== undefined ? String(activityData.completionPercentage) : "0",
           };
           
           const parsedActivity = insertActivitySchema.parse(processedActivity);
