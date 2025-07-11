@@ -334,6 +334,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Alternative consolidated dashboard endpoint
+  app.get("/api/consolidated-dashboard/:userId", async (req, res) => {
+    try {
+      const userId = parseInt(req.params.userId);
+      
+      if (!userId) {
+        return res.status(400).json({ message: 'Invalid user ID' });
+      }
+      
+      const user = await storage.getUser(userId);
+      
+      if (!user || !user.isSuperUser) {
+        return res.status(403).json({ message: 'Access denied. Super user privileges required.' });
+      }
+      
+      // Get consolidated data
+      const [activities, projects, users] = await Promise.all([
+        storage.getActivities(),
+        storage.getProjects(), 
+        storage.getUsers()
+      ]);
+      
+      const consolidatedData = {
+        activities: activities || [],
+        projects: projects || [],
+        users: users || [],
+        dashboards: []
+      };
+      
+      res.json(consolidatedData);
+    } catch (error) {
+      console.error("Error fetching consolidated dashboard data:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // Super User Management Routes
   app.get("/api/super-users", async (req, res) => {
     try {
