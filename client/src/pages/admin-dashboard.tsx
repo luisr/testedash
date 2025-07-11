@@ -95,7 +95,7 @@ export default function AdminDashboard() {
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `relatorio-${type}.pdf`;
+      a.download = `relatorio-${type}.txt`;
       a.click();
       URL.revokeObjectURL(url);
     } catch (error) {
@@ -375,6 +375,61 @@ export default function AdminDashboard() {
                 Novo Projeto
               </Button>
             </div>
+            
+            {/* Projects List */}
+            <div className="grid gap-4">
+              {projects.map((project) => (
+                <Card key={project.id} className="hover:shadow-lg transition-shadow">
+                  <CardHeader className="pb-3">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <CardTitle className="text-lg">{project.name}</CardTitle>
+                        <p className="text-sm text-muted-foreground mt-1">{project.description}</p>
+                      </div>
+                      <Badge className={getStatusColor(project.status)}>
+                        {project.status}
+                      </Badge>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      <div>
+                        <p className="text-sm font-medium">Orçamento</p>
+                        <p className="text-sm text-muted-foreground">R$ {parseFloat(project.budget || '0').toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium">Gasto</p>
+                        <p className="text-sm text-muted-foreground">R$ {parseFloat(project.actualCost || '0').toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium">Início</p>
+                        <p className="text-sm text-muted-foreground">
+                          {project.startDate ? new Date(project.startDate).toLocaleDateString('pt-BR') : 'Não definido'}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium">Fim</p>
+                        <p className="text-sm text-muted-foreground">
+                          {project.endDate ? new Date(project.endDate).toLocaleDateString('pt-BR') : 'Não definido'}
+                        </p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+              
+              {projects.length === 0 && (
+                <Card>
+                  <CardContent className="text-center py-8">
+                    <p className="text-muted-foreground">Nenhum projeto encontrado.</p>
+                    <Button onClick={() => setShowNewProjectModal(true)} className="mt-4">
+                      <Plus className="w-4 h-4 mr-2" />
+                      Criar Primeiro Projeto
+                    </Button>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
 
             <div className="flex gap-4 mb-6">
               <div className="flex-1">
@@ -539,7 +594,7 @@ export default function AdminDashboard() {
                 <CardContent>
                   <Button variant="outline" className="w-full" onClick={() => generateReport('projects')}>
                     <Download className="w-4 h-4 mr-2" />
-                    Baixar PDF
+                    Baixar Relatório
                   </Button>
                 </CardContent>
               </Card>
@@ -555,7 +610,7 @@ export default function AdminDashboard() {
                 <CardContent>
                   <Button variant="outline" className="w-full" onClick={() => generateReport('users')}>
                     <Download className="w-4 h-4 mr-2" />
-                    Baixar PDF
+                    Baixar Relatório
                   </Button>
                 </CardContent>
               </Card>
@@ -571,7 +626,7 @@ export default function AdminDashboard() {
                 <CardContent>
                   <Button variant="outline" className="w-full" onClick={() => generateReport('financial')}>
                     <Download className="w-4 h-4 mr-2" />
-                    Baixar PDF
+                    Baixar Relatório
                   </Button>
                 </CardContent>
               </Card>
