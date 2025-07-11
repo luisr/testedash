@@ -327,6 +327,11 @@ export default function Dashboard() {
             onCustomColumnsUpdate={() => window.location.reload()}
             onExport={handleExport}
             dashboardId={dashboardId}
+            onNewActivity={() => setNewActivityModalOpen(true)}
+            onManageDependencies={() => {
+              // TODO: Implementar modal de dependências
+              console.log('Abrir modal de dependências');
+            }}
           />
         </main>
       </div>

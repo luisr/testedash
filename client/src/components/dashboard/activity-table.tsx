@@ -22,7 +22,9 @@ import {
   Trash2,
   GripVertical,
   ChevronRight,
-  ChevronDown
+  ChevronDown,
+  Plus,
+  GitBranch
 } from "lucide-react";
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { Activity } from "@shared/schema";
@@ -48,6 +50,8 @@ interface ActivityTableProps {
   onCustomColumnsUpdate: () => void;
   onExport: (options: any) => void;
   dashboardId: number;
+  onNewActivity?: () => void;
+  onManageDependencies?: () => void;
 }
 
 interface ActivityWithChildren extends Activity {
@@ -73,7 +77,9 @@ export default function ActivityTable({
   onActivitiesImport,
   onCustomColumnsUpdate,
   onExport,
-  dashboardId
+  dashboardId,
+  onNewActivity,
+  onManageDependencies
 }: ActivityTableProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [configModalOpen, setConfigModalOpen] = useState(false);
@@ -173,22 +179,21 @@ export default function ActivityTable({
     // Se for o mesmo lugar, não fazer nada
     if (sourceIndex === destIndex) return;
 
-    // Lógica para determinar novo parent baseado na posição
-    const flatActivities = flattenHierarchy(buildHierarchy(activities));
-    const targetActivity = flatActivities[destIndex];
-    
-    if (targetActivity && destIndex > sourceIndex) {
-      // Arrastou para baixo - tornar subatividade
+    // Lógica simples: se arrastou para baixo, torna subatividade da atividade anterior
+    if (destIndex > sourceIndex) {
+      // Arrastou para baixo - encontrar atividade anterior para ser parent
+      const prevActivity = currentActivities[destIndex - 1];
+      if (prevActivity) {
+        onActivityUpdate(activityId, {
+          parentActivityId: prevActivity.id,
+          sortOrder: 0
+        });
+      }
+    } else {
+      // Arrastou para cima - torna atividade principal
       onActivityUpdate(activityId, {
-        parentActivityId: targetActivity.id,
-        sortOrder: 0
-      });
-    } else if (targetActivity && destIndex < sourceIndex) {
-      // Arrastou para cima - pode ser subatividade ou atividade principal
-      const parentId = targetActivity.parentActivityId || null;
-      onActivityUpdate(activityId, {
-        parentActivityId: parentId,
-        sortOrder: targetActivity.sortOrder ? targetActivity.sortOrder + 1 : 1
+        parentActivityId: null,
+        sortOrder: destIndex
       });
     }
   };
@@ -228,6 +233,24 @@ export default function ActivityTable({
                 className="pl-10 w-64 focus-ring"
               />
             </div>
+            <Button 
+              variant="default" 
+              size="sm"
+              className="hover-lift focus-ring"
+              onClick={onNewActivity}
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Nova Atividade
+            </Button>
+            <Button 
+              variant="outline" 
+              size="sm"
+              className="hover-lift focus-ring"
+              onClick={onManageDependencies}
+            >
+              <GitBranch className="w-4 h-4 mr-2" />
+              Dependências
+            </Button>
             <Button variant="ghost" size="icon" className="hover-lift focus-ring">
               <Filter className="w-5 h-5" />
             </Button>
@@ -244,8 +267,8 @@ export default function ActivityTable({
       </CardHeader>
       
       <CardContent className="p-0">
-        <div className="overflow-x-auto">
-          <DragDropContext onDragEnd={handleDragEnd}>
+        <DragDropContext onDragEnd={handleDragEnd}>
+          <div className="overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow className="bg-muted/50">
@@ -304,22 +327,29 @@ export default function ActivityTable({
                             </TableCell>
                             <TableCell>
                               <div className="flex items-center">
-                                <div style={{ marginLeft: `${(activity.level || 0) * 20}px` }}>
-                                  {activity.children && activity.children.length > 0 && (
+                                <div style={{ marginLeft: `${(activity.level || 0) * 20}px` }} className="flex items-center">
+                                  {activity.children && activity.children.length > 0 ? (
                                     <button
                                       onClick={() => toggleExpanded(activity.id)}
-                                      className="mr-2 p-1 hover:bg-gray-100 rounded"
+                                      className="mr-2 p-1 hover:bg-gray-100 rounded flex items-center justify-center"
                                     >
                                       {expandedRows.has(activity.id) ? (
-                                        <ChevronDown className="w-4 h-4" />
+                                        <ChevronDown className="w-4 h-4 text-muted-foreground" />
                                       ) : (
-                                        <ChevronRight className="w-4 h-4" />
+                                        <ChevronRight className="w-4 h-4 text-muted-foreground" />
                                       )}
                                     </button>
+                                  ) : (
+                                    <div className="w-6 h-6 mr-2"></div>
                                   )}
                                   <div>
                                     <div className="font-medium text-foreground">
                                       {activity.name}
+                                      {activity.parentActivityId && (
+                                        <span className="ml-2 px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded">
+                                          Sub
+                                        </span>
+                                      )}
                                     </div>
                                     <div className="text-sm text-muted-foreground">
                                       Projeto {activity.projectId}
@@ -405,8 +435,8 @@ export default function ActivityTable({
                 )}
               </Droppable>
             </Table>
-          </DragDropContext>
-        </div>
+          </div>
+        </DragDropContext>
         
         <div className="px-6 py-4 border-t border-border flex items-center justify-between">
           <div className="text-sm text-muted-foreground">
