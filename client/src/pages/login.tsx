@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Eye, EyeOff, LogIn, Shield } from "lucide-react";
+import beachParkLogo from "@assets/pngegg_1752264509099.png";
 
 export default function Login() {
   const [, setLocation] = useLocation();
@@ -52,7 +53,7 @@ export default function Login() {
         <div className="text-center space-y-2">
           <div className="flex justify-center">
             <div className="w-16 h-16 rounded-2xl flex items-center justify-center bg-white p-2">
-              <img src="/attached_assets/pngegg_1752264509099.png" alt="BeachPark Logo" className="w-12 h-12 object-contain" />
+              <img src={beachParkLogo} alt="BeachPark Logo" className="w-12 h-12 object-contain" />
             </div>
           </div>
           <h1 className="text-3xl font-bold text-foreground">Tô Sabendo</h1>

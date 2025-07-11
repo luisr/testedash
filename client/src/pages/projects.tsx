@@ -18,6 +18,7 @@ import {
   FileText,
   Settings
 } from "lucide-react";
+import beachParkLogo from "@assets/pngegg_1752264509099.png";
 
 interface User {
   id: number;
@@ -180,7 +181,7 @@ export default function Projects() {
           <div className="flex justify-between items-center py-4">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-white p-1">
-                <img src="/attached_assets/pngegg_1752264509099.png" alt="BeachPark Logo" className="w-8 h-8 object-contain" />
+                <img src={beachParkLogo} alt="BeachPark Logo" className="w-8 h-8 object-contain" />
               </div>
               <div>
                 <h1 className="text-2xl font-bold text-foreground">Tô Sabendo</h1>

@@ -16,6 +16,7 @@ import {
   Menu
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import beachParkLogo from "@assets/pngegg_1752264509099.png";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -61,7 +62,7 @@ export default function Sidebar({ isOpen, onClose, onActivityLogToggle, onUsersC
         <div className="flex items-center justify-between h-16 px-6 border-b border-border/50">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-elegant hover-lift">
-              <img src="/attached_assets/pngegg_1752264509099.png" alt="BeachPark Logo" className="w-8 h-8 object-contain" />
+              <img src={beachParkLogo} alt="BeachPark Logo" className="w-8 h-8 object-contain" />
             </div>
             <h1 className="text-xl font-bold text-foreground bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">Tô Sabendo</h1>
           </div>
