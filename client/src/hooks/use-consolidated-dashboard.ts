@@ -12,7 +12,12 @@ export interface ConsolidatedDashboardData {
 
 export function useConsolidatedDashboard(userId?: number) {
   const { data, isLoading, error } = useQuery<ConsolidatedDashboardData>({
-    queryKey: ["/api/dashboard/consolidated", { userId }],
+    queryKey: ["/api/dashboard/consolidated", userId],
+    queryFn: async () => {
+      const response = await fetch(`/api/dashboard/consolidated?userId=${userId}`);
+      if (!response.ok) throw new Error('Failed to fetch consolidated dashboard');
+      return response.json();
+    },
     enabled: !!userId,
   });
 
