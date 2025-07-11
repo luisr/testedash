@@ -172,8 +172,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/projects", async (req, res) => {
     try {
-      const projectData = insertProjectSchema.parse(req.body);
-      const project = await storage.createProject(projectData);
+      // Handle date string conversion
+      const projectData = {
+        ...req.body,
+        startDate: req.body.startDate ? new Date(req.body.startDate) : null,
+        endDate: req.body.endDate ? new Date(req.body.endDate) : null,
+      };
+      
+      const validatedData = insertProjectSchema.parse(projectData);
+      const project = await storage.createProject(validatedData);
       res.status(201).json(project);
     } catch (error) {
       console.error("Error creating project:", error);
