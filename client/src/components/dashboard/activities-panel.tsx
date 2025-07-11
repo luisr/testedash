@@ -47,24 +47,24 @@ const ActivitiesPanel: React.FC<ActivitiesPanelProps> = ({
   const [viewMode, setViewMode] = useState<'hierarchical' | 'table'>('hierarchical');
   const [showDependencies, setShowDependencies] = useState(false);
 
-  const filteredActivities = activities.filter(activity =>
-    activity.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    activity.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    activity.discipline.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    activity.responsible.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredActivities = (activities || []).filter(activity =>
+    activity?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    activity?.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    activity?.discipline?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    activity?.responsible?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const getStatusCounts = () => {
     const counts = {
-      total: activities.length,
+      total: (activities || []).length,
       completed: 0,
       in_progress: 0,
       not_started: 0,
       delayed: 0
     };
 
-    activities.forEach(activity => {
-      switch (activity.status) {
+    (activities || []).forEach(activity => {
+      switch (activity?.status) {
         case 'completed':
           counts.completed++;
           break;

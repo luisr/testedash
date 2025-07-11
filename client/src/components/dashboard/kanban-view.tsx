@@ -82,7 +82,7 @@ export default function KanbanView({ activities, onUpdateActivity }: KanbanViewP
       <DragDropContext onDragEnd={handleDragEnd} onDragStart={handleDragStart}>
         <div className="flex gap-6 h-full overflow-x-auto p-4">
           {statusColumns.map(column => {
-            const columnActivities = activities.filter(activity => activity.status === column.id);
+            const columnActivities = (activities || []).filter(activity => activity?.status === column.id);
             const IconComponent = column.icon;
             
             return (
