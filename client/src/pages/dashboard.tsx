@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams } from "wouter";
 import { useDashboardData } from "@/hooks/use-dashboard-data";
 import { useActivityMetrics } from "@/hooks/use-activity-metrics";
+import { useNotifications, useWebSocketNotifications } from "@/hooks/use-notifications";
 import Sidebar from "@/components/dashboard/sidebar";
 import Header from "@/components/dashboard/header";
 import KPICards from "@/components/dashboard/kpi-cards";
@@ -10,12 +11,15 @@ import ActivityTable from "@/components/dashboard/activity-table";
 import ShareModal from "@/components/dashboard/share-modal";
 import ActivityLogPanel from "@/components/dashboard/activity-log-panel";
 import ExportModal from "@/components/dashboard/export-modal";
+import { NotificationPopup } from "@/components/notifications/notification-popup";
+import { NotificationPreferencesDialog } from "@/components/notifications/notification-preferences-dialog";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 
 export default function Dashboard() {
   const { id } = useParams<{ id?: string }>();
   const dashboardId = id ? parseInt(id) : 1; // Default to dashboard 1
+  const userId = 1; // TODO: Get from authentication
   
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [shareModalOpen, setShareModalOpen] = useState(false);
@@ -26,6 +30,32 @@ export default function Dashboard() {
   const [filterResponsible, setFilterResponsible] = useState("all");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+
+  // Initialize notifications and WebSocket
+  const { createNotification } = useNotifications(userId);
+  const { isConnected } = useWebSocketNotifications(userId);
+
+  // Function to create notification when activities are updated
+  const handleActivityUpdate = (activity: any, action: string) => {
+    const notificationTypes = {
+      create: { type: "activity_update", title: "Nova atividade criada", message: `A atividade "${activity.name}" foi criada.` },
+      update: { type: "activity_update", title: "Atividade atualizada", message: `A atividade "${activity.name}" foi atualizada.` },
+      delete: { type: "activity_update", title: "Atividade excluída", message: `A atividade "${activity.name}" foi excluída.` },
+      status: { type: "activity_update", title: "Status alterado", message: `O status da atividade "${activity.name}" foi alterado para ${activity.status}.` }
+    };
+
+    const notification = notificationTypes[action as keyof typeof notificationTypes];
+    if (notification) {
+      createNotification({
+        userId,
+        dashboardId,
+        type: notification.type,
+        title: notification.title,
+        message: notification.message,
+        data: { activityId: activity.id, action }
+      });
+    }
+  };
 
   const {
     dashboard,
@@ -169,6 +199,12 @@ export default function Dashboard() {
           onMenuClick={() => setSidebarOpen(true)}
           onShareClick={() => setShareModalOpen(true)}
           onExportClick={() => setExportModalOpen(true)}
+          rightContent={
+            <div className="flex items-center gap-2">
+              <NotificationPreferencesDialog userId={userId} />
+              <NotificationPopup userId={userId} />
+            </div>
+          }
         />
         
         <main className="p-6 space-y-6">
@@ -181,15 +217,34 @@ export default function Dashboard() {
                 Visão geral dos projetos e atividades
               </p>
             </div>
-            <Button 
-              onClick={() => {
-                // TODO: Open create activity modal
-              }}
-              className="flex items-center gap-2"
-            >
-              <Plus className="h-4 w-4" />
-              Nova Atividade
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                onClick={() => {
+                  // Create a test notification
+                  createNotification({
+                    userId,
+                    dashboardId,
+                    type: "system",
+                    title: "Notificação de Teste",
+                    message: "Esta é uma notificação de teste para demonstrar o sistema em tempo real.",
+                    data: { test: true }
+                  });
+                }}
+                variant="outline"
+                className="text-blue-600 border-blue-600 hover:bg-blue-50"
+              >
+                Testar Notificação
+              </Button>
+              <Button 
+                onClick={() => {
+                  // TODO: Open create activity modal
+                }}
+                className="flex items-center gap-2"
+              >
+                <Plus className="h-4 w-4" />
+                Nova Atividade
+              </Button>
+            </div>
           </div>
 
           <KPICards metrics={metrics} />

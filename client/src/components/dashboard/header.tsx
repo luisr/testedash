@@ -7,13 +7,15 @@ interface HeaderProps {
   onMenuClick: () => void;
   onShareClick: () => void;
   onExportClick: () => void;
+  rightContent?: React.ReactNode;
 }
 
 export default function Header({ 
   dashboardName, 
   onMenuClick, 
   onShareClick, 
-  onExportClick 
+  onExportClick,
+  rightContent
 }: HeaderProps) {
   const { theme, toggleTheme } = useTheme();
 
@@ -40,6 +42,7 @@ export default function Header({
         </div>
         
         <div className="flex items-center space-x-3">
+          {rightContent}
           <Button
             variant="ghost"
             size="icon"

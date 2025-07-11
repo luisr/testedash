@@ -3,10 +3,12 @@ import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 import {
   users, dashboards, projects, activities, dashboardShares, activityLogs, customColumns, customCharts,
+  notifications, notificationPreferences,
   type User, type InsertUser, type Dashboard, type InsertDashboard, type Project, type InsertProject,
   type Activity, type InsertActivity, type DashboardShare, type InsertDashboardShare,
   type ActivityLog, type InsertActivityLog, type CustomColumn, type InsertCustomColumn,
-  type CustomChart, type InsertCustomChart
+  type CustomChart, type InsertCustomChart, type Notification, type InsertNotification,
+  type NotificationPreferences, type InsertNotificationPreferences
 } from "@shared/schema";
 
 // Check if DATABASE_URL is properly configured or build from individual components
@@ -85,6 +87,21 @@ export interface IStorage {
   createCustomChart(chart: InsertCustomChart): Promise<CustomChart>;
   updateCustomChart(id: number, chart: Partial<InsertCustomChart>): Promise<CustomChart | undefined>;
   deleteCustomChart(id: number): Promise<boolean>;
+
+  // Notifications
+  getNotifications(userId: number, limit?: number): Promise<Notification[]>;
+  getUnreadNotifications(userId: number): Promise<Notification[]>;
+  createNotification(notification: InsertNotification): Promise<Notification>;
+  markNotificationAsRead(notificationId: number): Promise<boolean>;
+  markAllNotificationsAsRead(userId: number): Promise<boolean>;
+  deleteNotification(id: number): Promise<boolean>;
+  
+  // Notification Preferences
+  getNotificationPreferences(userId: number): Promise<NotificationPreferences | undefined>;
+  updateNotificationPreferences(userId: number, preferences: Partial<InsertNotificationPreferences>): Promise<NotificationPreferences | undefined>;
+  
+  // Dashboard Users (for notifications)
+  getDashboardUsers(dashboardId: number): Promise<User[]>;
 }
 
 // Mock data for development
@@ -551,6 +568,178 @@ export class DatabaseStorage implements IStorage {
       return true;
     }
     return false;
+  }
+
+  // Notifications
+  async getNotifications(userId: number, limit: number = 50): Promise<Notification[]> {
+    if (!db) return [];
+    
+    try {
+      const result = await db.select()
+        .from(notifications)
+        .where(eq(notifications.userId, userId))
+        .orderBy(desc(notifications.createdAt))
+        .limit(limit);
+      return result;
+    } catch (error) {
+      console.error('Error getting notifications:', error);
+      return [];
+    }
+  }
+
+  async getUnreadNotifications(userId: number): Promise<Notification[]> {
+    if (!db) return [];
+    
+    try {
+      const result = await db.select()
+        .from(notifications)
+        .where(and(
+          eq(notifications.userId, userId),
+          eq(notifications.read, false)
+        ))
+        .orderBy(desc(notifications.createdAt));
+      return result;
+    } catch (error) {
+      console.error('Error getting unread notifications:', error);
+      return [];
+    }
+  }
+
+  async createNotification(notification: InsertNotification): Promise<Notification> {
+    if (!db) {
+      const newNotification: Notification = {
+        id: Date.now(),
+        userId: notification.userId,
+        dashboardId: notification.dashboardId || null,
+        type: notification.type,
+        title: notification.title,
+        message: notification.message,
+        data: notification.data || null,
+        read: false,
+        createdAt: new Date(),
+      };
+      return newNotification;
+    }
+    
+    try {
+      const result = await db.insert(notifications).values(notification).returning();
+      return result[0];
+    } catch (error) {
+      console.error('Error creating notification:', error);
+      throw error;
+    }
+  }
+
+  async markNotificationAsRead(notificationId: number): Promise<boolean> {
+    if (!db) return false;
+    
+    try {
+      await db.update(notifications)
+        .set({ read: true })
+        .where(eq(notifications.id, notificationId));
+      return true;
+    } catch (error) {
+      console.error('Error marking notification as read:', error);
+      return false;
+    }
+  }
+
+  async markAllNotificationsAsRead(userId: number): Promise<boolean> {
+    if (!db) return false;
+    
+    try {
+      await db.update(notifications)
+        .set({ read: true })
+        .where(eq(notifications.userId, userId));
+      return true;
+    } catch (error) {
+      console.error('Error marking all notifications as read:', error);
+      return false;
+    }
+  }
+
+  async deleteNotification(id: number): Promise<boolean> {
+    if (!db) return false;
+    
+    try {
+      await db.delete(notifications).where(eq(notifications.id, id));
+      return true;
+    } catch (error) {
+      console.error('Error deleting notification:', error);
+      return false;
+    }
+  }
+
+  async getNotificationPreferences(userId: number): Promise<NotificationPreferences | undefined> {
+    if (!db) return undefined;
+    
+    try {
+      const result = await db.select()
+        .from(notificationPreferences)
+        .where(eq(notificationPreferences.userId, userId));
+      return result[0];
+    } catch (error) {
+      console.error('Error getting notification preferences:', error);
+      return undefined;
+    }
+  }
+
+  async updateNotificationPreferences(userId: number, preferences: Partial<InsertNotificationPreferences>): Promise<NotificationPreferences | undefined> {
+    if (!db) return undefined;
+    
+    try {
+      const result = await db.update(notificationPreferences)
+        .set({ ...preferences, updatedAt: new Date() })
+        .where(eq(notificationPreferences.userId, userId))
+        .returning();
+      return result[0];
+    } catch (error) {
+      console.error('Error updating notification preferences:', error);
+      return undefined;
+    }
+  }
+
+  async getDashboardUsers(dashboardId: number): Promise<User[]> {
+    if (!db) return [];
+    
+    try {
+      // Get dashboard owner
+      const dashboard = await db.select()
+        .from(dashboards)
+        .where(eq(dashboards.id, dashboardId));
+      
+      if (!dashboard[0]) return [];
+      
+      // Get dashboard owner user
+      const owner = await db.select()
+        .from(users)
+        .where(eq(users.id, dashboard[0].ownerId || 1));
+      
+      // Get shared users
+      const sharedUsers = await db.select({
+        id: users.id,
+        email: users.email,
+        name: users.name,
+        avatar: users.avatar,
+        role: users.role,
+        createdAt: users.createdAt,
+        updatedAt: users.updatedAt
+      })
+        .from(dashboardShares)
+        .innerJoin(users, eq(dashboardShares.userId, users.id))
+        .where(eq(dashboardShares.dashboardId, dashboardId));
+      
+      // Combine owner and shared users, remove duplicates
+      const allUsers = [...owner, ...sharedUsers];
+      const uniqueUsers = allUsers.filter((user, index, self) => 
+        self.findIndex(u => u.id === user.id) === index
+      );
+      
+      return uniqueUsers;
+    } catch (error) {
+      console.error('Error getting dashboard users:', error);
+      return [];
+    }
   }
 }
 

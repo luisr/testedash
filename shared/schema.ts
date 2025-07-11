@@ -109,6 +109,32 @@ export const customCharts = pgTable("custom_charts", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Real-time notifications table
+export const notifications = pgTable("notifications", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  dashboardId: integer("dashboard_id").references(() => dashboards.id),
+  type: text("type").notNull(), // activity_created, activity_updated, activity_deleted, dashboard_shared, etc.
+  title: text("title").notNull(),
+  message: text("message").notNull(),
+  data: jsonb("data"), // Additional context data
+  read: boolean("read").default(false).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// User notification preferences
+export const notificationPreferences = pgTable("notification_preferences", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  emailNotifications: boolean("email_notifications").default(true).notNull(),
+  pushNotifications: boolean("push_notifications").default(true).notNull(),
+  activityUpdates: boolean("activity_updates").default(true).notNull(),
+  dashboardShares: boolean("dashboard_shares").default(true).notNull(),
+  systemAlerts: boolean("system_alerts").default(true).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).omit({ id: true, createdAt: true, updatedAt: true });
 export const insertDashboardSchema = createInsertSchema(dashboards).omit({ id: true, createdAt: true, updatedAt: true });
@@ -118,6 +144,8 @@ export const insertDashboardShareSchema = createInsertSchema(dashboardShares).om
 export const insertActivityLogSchema = createInsertSchema(activityLogs).omit({ id: true, timestamp: true });
 export const insertCustomColumnSchema = createInsertSchema(customColumns).omit({ id: true, createdAt: true });
 export const insertCustomChartSchema = createInsertSchema(customCharts).omit({ id: true, createdAt: true });
+export const insertNotificationSchema = createInsertSchema(notifications).omit({ id: true, createdAt: true });
+export const insertNotificationPreferencesSchema = createInsertSchema(notificationPreferences).omit({ id: true, createdAt: true, updatedAt: true });
 
 // Types
 export type User = typeof users.$inferSelect;
@@ -136,3 +164,7 @@ export type CustomColumn = typeof customColumns.$inferSelect;
 export type InsertCustomColumn = z.infer<typeof insertCustomColumnSchema>;
 export type CustomChart = typeof customCharts.$inferSelect;
 export type InsertCustomChart = z.infer<typeof insertCustomChartSchema>;
+export type Notification = typeof notifications.$inferSelect;
+export type InsertNotification = z.infer<typeof insertNotificationSchema>;
+export type NotificationPreferences = typeof notificationPreferences.$inferSelect;
+export type InsertNotificationPreferences = z.infer<typeof insertNotificationPreferencesSchema>;
