@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Network, Plus, Trash2, ArrowRight, AlertCircle, GitBranch } from 'lucide-react';
@@ -40,8 +40,9 @@ export default function DependencyManager({ dashboardId, activities, trigger }: 
   const loadDependencies = async () => {
     setIsLoading(true);
     try {
-      const response = await apiRequest(`/api/dashboards/${dashboardId}/dependencies`);
-      setDependencies(response || []);
+      const response = await apiRequest('GET', `/api/dashboards/${dashboardId}/dependencies`);
+      const data = await response.json();
+      setDependencies(data || []);
     } catch (error) {
       console.error('Error loading dependencies:', error);
       toast({
@@ -64,16 +65,11 @@ export default function DependencyManager({ dashboardId, activities, trigger }: 
         isActive: true
       };
 
-      const response = await apiRequest('/api/activity-dependencies', {
-        method: 'POST',
-        body: JSON.stringify(newDependency),
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
+      const response = await apiRequest('POST', '/api/activity-dependencies', newDependency);
+      const data = await response.json();
 
-      if (response) {
-        setDependencies([...dependencies, response]);
+      if (data) {
+        setDependencies([...dependencies, data]);
         toast({
           title: "Dependência adicionada",
           description: "A dependência foi criada com sucesso."
@@ -91,9 +87,7 @@ export default function DependencyManager({ dashboardId, activities, trigger }: 
 
   const removeDependency = async (dependencyId: number) => {
     try {
-      await apiRequest(`/api/activity-dependencies/${dependencyId}`, {
-        method: 'DELETE'
-      });
+      await apiRequest('DELETE', `/api/activity-dependencies/${dependencyId}`);
 
       setDependencies(dependencies.filter(dep => dep.id !== dependencyId));
       toast({
@@ -225,6 +219,9 @@ export default function DependencyManager({ dashboardId, activities, trigger }: 
             <GitBranch className="w-5 h-5 text-blue-600" />
             Gerenciador de Dependências
           </DialogTitle>
+          <DialogDescription className="text-muted-foreground">
+            Gerencie as dependências entre atividades do projeto. Adicione, visualize e remova dependências conforme necessário.
+          </DialogDescription>
         </DialogHeader>
         
         <div className="space-y-6">

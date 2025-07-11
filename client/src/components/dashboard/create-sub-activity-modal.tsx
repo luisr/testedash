@@ -8,7 +8,8 @@ import {
   DialogContent, 
   DialogHeader, 
   DialogTitle, 
-  DialogTrigger 
+  DialogTrigger,
+  DialogDescription 
 } from '@/components/ui/dialog';
 import { 
   Select, 
@@ -74,13 +75,7 @@ export default function CreateSubActivityModal({
         completionPercentage: formData.completionPercentage.toString()
       };
 
-      const response = await apiRequest(`/api/activities/${parentActivity.id}/sub-activity`, {
-        method: 'POST',
-        body: JSON.stringify(subActivityData),
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
+      const response = await apiRequest('POST', `/api/activities/${parentActivity.id}/sub-activity`, subActivityData);
 
       toast({
         title: "Subtarefa criada com sucesso",
@@ -132,6 +127,9 @@ export default function CreateSubActivityModal({
           <DialogTitle className="text-lg font-semibold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
             Criar Subtarefa para: {parentActivity.name}
           </DialogTitle>
+          <DialogDescription className="text-muted-foreground">
+            Crie uma nova subtarefa vinculada à atividade principal. A subtarefa herdará algumas propriedades da atividade pai.
+          </DialogDescription>
         </DialogHeader>
         
         <form onSubmit={handleSubmit} className="space-y-6">
