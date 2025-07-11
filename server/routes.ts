@@ -44,13 +44,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/users", async (req, res) => {
     try {
-      // For now, return mock users since we don't have a getUsers method
-      const mockUsers = [
-        { id: 1, name: "João Silva", email: "joao@exemplo.com", role: "admin", department: "TI", position: "Desenvolvedor Senior", createdAt: new Date(), updatedAt: new Date() },
-        { id: 2, name: "Maria Santos", email: "maria@exemplo.com", role: "manager", department: "TI", position: "Gerente de Projetos", createdAt: new Date(), updatedAt: new Date() },
-        { id: 3, name: "Carlos Oliveira", email: "carlos@exemplo.com", role: "user", department: "Marketing", position: "Analista", createdAt: new Date(), updatedAt: new Date() }
-      ];
-      res.json(mockUsers);
+      const users = await storage.getUsers();
+      res.json(users);
     } catch (error) {
       res.status(500).json({ message: "Internal server error" });
     }

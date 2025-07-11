@@ -48,6 +48,7 @@ if (connectionString && connectionString.startsWith('postgresql://')) {
 export interface IStorage {
   // Users
   getUser(id: number): Promise<User | undefined>;
+  getUsers(): Promise<User[]>;
   getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   updateUser(id: number, user: Partial<InsertUser>): Promise<User | undefined>;
@@ -188,6 +189,14 @@ export class DatabaseStorage implements IStorage {
       return result[0];
     }
     return mockUsers.find(u => u.id === id);
+  }
+
+  async getUsers(): Promise<User[]> {
+    if (db) {
+      const result = await db.select().from(users).orderBy(users.name);
+      return result;
+    }
+    return mockUsers;
   }
 
   async getUserByEmail(email: string): Promise<User | undefined> {

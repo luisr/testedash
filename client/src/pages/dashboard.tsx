@@ -26,6 +26,10 @@ import { BackupSimple } from "@/components/dashboard/backup-simple";
 import { DependencyManager } from "@/components/dashboard/dependency-manager";
 import { ActivityDateEditor } from "@/components/dashboard/activity-date-editor";
 import { DateAuditViewer } from "@/components/dashboard/date-audit-viewer";
+import { NewUserModal } from "@/components/dashboard/new-user-modal";
+import { NewProjectModal } from "@/components/dashboard/new-project-modal";
+import { UsersListModal } from "@/components/dashboard/users-list-modal";
+import { ProjectsListModal } from "@/components/dashboard/projects-list-modal";
 
 export default function Dashboard() {
   const { id } = useParams<{ id?: string }>();
@@ -39,6 +43,10 @@ export default function Dashboard() {
   const [newActivityModalOpen, setNewActivityModalOpen] = useState(false);
   const [dependencyModalOpen, setDependencyModalOpen] = useState(false);
   const [modalType, setModalType] = useState<'projects' | 'users' | 'reports' | 'import' | null>(null);
+  const [newUserModalOpen, setNewUserModalOpen] = useState(false);
+  const [newProjectModalOpen, setNewProjectModalOpen] = useState(false);
+  const [usersListModalOpen, setUsersListModalOpen] = useState(false);
+  const [projectsListModalOpen, setProjectsListModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
   const [filterResponsible, setFilterResponsible] = useState("all");
@@ -251,22 +259,68 @@ export default function Dashboard() {
               </p>
             </div>
             <div className="flex items-center gap-2 flex-wrap">
-              <Button
-                onClick={() => setModalType('projects')}
-                variant="outline"
-                className="flex items-center gap-2"
-              >
-                <FolderOpen className="h-4 w-4" />
-                Projetos
-              </Button>
-              <Button
-                onClick={() => setModalType('users')}
-                variant="outline"
-                className="flex items-center gap-2"
-              >
-                <Users className="h-4 w-4" />
-                Usuários
-              </Button>
+              <NewProjectModal
+                trigger={
+                  <Button
+                    variant="outline"
+                    className="flex items-center gap-2"
+                  >
+                    <FolderOpen className="h-4 w-4" />
+                    Novo Projeto
+                  </Button>
+                }
+                dashboardId={dashboardId}
+                isOpen={newProjectModalOpen}
+                onOpenChange={setNewProjectModalOpen}
+              />
+              <NewUserModal
+                trigger={
+                  <Button
+                    variant="outline"
+                    className="flex items-center gap-2"
+                  >
+                    <Users className="h-4 w-4" />
+                    Novo Usuário
+                  </Button>
+                }
+                isOpen={newUserModalOpen}
+                onOpenChange={setNewUserModalOpen}
+              />
+              <ProjectsListModal
+                trigger={
+                  <Button
+                    variant="outline"
+                    className="flex items-center gap-2"
+                  >
+                    <FolderOpen className="h-4 w-4" />
+                    Ver Projetos
+                  </Button>
+                }
+                dashboardId={dashboardId}
+                isOpen={projectsListModalOpen}
+                onOpenChange={setProjectsListModalOpen}
+                onNewProject={() => {
+                  setProjectsListModalOpen(false);
+                  setNewProjectModalOpen(true);
+                }}
+              />
+              <UsersListModal
+                trigger={
+                  <Button
+                    variant="outline"
+                    className="flex items-center gap-2"
+                  >
+                    <Users className="h-4 w-4" />
+                    Ver Usuários
+                  </Button>
+                }
+                isOpen={usersListModalOpen}
+                onOpenChange={setUsersListModalOpen}
+                onNewUser={() => {
+                  setUsersListModalOpen(false);
+                  setNewUserModalOpen(true);
+                }}
+              />
               <Button
                 onClick={() => setModalType('reports')}
                 variant="outline"
