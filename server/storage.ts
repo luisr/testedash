@@ -76,6 +76,7 @@ export interface IStorage {
 
   // Projects
   getProject(id: number): Promise<Project | undefined>;
+  getProjects(): Promise<Project[]>;
   getProjectsByDashboardId(dashboardId: number): Promise<Project[]>;
   createProject(project: InsertProject): Promise<Project>;
   updateProject(id: number, project: Partial<InsertProject>): Promise<Project | undefined>;
@@ -83,6 +84,7 @@ export interface IStorage {
 
   // Activities
   getActivity(id: number): Promise<Activity | undefined>;
+  getActivities(): Promise<Activity[]>;
   getActivitiesByDashboardId(dashboardId: number): Promise<Activity[]>;
   getActivitiesByProjectId(projectId: number): Promise<Activity[]>;
   createActivity(activity: InsertActivity): Promise<Activity>;
@@ -440,6 +442,13 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
+  async getProjects(): Promise<Project[]> {
+    if (db) {
+      return await db.select().from(projects);
+    }
+    return mockProjects;
+  }
+
   async getProjectsByDashboardId(dashboardId: number): Promise<Project[]> {
     if (db) {
       return await db.select().from(projects).where(eq(projects.dashboardId, dashboardId));
@@ -502,6 +511,13 @@ export class DatabaseStorage implements IStorage {
       return result[0];
     }
     return mockActivities.find(a => a.id === id);
+  }
+
+  async getActivities(): Promise<Activity[]> {
+    if (db) {
+      return await db.select().from(activities);
+    }
+    return mockActivities;
   }
 
   async getActivitiesByDashboardId(dashboardId: number): Promise<Activity[]> {

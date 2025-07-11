@@ -352,7 +352,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Get consolidated data
       const [activities, projects, users] = await Promise.all([
         storage.getActivities(),
-        storage.getProjects(), 
+        storage.getProjects(),
         storage.getUsers()
       ]);
       
