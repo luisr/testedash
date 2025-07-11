@@ -1,8 +1,13 @@
 import type { User, Project } from '@shared/schema';
 
+// Dynamic import for jsPDF
+const createPDF = async () => {
+  const { jsPDF } = await import('jspdf');
+  const autoTable = (await import('jspdf-autotable')).default;
+  return { jsPDF, autoTable };
+};
+
 export class PDFGenerator {
-  // Simplified PDF generator for text-based reports
-  
   private async generateGeminiObservations(data: any, reportType: string): Promise<string> {
     try {
       // For now, return static observations until we fix the AI integration
@@ -177,11 +182,31 @@ export class PDFGenerator {
     }
   }
 
-  async generateProjectsReport(projects: Project[]): Promise<string> {
-    const date = new Date().toLocaleDateString('pt-BR');
-    let content = `BEACHPARK - TÔ SABENDO\n`;
-    content += `RELATÓRIO DE PROJETOS - ${date}\n`;
-    content += `===============================================\n\n`;
+  async generateProjectsReport(projects: Project[]): Promise<Buffer> {
+    const { jsPDF } = await createPDF();
+    const doc = new jsPDF();
+    
+    let yPosition = 20;
+    const pageHeight = doc.internal.pageSize.height;
+    const margin = 20;
+    
+    // Header
+    doc.setFontSize(20);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(0, 102, 204);
+    doc.text('BeachPark - Tô Sabendo', margin, yPosition);
+    
+    yPosition += 15;
+    doc.setFontSize(16);
+    doc.setTextColor(0, 0, 0);
+    doc.text('RELATÓRIO DE PROJETOS', margin, yPosition);
+    
+    yPosition += 10;
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`Gerado em: ${new Date().toLocaleString('pt-BR')}`, margin, yPosition);
+    
+    yPosition += 20;
     
     // Resumo Executivo
     const totalProjects = projects.length;
@@ -190,48 +215,125 @@ export class PDFGenerator {
     const totalBudget = projects.reduce((sum, p) => sum + parseFloat(p.budget || '0'), 0);
     const totalSpent = projects.reduce((sum, p) => sum + parseFloat(p.actualCost || '0'), 0);
     
-    content += `RESUMO EXECUTIVO:\n`;
-    content += `Total de Projetos: ${totalProjects}\n`;
-    content += `Projetos Ativos: ${activeProjects}\n`;
-    content += `Projetos Concluídos: ${completedProjects}\n`;
-    content += `Orçamento Total: R$ ${totalBudget.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}\n`;
-    content += `Gasto Total: R$ ${totalSpent.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}\n`;
-    content += `Economia/Excesso: R$ ${(totalBudget - totalSpent).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}\n\n`;
-
-    // Detalhamento por Projeto
-    content += `DETALHAMENTO DOS PROJETOS:\n`;
-    content += `-------------------------------------------\n`;
+    doc.setFontSize(14);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(0, 102, 204);
+    doc.text('RESUMO EXECUTIVO', margin, yPosition);
     
-    for (const project of projects) {
-      const budget = parseFloat(project.budget || '0');
-      const spent = parseFloat(project.actualCost || '0');
-      const variance = budget - spent;
-      const variancePercent = budget > 0 ? (variance / budget) * 100 : 0;
-      
-      content += `\nPROJETO: ${project.name.toUpperCase()}\n`;
-      content += `Status: ${project.status}\n`;
-      content += `Descrição: ${project.description || 'Não informado'}\n`;
-      content += `Orçamento: R$ ${budget.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}\n`;
-      content += `Gasto Atual: R$ ${spent.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}\n`;
-      content += `Variação: R$ ${variance.toLocaleString('pt-BR', { minimumFractionDigits: 2 })} (${variancePercent.toFixed(1)}%)\n`;
-      content += `Data de Início: ${project.startDate ? new Date(project.startDate).toLocaleDateString('pt-BR') : 'Não definido'}\n`;
-      content += `Data de Fim: ${project.endDate ? new Date(project.endDate).toLocaleDateString('pt-BR') : 'Não definido'}\n`;
-      content += `-------------------------------------------\n`;
+    yPosition += 10;
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(0, 0, 0);
+    
+    const summaryText = [
+      `Total de Projetos: ${totalProjects}`,
+      `Projetos Ativos: ${activeProjects}`,
+      `Projetos Concluídos: ${completedProjects}`,
+      `Orçamento Total: R$ ${totalBudget.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
+      `Gasto Total: R$ ${totalSpent.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
+      `Economia/Excesso: R$ ${(totalBudget - totalSpent).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`
+    ];
+    
+    summaryText.forEach(text => {
+      if (yPosition > pageHeight - 30) {
+        doc.addPage();
+        yPosition = 20;
+      }
+      doc.text(text, margin, yPosition);
+      yPosition += 5;
+    });
+    
+    yPosition += 20;
+    
+    // Tabela de Projetos
+    if (yPosition > pageHeight - 100) {
+      doc.addPage();
+      yPosition = 20;
     }
-
-    // Observações IA
-    const observations = await this.generateGeminiObservations({ projects }, 'projects');
-    content += `\nOBSERVAÇÕES E RECOMENDAÇÕES:\n`;
-    content += `${observations}\n`;
     
-    return content;
+    const tableData = projects.map(project => [
+      project.name,
+      project.status,
+      `R$ ${parseFloat(project.budget || '0').toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
+      `R$ ${parseFloat(project.actualCost || '0').toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
+      project.startDate ? new Date(project.startDate).toLocaleDateString('pt-BR') : 'N/A',
+      project.endDate ? new Date(project.endDate).toLocaleDateString('pt-BR') : 'N/A'
+    ]);
+
+    (doc as any).autoTable({
+      head: [['Projeto', 'Status', 'Orçamento', 'Gasto', 'Início', 'Fim']],
+      body: tableData,
+      startY: yPosition,
+      theme: 'striped',
+      headStyles: { fillColor: [0, 102, 204], textColor: 255 },
+      styles: { fontSize: 8 },
+      columnStyles: {
+        0: { cellWidth: 40 },
+        1: { cellWidth: 25 },
+        2: { cellWidth: 30 },
+        3: { cellWidth: 30 },
+        4: { cellWidth: 25 },
+        5: { cellWidth: 25 }
+      }
+    });
+
+    yPosition = (doc as any).lastAutoTable.finalY + 20;
+    
+    // Observações IA
+    if (yPosition > pageHeight - 50) {
+      doc.addPage();
+      yPosition = 20;
+    }
+    
+    const observations = await this.generateGeminiObservations({ projects }, 'projects');
+    doc.setFontSize(14);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(0, 102, 204);
+    doc.text('OBSERVAÇÕES E RECOMENDAÇÕES', margin, yPosition);
+    
+    yPosition += 10;
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(0, 0, 0);
+    
+    const obsLines = doc.splitTextToSize(observations, doc.internal.pageSize.width - 2 * margin);
+    obsLines.forEach((line: string) => {
+      if (yPosition > pageHeight - 20) {
+        doc.addPage();
+        yPosition = 20;
+      }
+      doc.text(line, margin, yPosition);
+      yPosition += 5;
+    });
+    
+    return Buffer.from(doc.output('arraybuffer'));
   }
 
-  async generateUsersReport(users: User[]): Promise<string> {
-    const date = new Date().toLocaleDateString('pt-BR');
-    let content = `BEACHPARK - TÔ SABENDO\n`;
-    content += `RELATÓRIO DE USUÁRIOS - ${date}\n`;
-    content += `===============================================\n\n`;
+  async generateUsersReport(users: User[]): Promise<Buffer> {
+    const { jsPDF } = await createPDF();
+    const doc = new jsPDF();
+    
+    let yPosition = 20;
+    const pageHeight = doc.internal.pageSize.height;
+    const margin = 20;
+    
+    // Header
+    doc.setFontSize(20);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(0, 102, 204);
+    doc.text('BeachPark - Tô Sabendo', margin, yPosition);
+    
+    yPosition += 15;
+    doc.setFontSize(16);
+    doc.setTextColor(0, 0, 0);
+    doc.text('RELATÓRIO DE USUÁRIOS', margin, yPosition);
+    
+    yPosition += 10;
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`Gerado em: ${new Date().toLocaleString('pt-BR')}`, margin, yPosition);
+    
+    yPosition += 20;
     
     // Resumo Executivo
     const totalUsers = users.length;
@@ -241,52 +343,126 @@ export class PDFGenerator {
     const managerUsers = users.filter(u => u.role === 'manager').length;
     const regularUsers = users.filter(u => u.role === 'user').length;
     
-    content += `RESUMO EXECUTIVO:\n`;
-    content += `Total de Usuários: ${totalUsers}\n`;
-    content += `Usuários Ativos: ${activeUsers}\n`;
-    content += `Usuários Inativos: ${totalUsers - activeUsers}\n`;
-    content += `Super Usuários: ${superUsers}\n`;
-    content += `Administradores: ${adminUsers}\n`;
-    content += `Gerentes: ${managerUsers}\n`;
-    content += `Usuários Regulares: ${regularUsers}\n\n`;
-
-    // Detalhamento de Usuários
-    content += `DETALHAMENTO DOS USUÁRIOS:\n`;
-    content += `-------------------------------------------\n`;
+    doc.setFontSize(14);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(0, 102, 204);
+    doc.text('RESUMO EXECUTIVO', margin, yPosition);
     
-    users.forEach(user => {
-      content += `\nUSUÁRIO: ${user.name}\n`;
-      content += `Email: ${user.email}\n`;
-      content += `Função: ${user.role === 'admin' ? 'Administrador' : user.role === 'manager' ? 'Gerente' : 'Usuário'}\n`;
-      content += `Status: ${user.isActive ? 'Ativo' : 'Inativo'}\n`;
-      content += `Super Usuário: ${user.isSuperUser ? 'Sim' : 'Não'}\n`;
-      content += `Criado em: ${user.createdAt ? new Date(user.createdAt).toLocaleDateString('pt-BR') : 'N/A'}\n`;
-      content += `-------------------------------------------\n`;
+    yPosition += 10;
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(0, 0, 0);
+    
+    const summaryText = [
+      `Total de Usuários: ${totalUsers}`,
+      `Usuários Ativos: ${activeUsers}`,
+      `Usuários Inativos: ${totalUsers - activeUsers}`,
+      `Super Usuários: ${superUsers}`,
+      `Administradores: ${adminUsers}`,
+      `Gerentes: ${managerUsers}`,
+      `Usuários Regulares: ${regularUsers}`
+    ];
+    
+    summaryText.forEach(text => {
+      if (yPosition > pageHeight - 30) {
+        doc.addPage();
+        yPosition = 20;
+      }
+      doc.text(text, margin, yPosition);
+      yPosition += 5;
+    });
+    
+    yPosition += 20;
+    
+    // Tabela de Usuários
+    if (yPosition > pageHeight - 100) {
+      doc.addPage();
+      yPosition = 20;
+    }
+    
+    const tableData = users.map(user => [
+      user.name,
+      user.email,
+      user.role === 'admin' ? 'Admin' : user.role === 'manager' ? 'Gerente' : 'Usuário',
+      user.isActive ? 'Ativo' : 'Inativo',
+      user.isSuperUser ? 'Sim' : 'Não',
+      user.createdAt ? new Date(user.createdAt).toLocaleDateString('pt-BR') : 'N/A'
+    ]);
+
+    (doc as any).autoTable({
+      head: [['Nome', 'Email', 'Função', 'Status', 'Super User', 'Criado em']],
+      body: tableData,
+      startY: yPosition,
+      theme: 'striped',
+      headStyles: { fillColor: [0, 102, 204], textColor: 255 },
+      styles: { fontSize: 8 },
+      columnStyles: {
+        0: { cellWidth: 35 },
+        1: { cellWidth: 50 },
+        2: { cellWidth: 20 },
+        3: { cellWidth: 20 },
+        4: { cellWidth: 20 },
+        5: { cellWidth: 25 }
+      }
     });
 
-    // Análise de Segurança
-    content += `\nANÁLISE DE SEGURANÇA:\n`;
-    content += `Distribuição de Permissões:\n`;
-    content += `• ${superUsers} usuários com privilégios de super administrador\n`;
-    content += `• ${adminUsers} usuários com privilégios administrativos\n`;
-    content += `• ${managerUsers} usuários com privilégios de gerenciamento\n`;
-    content += `• ${regularUsers} usuários regulares\n\n`;
-    content += `Taxa de Ativação: ${((activeUsers / totalUsers) * 100).toFixed(1)}%\n`;
-    content += `Usuários que precisam trocar senha: ${users.filter(u => u.mustChangePassword).length}\n\n`;
-
-    // Observações IA
-    const observations = await this.generateGeminiObservations({ users }, 'users');
-    content += `OBSERVAÇÕES E RECOMENDAÇÕES:\n`;
-    content += `${observations}\n`;
+    yPosition = (doc as any).lastAutoTable.finalY + 20;
     
-    return content;
+    // Observações IA
+    if (yPosition > pageHeight - 50) {
+      doc.addPage();
+      yPosition = 20;
+    }
+    
+    const observations = await this.generateGeminiObservations({ users }, 'users');
+    doc.setFontSize(14);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(0, 102, 204);
+    doc.text('OBSERVAÇÕES E RECOMENDAÇÕES', margin, yPosition);
+    
+    yPosition += 10;
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(0, 0, 0);
+    
+    const obsLines = doc.splitTextToSize(observations, doc.internal.pageSize.width - 2 * margin);
+    obsLines.forEach((line: string) => {
+      if (yPosition > pageHeight - 20) {
+        doc.addPage();
+        yPosition = 20;
+      }
+      doc.text(line, margin, yPosition);
+      yPosition += 5;
+    });
+    
+    return Buffer.from(doc.output('arraybuffer'));
   }
 
-  async generateFinancialReport(projects: Project[]): Promise<string> {
-    const date = new Date().toLocaleDateString('pt-BR');
-    let content = `BEACHPARK - TÔ SABENDO\n`;
-    content += `RELATÓRIO FINANCEIRO - ${date}\n`;
-    content += `===============================================\n\n`;
+  async generateFinancialReport(projects: Project[]): Promise<Buffer> {
+    const { jsPDF } = await createPDF();
+    const doc = new jsPDF();
+    
+    let yPosition = 20;
+    const pageHeight = doc.internal.pageSize.height;
+    const margin = 20;
+    
+    // Header
+    doc.setFontSize(20);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(0, 102, 204);
+    doc.text('BeachPark - Tô Sabendo', margin, yPosition);
+    
+    yPosition += 15;
+    doc.setFontSize(16);
+    doc.setTextColor(0, 0, 0);
+    doc.text('RELATÓRIO FINANCEIRO', margin, yPosition);
+    
+    yPosition += 10;
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`Gerado em: ${new Date().toLocaleString('pt-BR')}`, margin, yPosition);
+    
+    yPosition += 20;
     
     // Cálculos Financeiros
     const totalBudget = projects.reduce((sum, p) => sum + parseFloat(p.budget || '0'), 0);
@@ -294,41 +470,80 @@ export class PDFGenerator {
     const totalVariance = totalBudget - totalSpent;
     const budgetUtilization = totalBudget > 0 ? (totalSpent / totalBudget) * 100 : 0;
     
-    content += `RESUMO FINANCEIRO:\n`;
-    content += `Orçamento Total: R$ ${totalBudget.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}\n`;
-    content += `Gasto Total: R$ ${totalSpent.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}\n`;
-    content += `Variação Total: R$ ${totalVariance.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}\n`;
-    content += `Utilização do Orçamento: ${budgetUtilization.toFixed(1)}%\n`;
-    content += `Número de Projetos: ${projects.length}\n\n`;
-
-    // Análise por Projeto
-    content += `ANÁLISE POR PROJETO:\n`;
-    content += `-------------------------------------------\n`;
+    doc.setFontSize(14);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(0, 102, 204);
+    doc.text('RESUMO FINANCEIRO', margin, yPosition);
     
-    projects.forEach(project => {
+    yPosition += 10;
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(0, 0, 0);
+    
+    const summaryText = [
+      `Orçamento Total: R$ ${totalBudget.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
+      `Gasto Total: R$ ${totalSpent.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
+      `Variação Total: R$ ${totalVariance.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
+      `Utilização do Orçamento: ${budgetUtilization.toFixed(1)}%`,
+      `Número de Projetos: ${projects.length}`
+    ];
+    
+    summaryText.forEach(text => {
+      if (yPosition > pageHeight - 30) {
+        doc.addPage();
+        yPosition = 20;
+      }
+      doc.text(text, margin, yPosition);
+      yPosition += 5;
+    });
+    
+    yPosition += 20;
+    
+    // Tabela Financeira
+    if (yPosition > pageHeight - 100) {
+      doc.addPage();
+      yPosition = 20;
+    }
+    
+    const tableData = projects.map(project => {
       const budget = parseFloat(project.budget || '0');
       const spent = parseFloat(project.actualCost || '0');
       const variance = budget - spent;
       const utilizationPercent = budget > 0 ? (spent / budget) * 100 : 0;
       
-      content += `\nPROJETO: ${project.name}\n`;
-      content += `Orçamento: R$ ${budget.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}\n`;
-      content += `Gasto: R$ ${spent.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}\n`;
-      content += `Variação: R$ ${variance.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}\n`;
-      content += `Utilização: ${utilizationPercent.toFixed(1)}%\n`;
-      content += `-------------------------------------------\n`;
+      return [
+        project.name,
+        `R$ ${budget.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
+        `R$ ${spent.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
+        `R$ ${variance.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
+        `${utilizationPercent.toFixed(1)}%`
+      ];
     });
 
-    // Análise de Performance
-    const overBudgetProjects = projects.filter(p => parseFloat(p.actualCost || '0') > parseFloat(p.budget || '0'));
-    const underBudgetProjects = projects.filter(p => parseFloat(p.actualCost || '0') < parseFloat(p.budget || '0'));
-    
-    content += `\nANÁLISE DE PERFORMANCE:\n`;
-    content += `Projetos Acima do Orçamento: ${overBudgetProjects.length}\n`;
-    content += `Projetos Abaixo do Orçamento: ${underBudgetProjects.length}\n`;
-    content += `Projetos no Orçamento: ${projects.length - overBudgetProjects.length - underBudgetProjects.length}\n\n`;
+    (doc as any).autoTable({
+      head: [['Projeto', 'Orçamento', 'Gasto', 'Variação', 'Utilização']],
+      body: tableData,
+      startY: yPosition,
+      theme: 'striped',
+      headStyles: { fillColor: [0, 102, 204], textColor: 255 },
+      styles: { fontSize: 8 },
+      columnStyles: {
+        0: { cellWidth: 50 },
+        1: { cellWidth: 30 },
+        2: { cellWidth: 30 },
+        3: { cellWidth: 30 },
+        4: { cellWidth: 25 }
+      }
+    });
 
+    yPosition = (doc as any).lastAutoTable.finalY + 20;
+    
     // Observações IA
+    if (yPosition > pageHeight - 50) {
+      doc.addPage();
+      yPosition = 20;
+    }
+    
     const observations = await this.generateGeminiObservations({ 
       projects, 
       totalBudget, 
@@ -336,17 +551,54 @@ export class PDFGenerator {
       totalVariance, 
       budgetUtilization 
     }, 'financial');
-    content += `OBSERVAÇÕES E RECOMENDAÇÕES:\n`;
-    content += `${observations}\n`;
+    doc.setFontSize(14);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(0, 102, 204);
+    doc.text('OBSERVAÇÕES E RECOMENDAÇÕES', margin, yPosition);
     
-    return content;
+    yPosition += 10;
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(0, 0, 0);
+    
+    const obsLines = doc.splitTextToSize(observations, doc.internal.pageSize.width - 2 * margin);
+    obsLines.forEach((line: string) => {
+      if (yPosition > pageHeight - 20) {
+        doc.addPage();
+        yPosition = 20;
+      }
+      doc.text(line, margin, yPosition);
+      yPosition += 5;
+    });
+    
+    return Buffer.from(doc.output('arraybuffer'));
   }
 
-  async generateGeneralReport(users: User[], projects: Project[]): Promise<string> {
-    const date = new Date().toLocaleDateString('pt-BR');
-    let content = `BEACHPARK - TÔ SABENDO\n`;
-    content += `RELATÓRIO EXECUTIVO GERAL - ${date}\n`;
-    content += `===============================================\n\n`;
+  async generateGeneralReport(users: User[], projects: Project[]): Promise<Buffer> {
+    const { jsPDF } = await createPDF();
+    const doc = new jsPDF();
+    
+    let yPosition = 20;
+    const pageHeight = doc.internal.pageSize.height;
+    const margin = 20;
+    
+    // Header
+    doc.setFontSize(20);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(0, 102, 204);
+    doc.text('BeachPark - Tô Sabendo', margin, yPosition);
+    
+    yPosition += 15;
+    doc.setFontSize(16);
+    doc.setTextColor(0, 0, 0);
+    doc.text('RELATÓRIO EXECUTIVO GERAL', margin, yPosition);
+    
+    yPosition += 10;
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`Gerado em: ${new Date().toLocaleString('pt-BR')}`, margin, yPosition);
+    
+    yPosition += 20;
     
     // KPIs Gerais
     const totalUsers = users.length;
@@ -357,47 +609,84 @@ export class PDFGenerator {
     const totalBudget = projects.reduce((sum, p) => sum + parseFloat(p.budget || '0'), 0);
     const totalSpent = projects.reduce((sum, p) => sum + parseFloat(p.actualCost || '0'), 0);
     
-    content += `INDICADORES PRINCIPAIS:\n`;
-    content += `USUÁRIOS:\n`;
-    content += `• Total: ${totalUsers}\n`;
-    content += `• Ativos: ${activeUsers} (${((activeUsers / totalUsers) * 100).toFixed(1)}%)\n`;
-    content += `• Super Usuários: ${users.filter(u => u.isSuperUser).length}\n\n`;
-    content += `PROJETOS:\n`;
-    content += `• Total: ${totalProjects}\n`;
-    content += `• Ativos: ${activeProjects}\n`;
-    content += `• Concluídos: ${completedProjects}\n`;
-    content += `• Taxa de Conclusão: ${totalProjects > 0 ? ((completedProjects / totalProjects) * 100).toFixed(1) : 0}%\n\n`;
-    content += `FINANCEIRO:\n`;
-    content += `• Orçamento Total: R$ ${totalBudget.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}\n`;
-    content += `• Gasto Total: R$ ${totalSpent.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}\n`;
-    content += `• Economia/Excesso: R$ ${(totalBudget - totalSpent).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}\n`;
-    content += `• Eficiência Orçamentária: ${totalBudget > 0 ? ((totalSpent / totalBudget) * 100).toFixed(1) : 0}%\n\n`;
-
+    doc.setFontSize(14);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(0, 102, 204);
+    doc.text('INDICADORES PRINCIPAIS', margin, yPosition);
+    
+    yPosition += 10;
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(0, 0, 0);
+    
+    const kpiText = [
+      'USUÁRIOS:',
+      `• Total: ${totalUsers}`,
+      `• Ativos: ${activeUsers} (${((activeUsers / totalUsers) * 100).toFixed(1)}%)`,
+      `• Super Usuários: ${users.filter(u => u.isSuperUser).length}`,
+      '',
+      'PROJETOS:',
+      `• Total: ${totalProjects}`,
+      `• Ativos: ${activeProjects}`,
+      `• Concluídos: ${completedProjects}`,
+      `• Taxa de Conclusão: ${totalProjects > 0 ? ((completedProjects / totalProjects) * 100).toFixed(1) : 0}%`,
+      '',
+      'FINANCEIRO:',
+      `• Orçamento Total: R$ ${totalBudget.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
+      `• Gasto Total: R$ ${totalSpent.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
+      `• Economia/Excesso: R$ ${(totalBudget - totalSpent).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
+      `• Eficiência Orçamentária: ${totalBudget > 0 ? ((totalSpent / totalBudget) * 100).toFixed(1) : 0}%`
+    ];
+    
+    kpiText.forEach(text => {
+      if (yPosition > pageHeight - 30) {
+        doc.addPage();
+        yPosition = 20;
+      }
+      doc.text(text, margin, yPosition);
+      yPosition += 5;
+    });
+    
+    yPosition += 20;
+    
     // Status dos Projetos
     const statusCounts = projects.reduce((acc, project) => {
       acc[project.status] = (acc[project.status] || 0) + 1;
       return acc;
     }, {} as Record<string, number>);
 
-    content += `DISTRIBUIÇÃO DE STATUS DOS PROJETOS:\n`;
+    if (yPosition > pageHeight - 50) {
+      doc.addPage();
+      yPosition = 20;
+    }
+    
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(0, 102, 204);
+    doc.text('STATUS DOS PROJETOS', margin, yPosition);
+    
+    yPosition += 10;
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(0, 0, 0);
+    
     Object.entries(statusCounts).forEach(([status, count]) => {
-      content += `${status}: ${count} projetos\n`;
+      if (yPosition > pageHeight - 20) {
+        doc.addPage();
+        yPosition = 20;
+      }
+      doc.text(`${status}: ${count} projetos`, margin, yPosition);
+      yPosition += 5;
     });
-
-    // Funções dos Usuários
-    const roleCounts = users.reduce((acc, user) => {
-      const roleLabel = user.role === 'admin' ? 'Administrador' : 
-                       user.role === 'manager' ? 'Gerente' : 'Usuário';
-      acc[roleLabel] = (acc[roleLabel] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
-
-    content += `\nDISTRIBUIÇÃO DE FUNÇÕES:\n`;
-    Object.entries(roleCounts).forEach(([role, count]) => {
-      content += `${role}: ${count} usuários\n`;
-    });
-
+    
+    yPosition += 15;
+    
     // Observações IA
+    if (yPosition > pageHeight - 50) {
+      doc.addPage();
+      yPosition = 20;
+    }
+    
     const observations = await this.generateGeminiObservations({ 
       users, 
       projects, 
@@ -409,9 +698,26 @@ export class PDFGenerator {
       totalBudget, 
       totalSpent 
     }, 'general');
-    content += `\nOBSERVAÇÕES E RECOMENDAÇÕES EXECUTIVAS:\n`;
-    content += `${observations}\n`;
+    doc.setFontSize(14);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(0, 102, 204);
+    doc.text('OBSERVAÇÕES E RECOMENDAÇÕES EXECUTIVAS', margin, yPosition);
     
-    return content;
+    yPosition += 10;
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(0, 0, 0);
+    
+    const obsLines = doc.splitTextToSize(observations, doc.internal.pageSize.width - 2 * margin);
+    obsLines.forEach((line: string) => {
+      if (yPosition > pageHeight - 20) {
+        doc.addPage();
+        yPosition = 20;
+      }
+      doc.text(line, margin, yPosition);
+      yPosition += 5;
+    });
+    
+    return Buffer.from(doc.output('arraybuffer'));
   }
 }

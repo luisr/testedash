@@ -466,8 +466,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const generator = new PDFGenerator();
       const reportContent = await generator.generateProjectsReport(projects);
       
-      res.setHeader('Content-Type', 'text/plain; charset=utf-8');
-      res.setHeader('Content-Disposition', 'attachment; filename="relatorio-projetos.txt"');
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', 'attachment; filename="relatorio-projetos.pdf"');
       res.send(reportContent);
     } catch (error) {
       console.error("Error generating projects report:", error);
@@ -482,8 +482,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const generator = new PDFGenerator();
       const reportContent = await generator.generateUsersReport(users);
       
-      res.setHeader('Content-Type', 'text/plain; charset=utf-8');
-      res.setHeader('Content-Disposition', 'attachment; filename="relatorio-usuarios.txt"');
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', 'attachment; filename="relatorio-usuarios.pdf"');
       res.send(reportContent);
     } catch (error) {
       console.error("Error generating users report:", error);
@@ -498,8 +498,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const generator = new PDFGenerator();
       const reportContent = await generator.generateFinancialReport(projects);
       
-      res.setHeader('Content-Type', 'text/plain; charset=utf-8');
-      res.setHeader('Content-Disposition', 'attachment; filename="relatorio-financeiro.txt"');
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', 'attachment; filename="relatorio-financeiro.pdf"');
       res.send(reportContent);
     } catch (error) {
       console.error("Error generating financial report:", error);
@@ -515,8 +515,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const generator = new PDFGenerator();
       const reportContent = await generator.generateGeneralReport(users, projects);
       
-      res.setHeader('Content-Type', 'text/plain; charset=utf-8');
-      res.setHeader('Content-Disposition', 'attachment; filename="relatorio-geral.txt"');
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', 'attachment; filename="relatorio-geral.pdf"');
       res.send(reportContent);
     } catch (error) {
       console.error("Error generating general report:", error);

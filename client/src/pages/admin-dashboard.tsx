@@ -95,7 +95,7 @@ export default function AdminDashboard() {
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `relatorio-${type}.txt`;
+      a.download = `relatorio-${type}.pdf`;
       a.click();
       URL.revokeObjectURL(url);
     } catch (error) {
@@ -594,7 +594,7 @@ export default function AdminDashboard() {
                 <CardContent>
                   <Button variant="outline" className="w-full" onClick={() => generateReport('projects')}>
                     <Download className="w-4 h-4 mr-2" />
-                    Baixar Relatório
+                    Baixar PDF
                   </Button>
                 </CardContent>
               </Card>
@@ -610,7 +610,7 @@ export default function AdminDashboard() {
                 <CardContent>
                   <Button variant="outline" className="w-full" onClick={() => generateReport('users')}>
                     <Download className="w-4 h-4 mr-2" />
-                    Baixar Relatório
+                    Baixar PDF
                   </Button>
                 </CardContent>
               </Card>
@@ -626,7 +626,7 @@ export default function AdminDashboard() {
                 <CardContent>
                   <Button variant="outline" className="w-full" onClick={() => generateReport('financial')}>
                     <Download className="w-4 h-4 mr-2" />
-                    Baixar Relatório
+                    Baixar PDF
                   </Button>
                 </CardContent>
               </Card>
