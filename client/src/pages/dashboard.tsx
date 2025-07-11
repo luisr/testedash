@@ -308,25 +308,25 @@ export default function Dashboard() {
             customCharts={customCharts}
           />
           
-          <ActivitiesPanel 
+          <ActivityTable 
             activities={metrics.filteredActivities}
-            dashboardId={dashboardId}
+            customColumns={customColumns}
             searchTerm={searchTerm}
             onSearchChange={setSearchTerm}
-            onNewActivity={() => setNewActivityModalOpen(true)}
-            onUpdateActivity={updateActivity}
-            onDeleteActivity={deleteActivity}
-            onEditActivity={(activity) => {
-              // TODO: Implement edit activity modal
-              console.log('Edit activity:', activity);
-            }}
-            onCreateSubActivity={(parentId) => {
-              // TODO: Implement create sub-activity modal with parent ID
-              console.log('Create sub-activity for parent:', parentId);
-              setNewActivityModalOpen(true);
-            }}
-            onBulkImport={handleBulkImport}
-            customColumns={customColumns}
+            filterStatus={filterStatus}
+            onFilterStatusChange={setFilterStatus}
+            filterResponsible={filterResponsible}
+            onFilterResponsibleChange={setFilterResponsible}
+            startDate={startDate}
+            onStartDateChange={setStartDate}
+            endDate={endDate}
+            onEndDateChange={setEndDate}
+            onActivityUpdate={updateActivity}
+            onActivityDelete={deleteActivity}
+            onActivitiesImport={handleBulkImport}
+            onCustomColumnsUpdate={() => window.location.reload()}
+            onExport={handleExport}
+            dashboardId={dashboardId}
           />
         </main>
       </div>

@@ -19,8 +19,12 @@ import {
   Settings, 
   Edit2, 
   Eye, 
-  Trash2 
+  Trash2,
+  GripVertical,
+  ChevronRight,
+  ChevronDown
 } from "lucide-react";
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { Activity } from "@shared/schema";
 import TableConfigModal from "./table-config-modal";
 import EditActivityModal from "./edit-activity-modal";
@@ -44,6 +48,11 @@ interface ActivityTableProps {
   onCustomColumnsUpdate: () => void;
   onExport: (options: any) => void;
   dashboardId: number;
+}
+
+interface ActivityWithChildren extends Activity {
+  children?: ActivityWithChildren[];
+  level?: number;
 }
 
 export default function ActivityTable({ 
@@ -70,11 +79,8 @@ export default function ActivityTable({
   const [configModalOpen, setConfigModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null);
+  const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set());
   const itemsPerPage = 10;
-  
-  const totalPages = Math.ceil(activities.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const currentActivities = activities.slice(startIndex, startIndex + itemsPerPage);
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -104,6 +110,106 @@ export default function ActivityTable({
     const actualCost = parseFloat(activity.actualCost || "0");
     return actualCost > 0 ? (earnedValue / actualCost).toFixed(2) : "0.00";
   };
+
+  // Função para criar estrutura hierárquica
+  const buildHierarchy = (activities: Activity[]): ActivityWithChildren[] => {
+    const activityMap = new Map<number, ActivityWithChildren>();
+    const rootActivities: ActivityWithChildren[] = [];
+
+    // Criar mapa de atividades
+    activities.forEach(activity => {
+      activityMap.set(activity.id, {
+        ...activity,
+        children: [],
+        level: 0
+      });
+    });
+
+    // Construir hierarquia
+    activities.forEach(activity => {
+      const activityWithChildren = activityMap.get(activity.id);
+      if (activityWithChildren) {
+        if (activity.parentActivityId) {
+          const parent = activityMap.get(activity.parentActivityId);
+          if (parent) {
+            activityWithChildren.level = (parent.level || 0) + 1;
+            parent.children = parent.children || [];
+            parent.children.push(activityWithChildren);
+          }
+        } else {
+          rootActivities.push(activityWithChildren);
+        }
+      }
+    });
+
+    return rootActivities;
+  };
+
+  // Função para achatar hierarquia em lista para exibição
+  const flattenHierarchy = (activities: ActivityWithChildren[]): ActivityWithChildren[] => {
+    const result: ActivityWithChildren[] = [];
+    
+    const addToResult = (activity: ActivityWithChildren) => {
+      result.push(activity);
+      if (expandedRows.has(activity.id) && activity.children && activity.children.length > 0) {
+        activity.children.forEach(child => addToResult(child));
+      }
+    };
+
+    activities.forEach(activity => addToResult(activity));
+    return result;
+  };
+
+  // Handler para drag and drop
+  const handleDragEnd = (result: any) => {
+    const { destination, source, draggableId } = result;
+    
+    if (!destination) return;
+
+    const activityId = parseInt(draggableId);
+    const sourceIndex = source.index;
+    const destIndex = destination.index;
+
+    // Se for o mesmo lugar, não fazer nada
+    if (sourceIndex === destIndex) return;
+
+    // Lógica para determinar novo parent baseado na posição
+    const flatActivities = flattenHierarchy(buildHierarchy(activities));
+    const targetActivity = flatActivities[destIndex];
+    
+    if (targetActivity && destIndex > sourceIndex) {
+      // Arrastou para baixo - tornar subatividade
+      onActivityUpdate(activityId, {
+        parentActivityId: targetActivity.id,
+        sortOrder: 0
+      });
+    } else if (targetActivity && destIndex < sourceIndex) {
+      // Arrastou para cima - pode ser subatividade ou atividade principal
+      const parentId = targetActivity.parentActivityId || null;
+      onActivityUpdate(activityId, {
+        parentActivityId: parentId,
+        sortOrder: targetActivity.sortOrder ? targetActivity.sortOrder + 1 : 1
+      });
+    }
+  };
+
+  // Função para alternar expansão de linha
+  const toggleExpanded = (activityId: number) => {
+    const newExpanded = new Set(expandedRows);
+    if (newExpanded.has(activityId)) {
+      newExpanded.delete(activityId);
+    } else {
+      newExpanded.add(activityId);
+    }
+    setExpandedRows(newExpanded);
+  };
+
+  // Processar atividades com hierarquia
+  const hierarchicalActivities = buildHierarchy(activities);
+  const flatActivities = flattenHierarchy(hierarchicalActivities);
+  const totalPages = Math.ceil(flatActivities.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const currentActivities = flatActivities.slice(startIndex, startIndex + itemsPerPage);
 
   return (
     <Card className="table-container shadow-elegant animate-fade-in">
@@ -139,129 +245,176 @@ export default function ActivityTable({
       
       <CardContent className="p-0">
         <div className="overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow className="bg-muted/50">
-                <TableHead className="font-medium text-muted-foreground">
-                  Atividade
-                </TableHead>
-                <TableHead className="font-medium text-muted-foreground">
-                  Disciplina
-                </TableHead>
-                <TableHead className="font-medium text-muted-foreground">
-                  Responsável
-                </TableHead>
-                <TableHead className="font-medium text-muted-foreground">
-                  Status
-                </TableHead>
-                <TableHead className="font-medium text-muted-foreground">
-                  Progresso
-                </TableHead>
-                <TableHead className="font-medium text-muted-foreground">
-                  SPI
-                </TableHead>
-                <TableHead className="font-medium text-muted-foreground">
-                  CPI
-                </TableHead>
-                <TableHead className="font-medium text-muted-foreground">
-                  Ações
-                </TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {currentActivities.map((activity) => (
-                <TableRow key={activity.id} className="table-row hover:bg-table-row-hover transition-colors">
-                  <TableCell>
-                    <div>
-                      <div className="font-medium text-foreground">
-                        {activity.name}
-                      </div>
-                      <div className="text-sm text-muted-foreground">
-                        Projeto {activity.projectId}
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-foreground">
-                    {activity.discipline}
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center">
-                      <Avatar className="w-8 h-8">
-                        <AvatarImage src={`https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face`} />
-                        <AvatarFallback>
-                          {activity.responsible.split(' ').map(n => n[0]).join('')}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="ml-3">
-                        <div className="text-sm font-medium text-foreground">
-                          {activity.responsible}
-                        </div>
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    {getStatusBadge(activity.status)}
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center">
-                      <Progress 
-                        value={parseFloat(activity.completionPercentage || "0")} 
-                        className="w-16 mr-2"
-                      />
-                      <span className="text-sm text-foreground">
-                        {activity.completionPercentage}%
-                      </span>
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-foreground">
-                    {calculateSPI(activity)}
-                  </TableCell>
-                  <TableCell className="text-foreground">
-                    {calculateCPI(activity)}
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center space-x-1">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="text-primary hover:text-primary/80 hover-lift focus-ring h-8 w-8"
-                        onClick={() => {
-                          setSelectedActivity(activity);
-                          setEditModalOpen(true);
-                        }}
-                      >
-                        <Edit2 className="w-4 h-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="text-muted-foreground hover:text-foreground hover-lift focus-ring h-8 w-8"
-                      >
-                        <Eye className="w-4 h-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="text-destructive hover:text-destructive/80 hover-lift focus-ring h-8 w-8"
-                        onClick={() => onActivityDelete(activity.id)}
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </TableCell>
+          <DragDropContext onDragEnd={handleDragEnd}>
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-muted/50">
+                  <TableHead className="font-medium text-muted-foreground w-8">
+                    {/* Drag handle column */}
+                  </TableHead>
+                  <TableHead className="font-medium text-muted-foreground">
+                    Atividade
+                  </TableHead>
+                  <TableHead className="font-medium text-muted-foreground">
+                    Disciplina
+                  </TableHead>
+                  <TableHead className="font-medium text-muted-foreground">
+                    Responsável
+                  </TableHead>
+                  <TableHead className="font-medium text-muted-foreground">
+                    Status
+                  </TableHead>
+                  <TableHead className="font-medium text-muted-foreground">
+                    Progresso
+                  </TableHead>
+                  <TableHead className="font-medium text-muted-foreground">
+                    SPI
+                  </TableHead>
+                  <TableHead className="font-medium text-muted-foreground">
+                    CPI
+                  </TableHead>
+                  <TableHead className="font-medium text-muted-foreground">
+                    Ações
+                  </TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <Droppable droppableId="activities-table">
+                {(provided) => (
+                  <TableBody {...provided.droppableProps} ref={provided.innerRef}>
+                    {currentActivities.map((activity, index) => (
+                      <Draggable key={activity.id} draggableId={activity.id.toString()} index={index}>
+                        {(provided, snapshot) => (
+                          <TableRow 
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                            key={activity.id} 
+                            className={`table-row hover:bg-table-row-hover transition-colors ${
+                              snapshot.isDragging ? 'bg-blue-50 shadow-lg' : ''
+                            }`}
+                            style={{
+                              ...provided.draggableProps.style,
+                            }}
+                          >
+                            <TableCell>
+                              <div className="flex items-center">
+                                <div {...provided.dragHandleProps}>
+                                  <GripVertical className="w-4 h-4 text-muted-foreground cursor-grab" />
+                                </div>
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex items-center">
+                                <div style={{ marginLeft: `${(activity.level || 0) * 20}px` }}>
+                                  {activity.children && activity.children.length > 0 && (
+                                    <button
+                                      onClick={() => toggleExpanded(activity.id)}
+                                      className="mr-2 p-1 hover:bg-gray-100 rounded"
+                                    >
+                                      {expandedRows.has(activity.id) ? (
+                                        <ChevronDown className="w-4 h-4" />
+                                      ) : (
+                                        <ChevronRight className="w-4 h-4" />
+                                      )}
+                                    </button>
+                                  )}
+                                  <div>
+                                    <div className="font-medium text-foreground">
+                                      {activity.name}
+                                    </div>
+                                    <div className="text-sm text-muted-foreground">
+                                      Projeto {activity.projectId}
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </TableCell>
+                            <TableCell className="text-foreground">
+                              {activity.discipline}
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex items-center">
+                                <Avatar className="w-8 h-8">
+                                  <AvatarImage src={`https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face`} />
+                                  <AvatarFallback>
+                                    {activity.responsible.split(' ').map(n => n[0]).join('')}
+                                  </AvatarFallback>
+                                </Avatar>
+                                <div className="ml-3">
+                                  <div className="text-sm font-medium text-foreground">
+                                    {activity.responsible}
+                                  </div>
+                                </div>
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              {getStatusBadge(activity.status)}
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex items-center">
+                                <Progress 
+                                  value={parseFloat(activity.completionPercentage || "0")} 
+                                  className="w-16 mr-2"
+                                />
+                                <span className="text-sm text-foreground">
+                                  {activity.completionPercentage}%
+                                </span>
+                              </div>
+                            </TableCell>
+                            <TableCell className="text-foreground">
+                              {calculateSPI(activity)}
+                            </TableCell>
+                            <TableCell className="text-foreground">
+                              {calculateCPI(activity)}
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex items-center space-x-1">
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="text-primary hover:text-primary/80 hover-lift focus-ring h-8 w-8"
+                                  onClick={() => {
+                                    setSelectedActivity(activity);
+                                    setEditModalOpen(true);
+                                  }}
+                                >
+                                  <Edit2 className="w-4 h-4" />
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="text-muted-foreground hover:text-foreground hover-lift focus-ring h-8 w-8"
+                                >
+                                  <Eye className="w-4 h-4" />
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="text-destructive hover:text-destructive/80 hover-lift focus-ring h-8 w-8"
+                                  onClick={() => onActivityDelete(activity.id)}
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </Button>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        )}
+                      </Draggable>
+                    ))}
+                    {provided.placeholder}
+                  </TableBody>
+                )}
+              </Droppable>
+            </Table>
+          </DragDropContext>
         </div>
         
         <div className="px-6 py-4 border-t border-border flex items-center justify-between">
           <div className="text-sm text-muted-foreground">
             Mostrando <span className="font-medium">{startIndex + 1}</span> a{" "}
             <span className="font-medium">
-              {Math.min(startIndex + itemsPerPage, activities.length)}
+              {Math.min(startIndex + itemsPerPage, flatActivities.length)}
             </span> de{" "}
-            <span className="font-medium">{activities.length}</span> resultados
+            <span className="font-medium">{flatActivities.length}</span> resultados
           </div>
           <nav className="flex items-center space-x-2">
             <Button
