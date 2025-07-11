@@ -401,14 +401,14 @@ export default function TableConfigModal({
                           <div key={header} className="space-y-1">
                             <Label className="text-xs">{header}</Label>
                             <Select 
-                              value={importMapping[header] || ''}
-                              onValueChange={(value) => setImportMapping({...importMapping, [header]: value})}
+                              value={importMapping[header] || '__new__'}
+                              onValueChange={(value) => setImportMapping({...importMapping, [header]: value === '__new__' ? '' : value})}
                             >
                               <SelectTrigger>
                                 <SelectValue placeholder="Selecione uma coluna" />
                               </SelectTrigger>
                               <SelectContent>
-                                <SelectItem value="">Criar nova coluna</SelectItem>
+                                <SelectItem value="__new__">Criar nova coluna</SelectItem>
                                 {standardColumns.map(col => (
                                   <SelectItem key={col.key} value={col.key}>
                                     {col.label}
