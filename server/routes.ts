@@ -6,7 +6,7 @@ import {
   insertDashboardShareSchema, insertActivityLogSchema, insertCustomColumnSchema, insertCustomChartSchema,
   insertNotificationSchema, insertNotificationPreferencesSchema, insertDashboardBackupSchema,
   insertDashboardVersionSchema, insertBackupScheduleSchema, insertActivityDependencySchema, insertActivityConstraintSchema,
-  insertDateChangesAuditSchema
+  insertDateChangesAuditSchema, insertCustomKPISchema
 } from "@shared/schema";
 import { recalculateDashboardSchedule } from "./dependency-scheduler";
 import { z } from "zod";
@@ -222,12 +222,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/activities", async (req, res) => {
     try {
-      const activityData = insertActivitySchema.parse(req.body);
-      const activity = await storage.createActivity(activityData);
+      // Handle date string conversion for activities
+      const activityData = {
+        ...req.body,
+        plannedStartDate: req.body.plannedStartDate ? new Date(req.body.plannedStartDate) : null,
+        plannedEndDate: req.body.plannedEndDate ? new Date(req.body.plannedEndDate) : null,
+        actualStartDate: req.body.actualStartDate ? new Date(req.body.actualStartDate) : null,
+        actualEndDate: req.body.actualEndDate ? new Date(req.body.actualEndDate) : null,
+        baselineStartDate: req.body.baselineStartDate ? new Date(req.body.baselineStartDate) : null,
+        baselineEndDate: req.body.baselineEndDate ? new Date(req.body.baselineEndDate) : null,
+      };
+      
+      const validatedData = insertActivitySchema.parse(activityData);
+      const activity = await storage.createActivity(validatedData);
       
       // Log the activity creation
       await storage.createActivityLog({
-        dashboardId: activityData.dashboardId!,
+        dashboardId: validatedData.dashboardId!,
         userId: 1, // TODO: Get from authenticated user
         action: "create",
         entityType: "activity",
@@ -237,6 +248,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       res.status(201).json(activity);
     } catch (error) {
+      console.error("Error creating activity:", error);
       if (error instanceof z.ZodError) {
         return res.status(400).json({ message: "Invalid input", errors: error.errors });
       }
@@ -256,10 +268,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       for (const activityData of activities) {
         try {
-          const parsedActivity = insertActivitySchema.parse({
+          // Handle date string conversion for import
+          const processedActivity = {
             ...activityData,
-            dashboardId: dashboardId
-          });
+            dashboardId: dashboardId,
+            plannedStartDate: activityData.plannedStartDate ? new Date(activityData.plannedStartDate) : null,
+            plannedEndDate: activityData.plannedEndDate ? new Date(activityData.plannedEndDate) : null,
+            actualStartDate: activityData.actualStartDate ? new Date(activityData.actualStartDate) : null,
+            actualEndDate: activityData.actualEndDate ? new Date(activityData.actualEndDate) : null,
+            baselineStartDate: activityData.baselineStartDate ? new Date(activityData.baselineStartDate) : null,
+            baselineEndDate: activityData.baselineEndDate ? new Date(activityData.baselineEndDate) : null,
+          };
+          
+          const parsedActivity = insertActivitySchema.parse(processedActivity);
           const activity = await storage.createActivity(parsedActivity);
           createdActivities.push(activity);
           
@@ -1319,11 +1340,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/custom-kpis", async (req, res) => {
     try {
-      const kpiData = req.body;
+      const kpiData = insertCustomKPISchema.parse(req.body);
       const kpi = await storage.createCustomKPI(kpiData);
-      res.json(kpi);
+      res.status(201).json(kpi);
     } catch (error) {
       console.error("Error creating custom KPI:", error);
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid input", errors: error.errors });
+      }
       res.status(500).json({ error: "Failed to create custom KPI" });
     }
   });

@@ -249,7 +249,7 @@ export default function CustomKPIManager({ dashboardId, activities, projects, on
     }
 
     const kpi: CustomKPI = {
-      id: `kpi_${Date.now()}`,
+      // Don't set ID - let the database generate it
       name: newKPI.name!,
       description: newKPI.description,
       dataSource: newKPI.dataSource!,
