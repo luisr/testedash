@@ -1,5 +1,9 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { Folder, TrendingDown, TrendingUp, CheckCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Folder, TrendingDown, TrendingUp, CheckCircle, Plus, Settings2 } from "lucide-react";
+import CustomKPIManager from "./custom-kpi-manager";
+import { useState } from "react";
 
 interface KPICardsProps {
   metrics: {
@@ -11,9 +15,14 @@ interface KPICardsProps {
     totalPlannedCost: number;
     totalRealCost: number;
   };
+  dashboardId: number;
+  activities: any[];
+  projects: any[];
+  onKPIUpdate: () => void;
 }
 
-export default function KPICards({ metrics }: KPICardsProps) {
+export default function KPICards({ metrics, dashboardId, activities, projects, onKPIUpdate }: KPICardsProps) {
+  const [isKPIManagerOpen, setIsKPIManagerOpen] = useState(false);
   const kpis = [
     {
       title: "Projetos Ativos",
@@ -58,7 +67,37 @@ export default function KPICards({ metrics }: KPICardsProps) {
   ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 animate-fade-in">
+    <div className="space-y-6 animate-fade-in">
+      <div className="flex items-center justify-between">
+        <h2 className="text-xl font-semibold text-foreground">KPIs do Dashboard</h2>
+        <Dialog open={isKPIManagerOpen} onOpenChange={setIsKPIManagerOpen}>
+          <DialogTrigger asChild>
+            <Button variant="outline" className="flex items-center gap-2">
+              <Plus className="w-4 h-4" />
+              Criar KPI
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <Settings2 className="w-5 h-5 text-primary" />
+                Gerenciar KPIs
+              </DialogTitle>
+            </DialogHeader>
+            <CustomKPIManager
+              dashboardId={dashboardId}
+              activities={activities}
+              projects={projects}
+              onKPIUpdate={() => {
+                setIsKPIManagerOpen(false);
+                onKPIUpdate();
+              }}
+            />
+          </DialogContent>
+        </Dialog>
+      </div>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
       {kpis.map((kpi, index) => (
         <Card key={index} className="kpi-card hover-lift shadow-elegant group">
           <CardContent className="p-6">
@@ -92,6 +131,7 @@ export default function KPICards({ metrics }: KPICardsProps) {
           </CardContent>
         </Card>
       ))}
+      </div>
     </div>
   );
 }

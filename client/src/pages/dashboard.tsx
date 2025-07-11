@@ -11,7 +11,7 @@ import ActivityTable from "@/components/dashboard/activity-table";
 import ActivitiesPanel from "@/components/dashboard/activities-panel";
 import ProjectViews from "@/components/dashboard/project-views";
 import BackupManagement from "@/components/dashboard/backup-management";
-import DashboardCustomization from "@/components/dashboard/dashboard-customization";
+
 import ShareModalEnhanced from "@/components/dashboard/share-modal-enhanced";
 import ActivityLogPanel from "@/components/dashboard/activity-log-panel";
 import ExportModal from "@/components/dashboard/export-modal";
@@ -306,11 +306,21 @@ export default function Dashboard() {
             </div>
           </div>
 
-          <KPICards metrics={metrics} />
+          <KPICards 
+            metrics={metrics} 
+            dashboardId={dashboardId}
+            activities={activities}
+            projects={projects}
+            onKPIUpdate={() => setRefreshTrigger(Date.now())}
+          />
           
           <ChartsSection 
             metrics={metrics}
             customCharts={customCharts}
+            dashboardId={dashboardId}
+            activities={activities}
+            projects={projects}
+            onChartsUpdate={() => setRefreshTrigger(Date.now())}
           />
           
           <ActivityTable 
@@ -346,12 +356,7 @@ export default function Dashboard() {
             userId={1}
           />
           
-          <DashboardCustomization
-            dashboardId={dashboardId}
-            activities={activities}
-            projects={projects}
-            onCustomizationUpdate={() => window.location.reload()}
-          />
+
         </main>
       </div>
 

@@ -21,11 +21,13 @@ import {
   Plus,
   Trash2,
   Eye,
-  EyeOff
+  EyeOff,
+  Palette
 } from "lucide-react";
 import { CustomColumn } from "@shared/schema";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import CustomStatusManager from "./custom-status-manager";
 
 interface TableConfigModalProps {
   isOpen: boolean;
@@ -356,7 +358,7 @@ export default function TableConfigModal({
         </DialogHeader>
         
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="columns" className="flex items-center gap-2">
               <Columns className="h-4 w-4" />
               Colunas
@@ -372,6 +374,10 @@ export default function TableConfigModal({
             <TabsTrigger value="export" className="flex items-center gap-2">
               <Download className="h-4 w-4" />
               Exportar
+            </TabsTrigger>
+            <TabsTrigger value="custom-status" className="flex items-center gap-2">
+              <Palette className="h-4 w-4" />
+              Status Personalizados
             </TabsTrigger>
           </TabsList>
           
@@ -725,6 +731,19 @@ export default function TableConfigModal({
                 </Button>
               </CardContent>
             </Card>
+          </TabsContent>
+          
+          <TabsContent value="custom-status" className="space-y-4">
+            <CustomStatusManager
+              dashboardId={dashboardId}
+              onStatusUpdate={() => {
+                // Refresh the parent component if needed
+                toast({
+                  title: "Status atualizado!",
+                  description: "Os novos status foram salvos com sucesso.",
+                });
+              }}
+            />
           </TabsContent>
         </Tabs>
       </DialogContent>
