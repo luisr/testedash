@@ -17,8 +17,8 @@ interface DependencyManagerProps {
 
 interface ActivityDependency {
   id: number;
-  activityId: number;
-  dependsOnActivityId: number;
+  predecessorId: number;
+  successorId: number;
   dependencyType: 'finish_to_start' | 'start_to_start' | 'finish_to_finish' | 'start_to_finish';
   lagTime: number;
   isActive: boolean;
@@ -54,11 +54,11 @@ export default function DependencyManager({ dashboardId, activities, trigger }: 
     }
   };
 
-  const addDependency = async (activityId: number, dependsOnActivityId: number, dependencyType: string) => {
+  const addDependency = async (successorId: number, predecessorId: number, dependencyType: string) => {
     try {
       const newDependency = {
-        activityId,
-        dependsOnActivityId,
+        predecessorId,
+        successorId,
         dependencyType,
         lagTime: 0,
         isActive: true
@@ -255,11 +255,11 @@ export default function DependencyManager({ dashboardId, activities, trigger }: 
                       <div className="flex items-center gap-4">
                         <div className="flex items-center gap-3">
                           <Badge variant="secondary" className="bg-blue-100 text-blue-800">
-                            {getActivityName(dependency.activityId)}
+                            {getActivityName(dependency.successorId)}
                           </Badge>
                           <ArrowRight className="w-4 h-4 text-blue-600" />
                           <Badge variant="outline" className="border-blue-200 text-blue-700">
-                            {getActivityName(dependency.dependsOnActivityId)}
+                            {getActivityName(dependency.predecessorId)}
                           </Badge>
                         </div>
                         <Badge variant="outline" className="text-xs bg-gradient-to-r from-blue-50 to-cyan-50 text-blue-700 border-blue-200">
