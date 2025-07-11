@@ -32,13 +32,13 @@ export default function ChartsSection({ metrics, customCharts }: ChartsSectionPr
   ];
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      <Card className="shadow-sm">
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="text-lg font-semibold">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 animate-fade-in">
+      <Card className="chart-container shadow-elegant hover-lift">
+        <CardHeader className="flex flex-row items-center justify-between pb-4">
+          <CardTitle className="text-lg font-semibold text-foreground">
             Status dos Projetos
           </CardTitle>
-          <Button variant="ghost" size="icon">
+          <Button variant="ghost" size="icon" className="hover-lift focus-ring">
             <MoreHorizontal className="w-5 h-5" />
           </Button>
         </CardHeader>
@@ -59,19 +59,26 @@ export default function ChartsSection({ metrics, customCharts }: ChartsSectionPr
                     <Cell key={`cell-${index}`} fill={entry.color} />
                   ))}
                 </Pie>
-                <Tooltip />
+                <Tooltip 
+                  contentStyle={{ 
+                    backgroundColor: 'hsl(var(--card))', 
+                    border: '1px solid hsl(var(--border))',
+                    borderRadius: '8px',
+                    boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
+                  }}
+                />
               </PieChart>
             </ResponsiveContainer>
           </div>
         </CardContent>
       </Card>
 
-      <Card className="shadow-sm">
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="text-lg font-semibold">
+      <Card className="chart-container shadow-elegant hover-lift">
+        <CardHeader className="flex flex-row items-center justify-between pb-4">
+          <CardTitle className="text-lg font-semibold text-foreground">
             Progresso Mensal
           </CardTitle>
-          <Button variant="ghost" size="icon">
+          <Button variant="ghost" size="icon" className="hover-lift focus-ring">
             <MoreHorizontal className="w-5 h-5" />
           </Button>
         </CardHeader>
@@ -79,24 +86,42 @@ export default function ChartsSection({ metrics, customCharts }: ChartsSectionPr
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={progressData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="month" />
-                <YAxis />
-                <Tooltip />
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                <XAxis 
+                  dataKey="month" 
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
+                />
+                <YAxis 
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
+                />
+                <Tooltip 
+                  contentStyle={{ 
+                    backgroundColor: 'hsl(var(--card))', 
+                    border: '1px solid hsl(var(--border))',
+                    borderRadius: '8px',
+                    boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
+                  }}
+                />
                 <Legend />
                 <Line 
                   type="monotone" 
                   dataKey="planned" 
-                  stroke="#3B82F6" 
-                  strokeWidth={2}
+                  stroke="hsl(var(--primary))" 
+                  strokeWidth={3}
                   name="Planejado"
+                  dot={{ fill: 'hsl(var(--primary))', strokeWidth: 2, r: 4 }}
                 />
                 <Line 
                   type="monotone" 
                   dataKey="actual" 
-                  stroke="#10B981" 
-                  strokeWidth={2}
+                  stroke="hsl(var(--status-completed))" 
+                  strokeWidth={3}
                   name="Real"
+                  dot={{ fill: 'hsl(var(--status-completed))', strokeWidth: 2, r: 4 }}
                 />
               </LineChart>
             </ResponsiveContainer>

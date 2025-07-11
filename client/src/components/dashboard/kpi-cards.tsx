@@ -58,32 +58,36 @@ export default function KPICards({ metrics }: KPICardsProps) {
   ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 animate-fade-in">
       {kpis.map((kpi, index) => (
-        <Card key={index} className="shadow-sm">
+        <Card key={index} className="kpi-card hover-lift shadow-elegant group">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">
+              <div className="flex-1">
+                <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
                   {kpi.title}
                 </p>
-                <p className="text-3xl font-bold text-foreground">
+                <p className="text-3xl font-bold text-foreground mt-2 group-hover:text-primary transition-colors">
                   {kpi.value}
                 </p>
               </div>
-              <div className={`w-12 h-12 ${kpi.bgColor} rounded-lg flex items-center justify-center`}>
-                <kpi.icon className={`w-6 h-6 ${kpi.iconColor}`} />
+              <div className={`w-14 h-14 ${kpi.bgColor} rounded-xl flex items-center justify-center group-hover:scale-105 transition-transform`}>
+                <kpi.icon className={`w-7 h-7 ${kpi.iconColor}`} />
               </div>
             </div>
-            <div className="mt-4 flex items-center">
-              <span className={`text-sm font-medium ${
-                kpi.trendUp ? 'text-emerald-600' : 'text-amber-600'
-              }`}>
-                {kpi.trend}
-              </span>
-              <span className="text-sm text-muted-foreground ml-2">
-                {kpi.trendText}
-              </span>
+            <div className="mt-6 pt-4 border-t border-border/50 flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <span className={`text-sm font-semibold px-2 py-1 rounded-full ${
+                  kpi.trendUp 
+                    ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-400' 
+                    : 'bg-amber-100 text-amber-700 dark:bg-amber-900/20 dark:text-amber-400'
+                }`}>
+                  {kpi.trend}
+                </span>
+                <span className="text-sm text-muted-foreground font-medium">
+                  {kpi.trendText}
+                </span>
+              </div>
             </div>
           </CardContent>
         </Card>

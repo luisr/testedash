@@ -1,6 +1,407 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+:root {
+  /* Light theme - Professional Blue & Gray palette */
+  --background: 248 250 252;
+  --foreground: 15 23 42;
+  --card: 255 255 255;
+  --card-foreground: 15 23 42;
+  --popover: 255 255 255;
+  --popover-foreground: 15 23 42;
+  --primary: 59 130 246;
+  --primary-foreground: 248 250 252;
+  --secondary: 241 245 249;
+  --secondary-foreground: 51 65 85;
+  --muted: 241 245 249;
+  --muted-foreground: 100 116 139;
+  --accent: 241 245 249;
+  --accent-foreground: 51 65 85;
+  --destructive: 239 68 68;
+  --destructive-foreground: 248 250 252;
+  --border: 226 232 240;
+  --input: 226 232 240;
+  --ring: 59 130 246;
+  --radius: 0.5rem;
+  
+  /* Custom dashboard colors */
+  --sidebar-bg: 248 250 252;
+  --sidebar-border: 226 232 240;
+  --header-bg: 255 255 255;
+  --header-border: 226 232 240;
+  --kpi-bg: 255 255 255;
+  --kpi-border: 226 232 240;
+  --chart-bg: 255 255 255;
+  --chart-border: 226 232 240;
+  --table-header-bg: 248 250 252;
+  --table-row-hover: 248 250 252;
+  
+  /* Status colors */
+  --status-completed: 34 197 94;
+  --status-in-progress: 59 130 246;
+  --status-not-started: 156 163 175;
+  --status-delayed: 245 158 11;
+  --status-cancelled: 239 68 68;
+  
+  /* Priority colors */
+  --priority-low: 34 197 94;
+  --priority-medium: 245 158 11;
+  --priority-high: 239 68 68;
+  --priority-critical: 147 51 234;
+  
+  /* Risk colors */
+  --risk-baixo: 34 197 94;
+  --risk-medio: 245 158 11;
+  --risk-alto: 239 68 68;
+}
+
+.dark {
+  /* Dark theme - Modern dark with blue accents */
+  --background: 15 23 42;
+  --foreground: 248 250 252;
+  --card: 30 41 59;
+  --card-foreground: 248 250 252;
+  --popover: 30 41 59;
+  --popover-foreground: 248 250 252;
+  --primary: 59 130 246;
+  --primary-foreground: 15 23 42;
+  --secondary: 51 65 85;
+  --secondary-foreground: 203 213 225;
+  --muted: 51 65 85;
+  --muted-foreground: 148 163 184;
+  --accent: 51 65 85;
+  --accent-foreground: 203 213 225;
+  --destructive: 239 68 68;
+  --destructive-foreground: 248 250 252;
+  --border: 51 65 85;
+  --input: 51 65 85;
+  --ring: 59 130 246;
+  
+  /* Custom dashboard colors - dark */
+  --sidebar-bg: 15 23 42;
+  --sidebar-border: 51 65 85;
+  --header-bg: 30 41 59;
+  --header-border: 51 65 85;
+  --kpi-bg: 30 41 59;
+  --kpi-border: 51 65 85;
+  --chart-bg: 30 41 59;
+  --chart-border: 51 65 85;
+  --table-header-bg: 15 23 42;
+  --table-row-hover: 51 65 85;
+  
+  /* Status colors - dark theme adjusted */
+  --status-completed: 34 197 94;
+  --status-in-progress: 59 130 246;
+  --status-not-started: 107 114 128;
+  --status-delayed: 245 158 11;
+  --status-cancelled: 239 68 68;
+  
+  /* Priority colors - dark theme adjusted */
+  --priority-low: 34 197 94;
+  --priority-medium: 245 158 11;
+  --priority-high: 239 68 68;
+  --priority-critical: 147 51 234;
+  
+  /* Risk colors - dark theme adjusted */
+  --risk-baixo: 34 197 94;
+  --risk-medio: 245 158 11;
+  --risk-alto: 239 68 68;
+}
+
+/* Blue-Green theme for alternative styling */
+.theme-blue-green {
+  --background: 240 253 250;
+  --foreground: 6 78 59;
+  --card: 255 255 255;
+  --card-foreground: 6 78 59;
+  --primary: 20 184 166;
+  --primary-foreground: 240 253 250;
+  --secondary: 240 253 250;
+  --secondary-foreground: 6 78 59;
+  --muted: 240 253 250;
+  --muted-foreground: 75 85 99;
+  --accent: 240 253 250;
+  --accent-foreground: 6 78 59;
+  --border: 209 250 229;
+  --input: 209 250 229;
+  --ring: 20 184 166;
+  
+  --sidebar-bg: 240 253 250;
+  --sidebar-border: 209 250 229;
+  --header-bg: 255 255 255;
+  --header-border: 209 250 229;
+  --kpi-bg: 255 255 255;
+  --kpi-border: 209 250 229;
+  --chart-bg: 255 255 255;
+  --chart-border: 209 250 229;
+  --table-header-bg: 240 253 250;
+  --table-row-hover: 240 253 250;
+}
+
+* {
+  border-color: hsl(var(--border));
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: hsl(var(--muted));
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground) / 0.3);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground) / 0.5);
+}
+
+/* Glass effect for cards */
+.glass-card {
+  background: hsl(var(--card) / 0.8);
+  backdrop-filter: blur(10px);
+  border: 1px solid hsl(var(--border) / 0.5);
+}
+
+/* Enhanced shadows */
+.shadow-elegant {
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+}
+
+.shadow-elegant-lg {
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
+
+/* Status indicators */
+.status-completed {
+  background-color: hsl(var(--status-completed) / 0.1);
+  color: hsl(var(--status-completed));
+  border-color: hsl(var(--status-completed) / 0.2);
+}
+
+.status-in-progress {
+  background-color: hsl(var(--status-in-progress) / 0.1);
+  color: hsl(var(--status-in-progress));
+  border-color: hsl(var(--status-in-progress) / 0.2);
+}
+
+.status-not-started {
+  background-color: hsl(var(--status-not-started) / 0.1);
+  color: hsl(var(--status-not-started));
+  border-color: hsl(var(--status-not-started) / 0.2);
+}
+
+.status-delayed {
+  background-color: hsl(var(--status-delayed) / 0.1);
+  color: hsl(var(--status-delayed));
+  border-color: hsl(var(--status-delayed) / 0.2);
+}
+
+.status-cancelled {
+  background-color: hsl(var(--status-cancelled) / 0.1);
+  color: hsl(var(--status-cancelled));
+  border-color: hsl(var(--status-cancelled) / 0.2);
+}
+
+/* Priority indicators */
+.priority-low {
+  background-color: hsl(var(--priority-low) / 0.1);
+  color: hsl(var(--priority-low));
+  border-color: hsl(var(--priority-low) / 0.2);
+}
+
+.priority-medium {
+  background-color: hsl(var(--priority-medium) / 0.1);
+  color: hsl(var(--priority-medium));
+  border-color: hsl(var(--priority-medium) / 0.2);
+}
+
+.priority-high {
+  background-color: hsl(var(--priority-high) / 0.1);
+  color: hsl(var(--priority-high));
+  border-color: hsl(var(--priority-high) / 0.2);
+}
+
+.priority-critical {
+  background-color: hsl(var(--priority-critical) / 0.1);
+  color: hsl(var(--priority-critical));
+  border-color: hsl(var(--priority-critical) / 0.2);
+}
+
+/* Risk indicators */
+.risk-baixo {
+  background-color: hsl(var(--risk-baixo) / 0.1);
+  color: hsl(var(--risk-baixo));
+  border-color: hsl(var(--risk-baixo) / 0.2);
+}
+
+.risk-medio {
+  background-color: hsl(var(--risk-medio) / 0.1);
+  color: hsl(var(--risk-medio));
+  border-color: hsl(var(--risk-medio) / 0.2);
+}
+
+.risk-alto {
+  background-color: hsl(var(--risk-alto) / 0.1);
+  color: hsl(var(--risk-alto));
+  border-color: hsl(var(--risk-alto) / 0.2);
+}
+
+/* Animations */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out;
+}
+
+/* Hover effects */
+.hover-lift {
+  transition: all 0.2s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+}
+
+/* Focus styles */
+.focus-ring {
+  transition: all 0.2s ease;
+}
+
+.focus-ring:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px hsl(var(--ring) / 0.2);
+}
+
+/* Gradient backgrounds */
+.gradient-primary {
+  background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary)) 70%, hsl(var(--primary) / 0.8));
+}
+
+.gradient-secondary {
+  background: linear-gradient(135deg, hsl(var(--secondary)), hsl(var(--secondary)) 70%, hsl(var(--secondary) / 0.8));
+}
+
+/* Loading states */
+.loading-skeleton {
+  background: linear-gradient(90deg, hsl(var(--muted)), hsl(var(--muted) / 0.8), hsl(var(--muted)));
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s ease-in-out infinite;
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Enhanced typography */
+.text-gradient {
+  background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary) / 0.8));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Improved spacing utilities */
+.space-y-6 > * + * {
+  margin-top: 1.5rem;
+}
+
+.space-y-8 > * + * {
+  margin-top: 2rem;
+}
+
+/* Dashboard-specific improvements */
+.dashboard-card {
+  background: hsl(var(--card));
+  border: 1px solid hsl(var(--border));
+  border-radius: calc(var(--radius) + 2px);
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  transition: all 0.2s ease;
+}
+
+.dashboard-card:hover {
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+}
+
+.kpi-card {
+  background: hsl(var(--kpi-bg));
+  border: 1px solid hsl(var(--kpi-border));
+  border-radius: calc(var(--radius) + 2px);
+  padding: 1.5rem;
+  transition: all 0.2s ease;
+}
+
+.kpi-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px -5px rgb(0 0 0 / 0.1);
+}
+
+.chart-container {
+  background: hsl(var(--chart-bg));
+  border: 1px solid hsl(var(--chart-border));
+  border-radius: calc(var(--radius) + 2px);
+  padding: 1.5rem;
+}
+
+.table-container {
+  background: hsl(var(--card));
+  border: 1px solid hsl(var(--border));
+  border-radius: calc(var(--radius) + 2px);
+  overflow: hidden;
+}
+
+.table-header {
+  background: hsl(var(--table-header-bg));
+  border-bottom: 1px solid hsl(var(--border));
+}
+
+.table-row:hover {
+  background: hsl(var(--table-row-hover));
+}
+
+.sidebar-container {
+  background: hsl(var(--sidebar-bg));
+  border-right: 1px solid hsl(var(--sidebar-border));
+}
+
+.header-container {
+  background: hsl(var(--header-bg));
+  border-bottom: 1px solid hsl(var(--header-border));
+  backdrop-filter: blur(10px);
+}
 
 :root {
   --background: hsl(0, 0%, 100%);

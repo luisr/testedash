@@ -66,15 +66,17 @@ export default function ActivityTable({
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "completed":
-        return <Badge className="status-badge status-completed">Concluído</Badge>;
+        return <Badge className="status-completed font-medium px-3 py-1">Concluído</Badge>;
       case "in_progress":
-        return <Badge className="status-badge status-in-progress">Em Andamento</Badge>;
+        return <Badge className="status-in-progress font-medium px-3 py-1">Em Andamento</Badge>;
       case "delayed":
-        return <Badge className="status-badge status-delayed">Atrasado</Badge>;
+        return <Badge className="status-delayed font-medium px-3 py-1">Atrasado</Badge>;
       case "not_started":
-        return <Badge className="status-badge status-not-started">Não Iniciado</Badge>;
+        return <Badge className="status-not-started font-medium px-3 py-1">Não Iniciado</Badge>;
+      case "cancelled":
+        return <Badge className="status-cancelled font-medium px-3 py-1">Cancelado</Badge>;
       default:
-        return <Badge className="status-badge status-not-started">{status}</Badge>;
+        return <Badge className="status-not-started font-medium px-3 py-1">{status}</Badge>;
     }
   };
 
@@ -91,8 +93,8 @@ export default function ActivityTable({
   };
 
   return (
-    <Card className="shadow-sm">
-      <CardHeader className="border-b border-border">
+    <Card className="table-container shadow-elegant animate-fade-in">
+      <CardHeader className="table-header p-6">
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-semibold text-foreground">
             Atividades Recentes
@@ -104,13 +106,13 @@ export default function ActivityTable({
                 placeholder="Buscar atividades..."
                 value={searchTerm}
                 onChange={(e) => onSearchChange(e.target.value)}
-                className="pl-10 w-64"
+                className="pl-10 w-64 focus-ring"
               />
             </div>
-            <Button variant="ghost" size="icon">
+            <Button variant="ghost" size="icon" className="hover-lift focus-ring">
               <Filter className="w-5 h-5" />
             </Button>
-            <Button variant="ghost" size="icon">
+            <Button variant="ghost" size="icon" className="hover-lift focus-ring">
               <Settings className="w-5 h-5" />
             </Button>
           </div>
@@ -150,7 +152,7 @@ export default function ActivityTable({
             </TableHeader>
             <TableBody>
               {currentActivities.map((activity) => (
-                <TableRow key={activity.id} className="hover:bg-muted/50">
+                <TableRow key={activity.id} className="table-row hover:bg-table-row-hover transition-colors">
                   <TableCell>
                     <div>
                       <div className="font-medium text-foreground">
@@ -200,25 +202,25 @@ export default function ActivityTable({
                     {calculateCPI(activity)}
                   </TableCell>
                   <TableCell>
-                    <div className="flex items-center space-x-2">
+                    <div className="flex items-center space-x-1">
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="text-primary hover:text-primary/80"
+                        className="text-primary hover:text-primary/80 hover-lift focus-ring h-8 w-8"
                       >
                         <Edit2 className="w-4 h-4" />
                       </Button>
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="text-muted-foreground hover:text-foreground"
+                        className="text-muted-foreground hover:text-foreground hover-lift focus-ring h-8 w-8"
                       >
                         <Eye className="w-4 h-4" />
                       </Button>
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="text-destructive hover:text-destructive/80"
+                        className="text-destructive hover:text-destructive/80 hover-lift focus-ring h-8 w-8"
                         onClick={() => onActivityDelete(activity.id)}
                       >
                         <Trash2 className="w-4 h-4" />
