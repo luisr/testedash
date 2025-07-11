@@ -19,7 +19,9 @@ import {
   CheckCircle, 
   AlertCircle,
   Plus,
-  Trash2
+  Trash2,
+  Eye,
+  EyeOff
 } from "lucide-react";
 import { CustomColumn } from "@shared/schema";
 import { apiRequest } from "@/lib/queryClient";
@@ -90,6 +92,10 @@ export default function TableConfigModal({
     { key: 'completionPercentage', label: 'Percentual Conclusão' },
     { key: 'associatedRisk', label: 'Risco Associado' }
   ];
+
+  const [visibleColumns, setVisibleColumns] = useState<string[]>(
+    standardColumns.map(col => col.key)
+  );
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -210,9 +216,9 @@ export default function TableConfigModal({
           const values = line.split(',').map(v => v.trim().replace(/"/g, ''));
           const activity: any = {
             dashboardId,
-            name: '',
-            discipline: '',
-            responsible: '',
+            name: 'Atividade Importada',
+            discipline: 'Geral',
+            responsible: 'Usuário',
             status: 'not_started',
             priority: 'medium'
           };
@@ -260,7 +266,7 @@ export default function TableConfigModal({
                 };
                 activity[mappedKey] = priorityMap[value.toLowerCase()] || value;
               } else {
-                activity[mappedKey] = value;
+                activity[mappedKey] = value || activity[mappedKey];
               }
             } else {
               // Add to custom fields
@@ -350,10 +356,14 @@ export default function TableConfigModal({
         </DialogHeader>
         
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="columns" className="flex items-center gap-2">
               <Columns className="h-4 w-4" />
               Colunas
+            </TabsTrigger>
+            <TabsTrigger value="visibility" className="flex items-center gap-2">
+              <Eye className="h-4 w-4" />
+              Visibilidade
             </TabsTrigger>
             <TabsTrigger value="import" className="flex items-center gap-2">
               <Upload className="h-4 w-4" />
@@ -441,6 +451,113 @@ export default function TableConfigModal({
                 </CardContent>
               </Card>
             </div>
+          </TabsContent>
+          
+          <TabsContent value="visibility" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">Controle de Visibilidade das Colunas</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h4 className="font-medium">Colunas Padrão</h4>
+                    <div className="flex gap-2">
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => setVisibleColumns(standardColumns.map(col => col.key))}
+                      >
+                        Mostrar Todas
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => setVisibleColumns(standardColumns.filter(col => col.required).map(col => col.key))}
+                      >
+                        Apenas Obrigatórias
+                      </Button>
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {standardColumns.map((col) => (
+                      <div key={col.key} className="flex items-center space-x-2">
+                        <Checkbox
+                          checked={visibleColumns.includes(col.key)}
+                          onCheckedChange={(checked) => {
+                            if (checked) {
+                              setVisibleColumns([...visibleColumns, col.key]);
+                            } else {
+                              if (col.required) {
+                                toast({
+                                  title: "Atenção",
+                                  description: "Esta coluna é obrigatória e não pode ser ocultada.",
+                                  variant: "destructive"
+                                });
+                                return;
+                              }
+                              setVisibleColumns(visibleColumns.filter(c => c !== col.key));
+                            }
+                          }}
+                          disabled={col.required}
+                        />
+                        <div className="flex items-center gap-2">
+                          {visibleColumns.includes(col.key) ? (
+                            <Eye className="h-4 w-4 text-green-600" />
+                          ) : (
+                            <EyeOff className="h-4 w-4 text-gray-400" />
+                          )}
+                          <span className="text-sm">{col.label}</span>
+                          {col.required && (
+                            <Badge variant="secondary" className="text-xs">Obrigatória</Badge>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  
+                  {customColumns.length > 0 && (
+                    <div className="border-t pt-4">
+                      <h4 className="font-medium mb-2">Colunas Personalizadas</h4>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {customColumns.map((col) => (
+                          <div key={col.id} className="flex items-center space-x-2">
+                            <Checkbox
+                              checked={visibleColumns.includes(col.name)}
+                              onCheckedChange={(checked) => {
+                                if (checked) {
+                                  setVisibleColumns([...visibleColumns, col.name]);
+                                } else {
+                                  setVisibleColumns(visibleColumns.filter(c => c !== col.name));
+                                }
+                              }}
+                            />
+                            <div className="flex items-center gap-2">
+                              {visibleColumns.includes(col.name) ? (
+                                <Eye className="h-4 w-4 text-green-600" />
+                              ) : (
+                                <EyeOff className="h-4 w-4 text-gray-400" />
+                              )}
+                              <span className="text-sm">{col.name}</span>
+                              <Badge variant="outline" className="text-xs">
+                                {columnTypes.find(t => t.value === col.type)?.label}
+                              </Badge>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  
+                  <div className="bg-blue-50 p-3 rounded-lg">
+                    <p className="text-sm text-blue-700">
+                      <strong>Colunas visíveis:</strong> {visibleColumns.length} de {standardColumns.length + customColumns.length}
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </TabsContent>
           
           <TabsContent value="import" className="space-y-4">
