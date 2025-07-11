@@ -160,7 +160,7 @@ export default function NewActivityModal({ isOpen, onClose, onSubmit, projects, 
                 <SelectContent>
                   <SelectItem value="none">Nenhuma (Atividade Principal)</SelectItem>
                   {activities.filter(activity => !activity.parentActivityId).map(activity => (
-                    <SelectItem key={activity.id} value={activity.id.toString()}>
+                    <SelectItem key={`parent-${activity.id}`} value={activity.id.toString()}>
                       {activity.name}
                     </SelectItem>
                   ))}
@@ -298,7 +298,7 @@ export default function NewActivityModal({ isOpen, onClose, onSubmit, projects, 
               <SelectContent>
                 <SelectItem value="none">Nenhuma dependência</SelectItem>
                 {activities.filter(activity => !activity.parentActivityId).map(activity => (
-                  <SelectItem key={activity.id} value={activity.name}>
+                  <SelectItem key={`dep-${activity.id}`} value={activity.name}>
                     {activity.name}
                   </SelectItem>
                 ))}

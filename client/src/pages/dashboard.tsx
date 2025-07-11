@@ -9,6 +9,7 @@ import KPICards from "@/components/dashboard/kpi-cards";
 import ChartsSection from "@/components/dashboard/charts-section";
 import ActivityTable from "@/components/dashboard/activity-table";
 import ActivitiesPanel from "@/components/dashboard/activities-panel";
+import ProjectViews from "@/components/dashboard/project-views";
 import ShareModalEnhanced from "@/components/dashboard/share-modal-enhanced";
 import ActivityLogPanel from "@/components/dashboard/activity-log-panel";
 import ExportModal from "@/components/dashboard/export-modal";
@@ -331,6 +332,11 @@ export default function Dashboard() {
             dashboardId={dashboardId}
             onNewActivity={() => setNewActivityModalOpen(true)}
             onManageDependencies={() => setDependencyModalOpen(true)}
+          />
+          
+          <ProjectViews 
+            activities={activities}
+            onUpdateActivity={updateActivity}
           />
         </main>
       </div>
