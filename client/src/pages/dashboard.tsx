@@ -156,7 +156,7 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen flex bg-muted/30">
+    <div className="min-h-screen flex" style={{ backgroundColor: 'hsl(var(--background))' }}>
       <Sidebar 
         isOpen={sidebarOpen} 
         onClose={() => setSidebarOpen(false)}

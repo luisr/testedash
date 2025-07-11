@@ -83,11 +83,78 @@
 
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background-color: hsl(var(--background));
-  color: hsl(var(--foreground));
+  background-color: hsl(var(--background)) !important;
+  color: hsl(var(--foreground)) !important;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Force Apple colors to override any existing themes */
+html {
+  background-color: hsl(var(--background)) !important;
+}
+
+#root {
+  background-color: hsl(var(--background)) !important;
+  color: hsl(var(--foreground)) !important;
+}
+
+/* Override any conflicting background colors */
+.bg-muted\/30,
+.bg-muted,
+.bg-background,
+[class*="bg-"] {
+  background-color: hsl(var(--background)) !important;
+}
+
+/* Force removal of any yellow/amber backgrounds */
+body, html, #root, .min-h-screen, main, div {
+  background-color: hsl(var(--background)) !important;
+}
+
+/* Specific overrides for common problem areas */
+.bg-muted\/30 {
+  background-color: hsl(var(--background)) !important;
+}
+
+.bg-amber-50,
+.bg-yellow-50,
+.bg-orange-50,
+.bg-amber-100,
+.bg-yellow-100,
+.bg-orange-100 {
+  background-color: hsl(var(--background)) !important;
+}
+
+.dark .bg-amber-900,
+.dark .bg-yellow-900,
+.dark .bg-orange-900,
+.dark .bg-amber-800,
+.dark .bg-yellow-800,
+.dark .bg-orange-800 {
+  background-color: hsl(var(--background)) !important;
+}
+
+/* Ensure cards use proper Apple styling */
+.card,
+[class*="card"] {
+  background-color: hsl(var(--card)) !important;
+  border-color: hsl(var(--border)) !important;
+}
+
+/* Force sidebar to use proper colors */
+.sidebar-container,
+[class*="sidebar"] {
+  background-color: hsl(var(--card)) !important;
+  border-color: hsl(var(--border)) !important;
+}
+
+/* Force header to use proper colors */
+.header-container,
+[class*="header"] {
+  background-color: hsl(var(--card)) !important;
+  border-color: hsl(var(--border)) !important;
 }
 
 /* Custom scrollbar */
