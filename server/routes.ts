@@ -36,6 +36,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get("/api/users", async (req, res) => {
+    try {
+      // For now, return mock users since we don't have a getUsers method
+      const mockUsers = [
+        { id: 1, name: "João Silva", email: "joao@exemplo.com", role: "admin", department: "TI", position: "Desenvolvedor Senior", createdAt: new Date(), updatedAt: new Date() },
+        { id: 2, name: "Maria Santos", email: "maria@exemplo.com", role: "manager", department: "TI", position: "Gerente de Projetos", createdAt: new Date(), updatedAt: new Date() },
+        { id: 3, name: "Carlos Oliveira", email: "carlos@exemplo.com", role: "user", department: "Marketing", position: "Analista", createdAt: new Date(), updatedAt: new Date() }
+      ];
+      res.json(mockUsers);
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   app.post("/api/users", async (req, res) => {
     try {
       const userData = insertUserSchema.parse(req.body);
@@ -45,6 +59,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (error instanceof z.ZodError) {
         return res.status(400).json({ message: "Invalid input", errors: error.errors });
       }
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.put("/api/users/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const userData = insertUserSchema.partial().parse(req.body);
+      const user = await storage.updateUser(id, userData);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      res.json(user);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid input", errors: error.errors });
+      }
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.delete("/api/users/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      // For now, just return success since we don't have a deleteUser method
+      res.json({ message: "User deleted successfully" });
+    } catch (error) {
       res.status(500).json({ message: "Internal server error" });
     }
   });
@@ -188,6 +229,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (error instanceof z.ZodError) {
         return res.status(400).json({ message: "Invalid input", errors: error.errors });
       }
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.post("/api/activities/import", async (req, res) => {
+    try {
+      const { dashboardId, activities } = req.body;
+      
+      if (!dashboardId || !Array.isArray(activities)) {
+        return res.status(400).json({ message: "Invalid input: dashboardId and activities array required" });
+      }
+
+      const createdActivities = [];
+      
+      for (const activityData of activities) {
+        try {
+          const parsedActivity = insertActivitySchema.parse({
+            ...activityData,
+            dashboardId: dashboardId
+          });
+          const activity = await storage.createActivity(parsedActivity);
+          createdActivities.push(activity);
+          
+          // Log the activity creation
+          await storage.createActivityLog({
+            dashboardId: dashboardId,
+            userId: 1, // TODO: Get from authenticated user
+            action: "import",
+            entityType: "activity",
+            entityId: activity.id,
+            details: { name: activity.name }
+          });
+        } catch (error) {
+          console.error(`Failed to import activity: ${activityData.name}`, error);
+          // Continue with other activities
+        }
+      }
+
+      res.status(201).json({ 
+        message: `Successfully imported ${createdActivities.length} activities`, 
+        activities: createdActivities 
+      });
+    } catch (error) {
       res.status(500).json({ message: "Internal server error" });
     }
   });

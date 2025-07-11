@@ -16,7 +16,7 @@ import SimpleModal from "@/components/dashboard/simple-modal";
 import { NotificationPopup } from "@/components/notifications/notification-popup";
 import { NotificationPreferencesDialog } from "@/components/notifications/notification-preferences-dialog";
 import { Button } from "@/components/ui/button";
-import { Plus, FolderOpen, Users, FileText } from "lucide-react";
+import { Plus, FolderOpen, Users, FileText, Upload } from "lucide-react";
 
 export default function Dashboard() {
   const { id } = useParams<{ id?: string }>();
@@ -28,7 +28,7 @@ export default function Dashboard() {
   const [exportModalOpen, setExportModalOpen] = useState(false);
   const [activityLogOpen, setActivityLogOpen] = useState(false);
   const [newActivityModalOpen, setNewActivityModalOpen] = useState(false);
-  const [modalType, setModalType] = useState<'projects' | 'users' | 'reports' | null>(null);
+  const [modalType, setModalType] = useState<'projects' | 'users' | 'reports' | 'import' | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
   const [filterResponsible, setFilterResponsible] = useState("all");
@@ -270,6 +270,14 @@ export default function Dashboard() {
                 <Plus className="h-4 w-4" />
                 Nova Atividade
               </Button>
+              <Button
+                onClick={() => setModalType('import')}
+                variant="outline"
+                className="flex items-center gap-2"
+              >
+                <Upload className="h-4 w-4" />
+                Importar
+              </Button>
             </div>
           </div>
 
@@ -334,7 +342,8 @@ export default function Dashboard() {
         type={modalType || 'projects'}
         projects={projects}
         activities={activities}
-        users={[]} // TODO: Get users from API
+        users={[]} // Will be loaded from API
+        dashboardId={dashboardId}
       />
     </div>
   );

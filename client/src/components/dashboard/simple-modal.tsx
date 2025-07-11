@@ -1,17 +1,22 @@
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { FolderOpen, Users, FileText, BarChart3, Target, CheckCircle } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { FolderOpen, Users, FileText, BarChart3, Target, CheckCircle, Upload } from "lucide-react";
 import { Project, Activity, User } from "@shared/schema";
 import { formatCurrency, formatDate } from "@/lib/utils";
+import { apiRequest } from "@/lib/queryClient";
 
 interface SimpleModalProps {
   isOpen: boolean;
   onClose: () => void;
-  type: 'projects' | 'users' | 'reports';
+  type: 'projects' | 'users' | 'reports' | 'import';
   projects?: Project[];
   activities?: Activity[];
   users?: User[];
+  dashboardId?: number;
 }
 
 export default function SimpleModal({ 
@@ -20,13 +25,84 @@ export default function SimpleModal({
   type, 
   projects = [], 
   activities = [], 
-  users = [] 
+  users = [],
+  dashboardId = 1
 }: SimpleModalProps) {
+  const [loadedUsers, setLoadedUsers] = useState<User[]>([]);
+  const [csvFile, setCsvFile] = useState<File | null>(null);
+  const [isImporting, setIsImporting] = useState(false);
+
+  // Load users from API when modal opens
+  useEffect(() => {
+    if (isOpen && type === 'users') {
+      loadUsers();
+    }
+  }, [isOpen, type]);
+
+  const loadUsers = async () => {
+    try {
+      const response = await apiRequest("GET", "/api/users");
+      const usersData = await response.json();
+      setLoadedUsers(usersData);
+    } catch (error) {
+      console.error('Error loading users:', error);
+    }
+  };
+
+  const handleImportCSV = async () => {
+    if (!csvFile) return;
+
+    setIsImporting(true);
+    try {
+      const text = await csvFile.text();
+      const lines = text.split('\n');
+      const headers = lines[0].split(',').map(h => h.trim());
+      
+      const activities = [];
+      for (let i = 1; i < lines.length; i++) {
+        const values = lines[i].split(',').map(v => v.trim());
+        if (values.length >= 3) {
+          const activity = {
+            name: values[0] || `Atividade ${i}`,
+            description: values[1] || '',
+            discipline: values[2] || 'Geral',
+            responsible: values[3] || 'Não definido',
+            priority: values[4] || 'medium',
+            status: values[5] || 'not_started',
+            plannedValue: values[6] || '0',
+            dashboardId: dashboardId
+          };
+          activities.push(activity);
+        }
+      }
+
+      if (activities.length > 0) {
+        const response = await apiRequest("POST", "/api/activities/import", {
+          dashboardId: dashboardId,
+          activities: activities
+        });
+        
+        if (response.ok) {
+          const result = await response.json();
+          alert(`Importação concluída! ${result.activities.length} atividades foram importadas.`);
+          onClose();
+        } else {
+          throw new Error('Erro na importação');
+        }
+      }
+    } catch (error) {
+      console.error('Error importing CSV:', error);
+      alert('Erro ao importar arquivo CSV. Verifique o formato do arquivo.');
+    } finally {
+      setIsImporting(false);
+    }
+  };
   const getTitle = () => {
     switch (type) {
       case 'projects': return 'Gerenciamento de Projetos';
       case 'users': return 'Gerenciamento de Usuários';
       case 'reports': return 'Relatórios e Análises';
+      case 'import': return 'Importar Atividades';
       default: return 'Modal';
     }
   };
@@ -36,6 +112,7 @@ export default function SimpleModal({
       case 'projects': return <FolderOpen className="h-5 w-5 text-primary" />;
       case 'users': return <Users className="h-5 w-5 text-primary" />;
       case 'reports': return <FileText className="h-5 w-5 text-primary" />;
+      case 'import': return <Upload className="h-5 w-5 text-primary" />;
       default: return null;
     }
   };
@@ -119,51 +196,83 @@ export default function SimpleModal({
     </div>
   );
 
-  const renderUsersContent = () => (
-    <div className="space-y-4">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Total de Usuários</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{users.length}</div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Administradores</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-red-600">
-              {users.filter(u => u.role === 'admin').length}
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Usuários Ativos</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-green-600">
-              {users.filter(u => u.role === 'user').length}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+  const renderUsersContent = () => {
+    const usersToShow = loadedUsers.length > 0 ? loadedUsers : users;
+    
+    return (
+      <div className="space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Total de Usuários</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{usersToShow.length}</div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Administradores</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-red-600">
+                {usersToShow.filter(u => u.role === 'admin').length}
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Usuários Ativos</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-green-600">
+                {usersToShow.filter(u => u.role === 'user').length}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
 
-      <div className="text-center py-8">
-        <p className="text-muted-foreground">
-          Sistema de gerenciamento de usuários em desenvolvimento.
-        </p>
-        <p className="text-sm text-muted-foreground mt-2">
-          Funcionalidades completas serão implementadas em breve.
-        </p>
+        <div className="space-y-4">
+          {usersToShow.map(user => (
+            <Card key={user.id} className="hover:shadow-md transition-shadow">
+              <CardHeader className="pb-3">
+                <div className="flex justify-between items-start">
+                  <div className="space-y-1">
+                    <CardTitle className="text-lg">{user.name}</CardTitle>
+                    <p className="text-sm text-muted-foreground">{user.email}</p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className={`px-2 py-1 text-xs rounded-full ${
+                      user.role === 'admin' ? 'bg-red-100 text-red-800' :
+                      user.role === 'manager' ? 'bg-blue-100 text-blue-800' :
+                      'bg-green-100 text-green-800'
+                    }`}>
+                      {user.role === 'admin' ? 'Administrador' :
+                       user.role === 'manager' ? 'Gerente' : 'Usuário'}
+                    </span>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-xs text-muted-foreground">Departamento</p>
+                    <p className="text-sm font-medium">{user.department || 'N/A'}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground">Cargo</p>
+                    <p className="text-sm font-medium">{user.position || 'N/A'}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   const renderReportsContent = () => {
     const totalProjects = projects.length;
@@ -267,11 +376,73 @@ export default function SimpleModal({
     );
   };
 
+  const renderImportContent = () => (
+    <div className="space-y-4">
+      <div className="text-center py-4">
+        <Upload className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+        <h3 className="text-lg font-semibold mb-2">Importar Atividades via CSV</h3>
+        <p className="text-sm text-muted-foreground mb-4">
+          Importe múltiplas atividades de uma vez usando um arquivo CSV.
+        </p>
+      </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Formato do Arquivo CSV</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-muted-foreground mb-2">
+            O arquivo deve conter as seguintes colunas (nesta ordem):
+          </p>
+          <div className="bg-gray-50 p-3 rounded-lg text-sm font-mono">
+            nome,descricao,disciplina,responsavel,prioridade,status,valor_planejado
+          </div>
+          <p className="text-xs text-muted-foreground mt-2">
+            Exemplo: "Análise de Requisitos,Levantamento inicial,Análise,João Silva,high,not_started,5000"
+          </p>
+        </CardContent>
+      </Card>
+
+      <div className="space-y-4">
+        <div>
+          <Label htmlFor="csv-file">Selecionar arquivo CSV</Label>
+          <Input
+            id="csv-file"
+            type="file"
+            accept=".csv"
+            onChange={(e) => setCsvFile(e.target.files?.[0] || null)}
+            className="mt-1"
+          />
+        </div>
+
+        {csvFile && (
+          <div className="p-3 bg-blue-50 rounded-lg">
+            <p className="text-sm text-blue-800">
+              Arquivo selecionado: {csvFile.name}
+            </p>
+            <p className="text-xs text-blue-600 mt-1">
+              Tamanho: {(csvFile.size / 1024).toFixed(1)} KB
+            </p>
+          </div>
+        )}
+
+        <Button 
+          onClick={handleImportCSV} 
+          disabled={!csvFile || isImporting}
+          className="w-full"
+        >
+          {isImporting ? 'Importando...' : 'Importar Atividades'}
+        </Button>
+      </div>
+    </div>
+  );
+
   const renderContent = () => {
     switch (type) {
       case 'projects': return renderProjectsContent();
       case 'users': return renderUsersContent();
       case 'reports': return renderReportsContent();
+      case 'import': return renderImportContent();
       default: return <div>Conteúdo não encontrado</div>;
     }
   };
