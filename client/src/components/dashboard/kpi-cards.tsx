@@ -23,46 +23,53 @@ interface KPICardsProps {
 
 export default function KPICards({ metrics, dashboardId, activities, projects, onKPIUpdate }: KPICardsProps) {
   const [isKPIManagerOpen, setIsKPIManagerOpen] = useState(false);
+  const totalProjects = projects?.length || 0;
+  const activeProjects = projects?.filter(p => p.status === 'active' || p.status === 'in_progress')?.length || 0;
+  const completionRate = metrics.totalActivities > 0 ? ((metrics.completedActivities / metrics.totalActivities) * 100) : 0;
+  const totalBudget = projects?.reduce((sum, p) => sum + (parseFloat(p.budget) || 0), 0) || 0;
+  const totalActualCost = projects?.reduce((sum, p) => sum + (parseFloat(p.actualCost) || 0), 0) || 0;
+  const budgetVariance = totalBudget > 0 ? (((totalActualCost - totalBudget) / totalBudget) * 100) : 0;
+
   const kpis = [
     {
-      title: "Projetos Ativos",
-      value: metrics.totalActivities,
+      title: "Total de Projetos",
+      value: totalProjects,
       icon: Folder,
-      trend: "+12%",
-      trendText: "vs mês anterior",
-      trendUp: true,
-      bgColor: "bg-primary/10",
-      iconColor: "text-primary"
+      trend: `${activeProjects} ativos`,
+      trendText: "em execução",
+      trendUp: activeProjects > 0,
+      bgColor: "bg-blue-100 dark:bg-blue-900/20",
+      iconColor: "text-blue-600 dark:text-blue-400"
+    },
+    {
+      title: "Taxa de Conclusão",
+      value: `${completionRate.toFixed(1)}%`,
+      icon: CheckCircle,
+      trend: `${metrics.completedActivities}/${metrics.totalActivities}`,
+      trendText: "atividades concluídas",
+      trendUp: completionRate > 50,
+      bgColor: completionRate > 75 ? "bg-green-100 dark:bg-green-900/20" : "bg-yellow-100 dark:bg-yellow-900/20",
+      iconColor: completionRate > 75 ? "text-green-600 dark:text-green-400" : "text-yellow-600 dark:text-yellow-400"
+    },
+    {
+      title: "Orçamento Total",
+      value: new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(totalBudget),
+      icon: TrendingUp,
+      trend: `${budgetVariance >= 0 ? '+' : ''}${budgetVariance.toFixed(1)}%`,
+      trendText: "variação orçamentária",
+      trendUp: budgetVariance <= 0,
+      bgColor: budgetVariance <= 0 ? "bg-green-100 dark:bg-green-900/20" : "bg-red-100 dark:bg-red-900/20",
+      iconColor: budgetVariance <= 0 ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"
     },
     {
       title: "SPI Médio",
-      value: (metrics.averageSPI || 0).toFixed(2),
+      value: (metrics.averageSPI || 1).toFixed(2),
       icon: TrendingDown,
-      trend: "-5%",
-      trendText: "abaixo do ideal",
-      trendUp: false,
-      bgColor: "bg-amber-100 dark:bg-amber-900/20",
-      iconColor: "text-amber-600 dark:text-amber-400"
-    },
-    {
-      title: "CPI Médio",
-      value: (metrics.averageCPI || 0).toFixed(2),
-      icon: TrendingUp,
-      trend: "+8%",
-      trendText: "acima do orçamento",
-      trendUp: true,
-      bgColor: "bg-emerald-100 dark:bg-emerald-900/20",
-      iconColor: "text-emerald-600 dark:text-emerald-400"
-    },
-    {
-      title: "Tarefas Concluídas",
-      value: metrics.completedActivities || 0,
-      icon: CheckCircle,
-      trend: `${(metrics.overallCompletionPercentage || 0).toFixed(0)}%`,
-      trendText: "da meta mensal",
-      trendUp: true,
-      bgColor: "bg-emerald-100 dark:bg-emerald-900/20",
-      iconColor: "text-emerald-600 dark:text-emerald-400"
+      trend: metrics.averageSPI >= 1 ? "No prazo" : "Atrasado",
+      trendText: "performance cronograma",
+      trendUp: metrics.averageSPI >= 1,
+      bgColor: metrics.averageSPI >= 1 ? "bg-green-100 dark:bg-green-900/20" : "bg-red-100 dark:bg-red-900/20",
+      iconColor: metrics.averageSPI >= 1 ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"
     }
   ];
 

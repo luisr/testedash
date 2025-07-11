@@ -7,6 +7,7 @@ import KPICards from './kpi-cards';
 import ChartsSection from './charts-section';
 import ActivityTable from './activity-table';
 import ActivitiesPanel from './activities-panel';
+import ActivitySummary from './activity-summary';
 import ProjectViews from './project-views';
 import BackupManagement from './backup-management';
 import { Button } from '@/components/ui/button';
@@ -125,6 +126,9 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({
         projects={projects}
         onKPIUpdate={() => window.location.reload()}
       />
+
+      {/* Activity Summary */}
+      <ActivitySummary activities={activities} />
 
       {/* Charts Section */}
       <ChartsSection 

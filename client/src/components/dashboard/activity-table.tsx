@@ -370,26 +370,34 @@ export default function ActivityTable({
                                       )}
                                     </div>
                                     <div className="text-sm text-muted-foreground">
-                                      Projeto {activity.projectId}
+                                      {activity.startDate && activity.finishDate ? (
+                                        <>
+                                          {new Date(activity.startDate).toLocaleDateString('pt-BR')} - {new Date(activity.finishDate).toLocaleDateString('pt-BR')}
+                                        </>
+                                      ) : (
+                                        'Datas não definidas'
+                                      )}
                                     </div>
                                   </div>
                                 </div>
                               </div>
                             </TableCell>
                             <TableCell className="text-foreground">
-                              {activity.discipline}
+                              <Badge variant="secondary" className="text-xs">
+                                {activity.discipline || 'Geral'}
+                              </Badge>
                             </TableCell>
                             <TableCell>
                               <div className="flex items-center">
                                 <Avatar className="w-8 h-8">
                                   <AvatarImage src={`https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face`} />
                                   <AvatarFallback>
-                                    {activity.responsible.split(' ').map(n => n[0]).join('')}
+                                    {activity.responsible ? activity.responsible.split(' ').map(n => n[0]).join('') : 'N/A'}
                                   </AvatarFallback>
                                 </Avatar>
                                 <div className="ml-3">
                                   <div className="text-sm font-medium text-foreground">
-                                    {activity.responsible}
+                                    {activity.responsible || 'Não atribuído'}
                                   </div>
                                 </div>
                               </div>
@@ -409,10 +417,24 @@ export default function ActivityTable({
                               </div>
                             </TableCell>
                             <TableCell className="text-foreground">
-                              {calculateSPI(activity)}
+                              <div className="flex items-center">
+                                <span className={`text-sm font-medium ${
+                                  parseFloat(calculateSPI(activity)) >= 1 ? 'text-green-600' : 'text-red-600'
+                                }`}>
+                                  {calculateSPI(activity)}
+                                </span>
+                                <div className="ml-2 w-2 h-2 rounded-full bg-current opacity-50"></div>
+                              </div>
                             </TableCell>
                             <TableCell className="text-foreground">
-                              {calculateCPI(activity)}
+                              <div className="flex items-center">
+                                <span className={`text-sm font-medium ${
+                                  parseFloat(calculateCPI(activity)) >= 1 ? 'text-green-600' : 'text-red-600'
+                                }`}>
+                                  {calculateCPI(activity)}
+                                </span>
+                                <div className="ml-2 w-2 h-2 rounded-full bg-current opacity-50"></div>
+                              </div>
                             </TableCell>
                             <TableCell>
                               <div className="flex items-center space-x-1">
