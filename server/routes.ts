@@ -504,16 +504,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put("/api/projects/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
-      const projectData = insertProjectSchema.partial().parse(req.body);
+      const rawData = req.body;
+      
+      // Convert date strings to Date objects
+      const projectData = {
+        ...rawData,
+        startDate: rawData.startDate ? new Date(rawData.startDate) : undefined,
+        endDate: rawData.endDate ? new Date(rawData.endDate) : undefined,
+        budget: rawData.budget ? String(rawData.budget) : undefined,
+        actualCost: rawData.actualCost ? String(rawData.actualCost) : undefined,
+        updatedAt: new Date()
+      };
+      
       const project = await storage.updateProject(id, projectData);
       if (!project) {
         return res.status(404).json({ message: "Project not found" });
       }
       res.json(project);
     } catch (error) {
-      if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: "Invalid input", errors: error.errors });
-      }
+      console.error("Error updating project:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });

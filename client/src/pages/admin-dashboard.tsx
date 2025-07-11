@@ -29,6 +29,7 @@ import {
 import beachParkLogo from "@assets/pngegg_1752264509099.png";
 import NewUserModal from "@/components/dashboard/new-user-modal";
 import NewProjectModal from "@/components/dashboard/new-project-modal";
+import EditProjectModal from "@/components/dashboard/edit-project-modal";
 import EditUserModal from "@/components/dashboard/edit-user-modal";
 import ChangePasswordModal from "@/components/auth/change-password-modal";
 
@@ -62,6 +63,8 @@ export default function AdminDashboard() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [showNewUserModal, setShowNewUserModal] = useState(false);
   const [showNewProjectModal, setShowNewProjectModal] = useState(false);
+  const [showEditProjectModal, setShowEditProjectModal] = useState(false);
+  const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [showEditUserModal, setShowEditUserModal] = useState(false);
   const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
 
@@ -176,6 +179,11 @@ export default function AdminDashboard() {
     } catch (error) {
       console.error('Error accessing project:', error);
     }
+  };
+
+  const handleEditProject = (project: Project) => {
+    setEditingProject(project);
+    setShowEditProjectModal(true);
   };
 
   const getInitials = (name: string) => {
@@ -385,60 +393,7 @@ export default function AdminDashboard() {
               </Button>
             </div>
             
-            {/* Projects List */}
-            <div className="grid gap-4">
-              {projects.map((project) => (
-                <Card key={project.id} className="hover:shadow-lg transition-shadow">
-                  <CardHeader className="pb-3">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <CardTitle className="text-lg">{project.name}</CardTitle>
-                        <p className="text-sm text-muted-foreground mt-1">{project.description}</p>
-                      </div>
-                      <Badge className={getStatusColor(project.status)}>
-                        {project.status}
-                      </Badge>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                      <div>
-                        <p className="text-sm font-medium">Orçamento</p>
-                        <p className="text-sm text-muted-foreground">R$ {parseFloat(project.budget || '0').toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium">Gasto</p>
-                        <p className="text-sm text-muted-foreground">R$ {parseFloat(project.actualCost || '0').toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium">Início</p>
-                        <p className="text-sm text-muted-foreground">
-                          {project.startDate ? new Date(project.startDate).toLocaleDateString('pt-BR') : 'Não definido'}
-                        </p>
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium">Fim</p>
-                        <p className="text-sm text-muted-foreground">
-                          {project.endDate ? new Date(project.endDate).toLocaleDateString('pt-BR') : 'Não definido'}
-                        </p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-              
-              {projects.length === 0 && (
-                <Card>
-                  <CardContent className="text-center py-8">
-                    <p className="text-muted-foreground">Nenhum projeto encontrado.</p>
-                    <Button onClick={() => setShowNewProjectModal(true)} className="mt-4">
-                      <Plus className="w-4 h-4 mr-2" />
-                      Criar Primeiro Projeto
-                    </Button>
-                  </CardContent>
-                </Card>
-              )}
-            </div>
+
 
             <div className="flex gap-4 mb-6">
               <div className="flex-1">
@@ -504,7 +459,7 @@ export default function AdminDashboard() {
                           Acessar
                         </Button>
                       )}
-                      <Button size="sm" variant="outline">
+                      <Button size="sm" variant="outline" onClick={() => handleEditProject(project)}>
                         <Edit className="w-4 h-4 mr-1" />
                         Editar
                       </Button>
@@ -718,6 +673,17 @@ export default function AdminDashboard() {
         onClose={() => setShowNewProjectModal(false)}
         onProjectCreated={fetchProjects}
       />
+      
+      {editingProject && (
+        <EditProjectModal
+          project={editingProject}
+          open={showEditProjectModal}
+          onOpenChange={(open) => {
+            setShowEditProjectModal(open);
+            if (!open) setEditingProject(null);
+          }}
+        />
+      )}
       
       {editingUser && (
         <EditUserModal
