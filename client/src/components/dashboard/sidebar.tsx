@@ -21,21 +21,25 @@ interface SidebarProps {
   isOpen: boolean;
   onClose: () => void;
   onActivityLogToggle: () => void;
+  onUsersClick?: () => void;
+  onProjectsClick?: () => void;
+  onReportsClick?: () => void;
+  onSettingsClick?: () => void;
 }
 
-export default function Sidebar({ isOpen, onClose, onActivityLogToggle }: SidebarProps) {
+export default function Sidebar({ isOpen, onClose, onActivityLogToggle, onUsersClick, onProjectsClick, onReportsClick, onSettingsClick }: SidebarProps) {
   const navigation = [
     { name: "Dashboard", href: "/", icon: LayoutDashboard, current: true },
-    { name: "Projetos", href: "/projects", icon: Folder, current: false },
+    { name: "Projetos", href: "#", icon: Folder, current: false, onClick: onProjectsClick },
     { name: "Cronograma", href: "/schedule", icon: Calendar, current: false },
-    { name: "Relatórios", href: "/reports", icon: BarChart3, current: false },
+    { name: "Relatórios", href: "#", icon: BarChart3, current: false, onClick: onReportsClick },
   ];
 
   const adminNavigation = [
-    { name: "Usuários", href: "/users", icon: Users, current: false },
+    { name: "Usuários", href: "#", icon: Users, current: false, onClick: onUsersClick },
     { name: "Compartilhamentos", href: "/shares", icon: Share2, current: false },
     { name: "Logs de Atividade", href: "#", icon: Activity, current: false, onClick: onActivityLogToggle },
-    { name: "Configurações", href: "/settings", icon: Settings, current: false },
+    { name: "Configurações", href: "#", icon: Settings, current: false, onClick: onSettingsClick },
   ];
 
   return (
@@ -73,20 +77,30 @@ export default function Sidebar({ isOpen, onClose, onActivityLogToggle }: Sideba
         <nav className="mt-6 px-4 space-y-6">
           <div className="space-y-1">
             {navigation.map((item) => (
-              <Link key={item.name} href={item.href}>
-                <Button
-                  variant={item.current ? "default" : "ghost"}
-                  className={cn(
-                    "w-full justify-start space-x-3 py-3 px-3 rounded-lg font-medium transition-all",
-                    item.current 
-                      ? "bg-primary text-primary-foreground shadow-elegant hover:bg-primary/90" 
-                      : "text-foreground hover:bg-accent hover:text-accent-foreground hover-lift"
-                  )}
-                >
-                  <item.icon className="w-5 h-5" />
-                  <span>{item.name}</span>
-                </Button>
-              </Link>
+              <Button
+                key={item.name}
+                variant={item.current ? "default" : "ghost"}
+                className={cn(
+                  "w-full justify-start space-x-3 py-3 px-3 rounded-lg font-medium transition-all",
+                  item.current 
+                    ? "bg-primary text-primary-foreground shadow-elegant hover:bg-primary/90" 
+                    : "text-foreground hover:bg-accent hover:text-accent-foreground hover-lift"
+                )}
+                onClick={item.onClick}
+                asChild={!item.onClick}
+              >
+                {item.onClick ? (
+                  <>
+                    <item.icon className="w-5 h-5" />
+                    <span>{item.name}</span>
+                  </>
+                ) : (
+                  <Link href={item.href}>
+                    <item.icon className="w-5 h-5" />
+                    <span>{item.name}</span>
+                  </Link>
+                )}
+              </Button>
             ))}
           </div>
           

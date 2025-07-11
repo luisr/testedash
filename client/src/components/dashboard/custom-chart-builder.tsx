@@ -141,7 +141,20 @@ export default function CustomChartBuilder({ dashboardId, activities, projects, 
       const response = await fetch(`/api/custom-charts`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...chart, dashboardId })
+        body: JSON.stringify({
+          name: chart.name,
+          type: chart.type,
+          dataSource: chart.dataSource,
+          xField: chart.xAxis,
+          yField: chart.yAxis,
+          dashboardId: dashboardId,
+          config: {
+            colors: chart.colors,
+            aggregation: chart.aggregation,
+            filters: chart.filters,
+            width: chart.width
+          }
+        })
       });
 
       if (response.ok) {

@@ -232,6 +232,10 @@ export default function Dashboard() {
         isOpen={sidebarOpen} 
         onClose={() => setSidebarOpen(false)}
         onActivityLogToggle={() => setActivityLogOpen(!activityLogOpen)}
+        onUsersClick={() => setUsersListModalOpen(true)}
+        onProjectsClick={() => setProjectsListModalOpen(true)}
+        onReportsClick={() => setModalType('reports')}
+        onSettingsClick={() => setModalType('import')}
       />
       
       <div className="flex-1 lg:ml-0">
