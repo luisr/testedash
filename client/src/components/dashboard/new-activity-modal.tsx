@@ -6,20 +6,22 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Calendar, CalendarDays, DollarSign, User, FolderOpen, AlertCircle } from "lucide-react";
-import { Project } from "@shared/schema";
+import { Project, Activity } from "@shared/schema";
 
 interface NewActivityModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (activityData: any) => void;
   projects: Project[];
+  activities?: Activity[];
 }
 
-export default function NewActivityModal({ isOpen, onClose, onSubmit, projects }: NewActivityModalProps) {
+export default function NewActivityModal({ isOpen, onClose, onSubmit, projects, activities = [] }: NewActivityModalProps) {
   const [formData, setFormData] = useState({
     name: '',
     description: '',
     projectId: '',
+    parentActivityId: '',
     discipline: '',
     responsible: '',
     priority: 'medium',
@@ -38,6 +40,7 @@ export default function NewActivityModal({ isOpen, onClose, onSubmit, projects }
     const activityData = {
       ...formData,
       projectId: formData.projectId ? parseInt(formData.projectId) : null,
+      parentActivityId: formData.parentActivityId ? parseInt(formData.parentActivityId) : null,
       plannedValue: formData.plannedValue || '0',
       actualCost: '0',
       earnedValue: '0',
@@ -55,6 +58,7 @@ export default function NewActivityModal({ isOpen, onClose, onSubmit, projects }
       name: '',
       description: '',
       projectId: '',
+      parentActivityId: '',
       discipline: '',
       responsible: '',
       priority: 'medium',
@@ -141,6 +145,23 @@ export default function NewActivityModal({ isOpen, onClose, onSubmit, projects }
                   {projects.map(project => (
                     <SelectItem key={project.id} value={project.id.toString()}>
                       {project.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="parentActivityId">Atividade Pai (Opcional)</Label>
+              <Select value={formData.parentActivityId} onValueChange={(value) => handleInputChange('parentActivityId', value)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecione para criar subatividade" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">Nenhuma (Atividade Principal)</SelectItem>
+                  {activities.filter(activity => !activity.parentActivityId).map(activity => (
+                    <SelectItem key={activity.id} value={activity.id.toString()}>
+                      {activity.name}
                     </SelectItem>
                   ))}
                 </SelectContent>
