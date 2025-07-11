@@ -10,10 +10,10 @@ export interface ConsolidatedDashboardData {
   projectsStats: any[];
 }
 
-export function useConsolidatedDashboard() {
+export function useConsolidatedDashboard(userId?: number) {
   const { data, isLoading, error } = useQuery<ConsolidatedDashboardData>({
-    queryKey: ["/api/dashboard/consolidated"],
-    enabled: true,
+    queryKey: ["/api/dashboard/consolidated", { userId }],
+    enabled: !!userId,
   });
 
   const consolidatedData = data || {

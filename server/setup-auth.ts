@@ -28,6 +28,7 @@ export async function setupAuthTables() {
     try {
       await client`ALTER TABLE users ADD COLUMN IF NOT EXISTS password_hash TEXT`;
       await client`ALTER TABLE users ADD COLUMN IF NOT EXISTS is_active BOOLEAN DEFAULT TRUE`;
+      await client`ALTER TABLE users ADD COLUMN IF NOT EXISTS is_super_user BOOLEAN DEFAULT FALSE`;
     } catch (error) {
       console.log('Users table columns already exist:', error.message);
     }
@@ -90,6 +91,13 @@ export async function setupAuthTables() {
       UPDATE users 
       SET is_active = TRUE 
       WHERE is_active IS NULL;
+    `;
+
+    // Set Luis as super user
+    await client`
+      UPDATE users 
+      SET is_super_user = TRUE 
+      WHERE email = 'luis.ribeiro@beachpark.com.br';
     `;
 
     // Insert default collaborators for existing projects

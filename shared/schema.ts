@@ -10,6 +10,7 @@ export const users = pgTable("users", {
   role: text("role").notNull().default("user"), // user, admin, manager
   passwordHash: text("password_hash"), // For simple authentication
   isActive: boolean("is_active").default(true),
+  isSuperUser: boolean("is_super_user").default(false), // Super user can access consolidated dashboard
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

@@ -244,14 +244,106 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Consolidated dashboard data (read-only for dashboard ID 1)
+  // Consolidated dashboard data (super users only)
   app.get("/api/dashboard/consolidated", async (req, res) => {
     try {
+      const userId = req.query.userId as string;
+      
+      if (!userId) {
+        return res.status(401).json({ error: 'User ID required' });
+      }
+      
+      const user = await storage.getUser(Number(userId));
+      
+      if (!user || !user.isSuperUser) {
+        return res.status(403).json({ error: 'Access denied. Super user privileges required.' });
+      }
+      
       const consolidatedData = await storage.getConsolidatedDashboardData();
-      res.json(consolidatedData);
+      res.json({ ...consolidatedData, readOnly: true });
     } catch (error) {
       console.error("Error fetching consolidated dashboard data:", error);
       res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Super User Management Routes
+  app.get("/api/super-users", async (req, res) => {
+    try {
+      const userId = req.query.userId as string;
+      
+      if (!userId) {
+        return res.status(401).json({ error: 'User ID required' });
+      }
+      
+      const user = await storage.getUser(Number(userId));
+      
+      if (!user || !user.isSuperUser) {
+        return res.status(403).json({ error: 'Access denied. Super user privileges required.' });
+      }
+      
+      const users = await storage.getUsers();
+      const superUsers = users.filter(u => u.isSuperUser);
+      res.json(superUsers);
+    } catch (error) {
+      console.error("Error fetching super users:", error);
+      res.status(500).json({ error: "Failed to fetch super users" });
+    }
+  });
+
+  app.post("/api/super-users/:targetUserId/promote", async (req, res) => {
+    try {
+      const { userId } = req.body;
+      const targetUserId = parseInt(req.params.targetUserId);
+      
+      if (!userId) {
+        return res.status(401).json({ error: 'User ID required' });
+      }
+      
+      const user = await storage.getUser(Number(userId));
+      
+      if (!user || !user.isSuperUser) {
+        return res.status(403).json({ error: 'Access denied. Super user privileges required.' });
+      }
+      
+      const updatedUser = await storage.updateUser(targetUserId, { isSuperUser: true });
+      
+      if (updatedUser) {
+        res.json({ message: 'User promoted to super user successfully', user: updatedUser });
+      } else {
+        res.status(404).json({ error: 'User not found' });
+      }
+    } catch (error) {
+      console.error("Error promoting user to super user:", error);
+      res.status(500).json({ error: "Failed to promote user to super user" });
+    }
+  });
+
+  app.post("/api/super-users/:targetUserId/demote", async (req, res) => {
+    try {
+      const { userId } = req.body;
+      const targetUserId = parseInt(req.params.targetUserId);
+      
+      if (!userId) {
+        return res.status(401).json({ error: 'User ID required' });
+      }
+      
+      const user = await storage.getUser(Number(userId));
+      
+      if (!user || !user.isSuperUser) {
+        return res.status(403).json({ error: 'Access denied. Super user privileges required.' });
+      }
+      
+      const updatedUser = await storage.updateUser(targetUserId, { isSuperUser: false });
+      
+      if (updatedUser) {
+        res.json({ message: 'User demoted from super user successfully', user: updatedUser });
+      } else {
+        res.status(404).json({ error: 'User not found' });
+      }
+    } catch (error) {
+      console.error("Error demoting user from super user:", error);
+      res.status(500).json({ error: "Failed to demote user from super user" });
     }
   });
 

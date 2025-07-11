@@ -166,8 +166,8 @@ export interface IStorage {
 
 // Mock data for development
 const mockUsers: User[] = [
-  { id: 1, email: 'admin@example.com', name: 'João Silva', avatar: null, role: 'admin', createdAt: new Date(), updatedAt: new Date() },
-  { id: 2, email: 'user@example.com', name: 'Maria Santos', avatar: null, role: 'user', createdAt: new Date(), updatedAt: new Date() }
+  { id: 1, email: 'admin@example.com', name: 'João Silva', avatar: null, role: 'admin', passwordHash: null, isActive: true, isSuperUser: false, createdAt: new Date(), updatedAt: new Date() },
+  { id: 2, email: 'user@example.com', name: 'Maria Santos', avatar: null, role: 'user', passwordHash: null, isActive: true, isSuperUser: false, createdAt: new Date(), updatedAt: new Date() }
 ];
 
 const mockDashboards: Dashboard[] = [
@@ -231,6 +231,9 @@ export class DatabaseStorage implements IStorage {
       ...user,
       avatar: user.avatar || null,
       role: user.role || 'user',
+      passwordHash: user.passwordHash || null,
+      isActive: user.isActive ?? true,
+      isSuperUser: user.isSuperUser ?? false,
       createdAt: new Date(),
       updatedAt: new Date()
     };

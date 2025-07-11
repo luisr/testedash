@@ -22,7 +22,7 @@ import SimpleModal from "@/components/dashboard/simple-modal";
 import { NotificationPopup } from "@/components/notifications/notification-popup";
 import { NotificationPreferencesDialog } from "@/components/notifications/notification-preferences-dialog";
 import { Button } from "@/components/ui/button";
-import { Plus, FolderOpen, Users, FileText, Upload, Archive } from "lucide-react";
+import { Plus, FolderOpen, Users, FileText, Upload, Archive, Crown } from "lucide-react";
 import { BackupSimple } from "@/components/dashboard/backup-simple";
 import { DependencyManager } from "@/components/dashboard/dependency-manager";
 import { ActivityDateEditor } from "@/components/dashboard/activity-date-editor";
@@ -33,12 +33,33 @@ import { UsersListModal } from "@/components/dashboard/users-list-modal";
 import { ProjectsListModal } from "@/components/dashboard/projects-list-modal";
 import ProjectsModal from "@/components/dashboard/projects-modal";
 import UsersModal from "@/components/dashboard/users-modal";
+import SuperUserModal from "@/components/dashboard/super-user-modal";
 
 export default function Dashboard() {
   const { id } = useParams<{ id?: string }>();
   const dashboardId = id ? parseInt(id) : 1; // Default to dashboard 1
   const userId = 5; // Luis Ribeiro user ID
   const isConsolidatedDashboard = dashboardId === 1; // Dashboard 1 is consolidated read-only
+  
+  // Get user data to check if super user
+  const [user, setUser] = useState<any>(null);
+  const [isSuperUser, setIsSuperUser] = useState(false);
+  
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const response = await fetch(`/api/users/${userId}`);
+        if (response.ok) {
+          const userData = await response.json();
+          setUser(userData);
+          setIsSuperUser(userData.isSuperUser || false);
+        }
+      } catch (error) {
+        console.error('Error fetching user:', error);
+      }
+    };
+    fetchUser();
+  }, [userId]);
   
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [shareModalOpen, setShareModalOpen] = useState(false);
@@ -51,6 +72,7 @@ export default function Dashboard() {
   const [newProjectModalOpen, setNewProjectModalOpen] = useState(false);
   const [usersListModalOpen, setUsersListModalOpen] = useState(false);
   const [projectsListModalOpen, setProjectsListModalOpen] = useState(false);
+  const [superUserModalOpen, setSuperUserModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
   const [filterResponsible, setFilterResponsible] = useState("all");
@@ -83,9 +105,35 @@ export default function Dashboard() {
     }
   };
 
+  // Check access to consolidated dashboard
+  if (isConsolidatedDashboard && !isSuperUser && user) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-cyan-50 flex items-center justify-center p-4">
+        <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 max-w-md w-full shadow-lg border border-white/50">
+          <div className="text-center">
+            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <span className="text-red-600 text-2xl">🚫</span>
+            </div>
+            <h1 className="text-xl font-semibold text-gray-900 mb-2">Acesso Negado</h1>
+            <p className="text-gray-600 mb-4">
+              Você não tem permissão para acessar o dashboard consolidado. 
+              Apenas super usuários podem visualizar dados consolidados.
+            </p>
+            <Button 
+              onClick={() => window.location.href = '/dashboard/2'} 
+              className="w-full bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600"
+            >
+              Ir para Meu Dashboard
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   // Use consolidated dashboard for dashboard ID 1, regular dashboard for others
   const regularDashboard = useDashboardData(dashboardId);
-  const consolidatedDashboard = useConsolidatedDashboard();
+  const consolidatedDashboard = useConsolidatedDashboard(userId);
   
   const {
     dashboard,
@@ -517,6 +565,16 @@ export default function Dashboard() {
                   </Button>
                 }
               />
+              {isSuperUser && (
+                <Button
+                  onClick={() => setSuperUserModalOpen(true)}
+                  variant="outline"
+                  className="flex items-center gap-2 text-yellow-600 border-yellow-600 hover:bg-yellow-50"
+                >
+                  <Crown className="h-4 w-4" />
+                  Super Usuários
+                </Button>
+              )}
             </div>
           </div>
 
@@ -640,6 +698,12 @@ export default function Dashboard() {
         onCreateUser={createUser}
         onUpdateUser={updateUser}
         onDeleteUser={deleteUser}
+      />
+
+      <SuperUserModal
+        isOpen={superUserModalOpen}
+        onClose={() => setSuperUserModalOpen(false)}
+        currentUserId={userId}
       />
     </div>
   );
