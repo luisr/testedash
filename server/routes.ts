@@ -210,7 +210,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const activities = await storage.getActivitiesByDashboardId(dashboardId);
       res.json(activities);
     } catch (error) {
-      res.status(500).json({ message: "Internal server error" });
+      console.error("Error getting activities:", error);
+      res.status(500).json({ message: "Internal server error", error: error instanceof Error ? error.message : 'Unknown error' });
     }
   });
 
@@ -1153,7 +1154,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ADD COLUMN IF NOT EXISTS duration INTEGER,
         ADD COLUMN IF NOT EXISTS buffer_time INTEGER,
         ADD COLUMN IF NOT EXISTS is_auto_scheduled BOOLEAN,
-        ADD COLUMN IF NOT EXISTS critical_path BOOLEAN;
+        ADD COLUMN IF NOT EXISTS critical_path BOOLEAN,
+        ADD COLUMN IF NOT EXISTS parent_activity_id INTEGER REFERENCES activities(id),
+        ADD COLUMN IF NOT EXISTS sort_order INTEGER DEFAULT 0,
+        ADD COLUMN IF NOT EXISTS level INTEGER DEFAULT 0;
       `);
       
       // Create indexes for better performance

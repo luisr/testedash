@@ -44,6 +44,7 @@ export const activities = pgTable("activities", {
   description: text("description"),
   projectId: integer("project_id").references(() => projects.id),
   dashboardId: integer("dashboard_id").references(() => dashboards.id),
+  parentActivityId: integer("parent_activity_id"), // For sub-activities
   discipline: text("discipline").notNull(),
   responsible: text("responsible").notNull(),
   priority: text("priority").default("medium"), // low, medium, high, critical
@@ -66,6 +67,8 @@ export const activities = pgTable("activities", {
   bufferTime: integer("buffer_time").default(0), // Buffer time in days
   isAutoScheduled: boolean("is_auto_scheduled").default(true), // Whether dates are auto-calculated
   criticalPath: boolean("critical_path").default(false), // Whether this activity is on critical path
+  sortOrder: integer("sort_order").default(0), // For ordering sub-activities
+  level: integer("level").default(0), // Hierarchy level (0 = root, 1 = first level sub-activity, etc.)
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

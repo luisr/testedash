@@ -8,6 +8,7 @@ import Header from "@/components/dashboard/header";
 import KPICards from "@/components/dashboard/kpi-cards";
 import ChartsSection from "@/components/dashboard/charts-section";
 import ActivityTable from "@/components/dashboard/activity-table";
+import ActivitiesPanel from "@/components/dashboard/activities-panel";
 import ShareModalEnhanced from "@/components/dashboard/share-modal-enhanced";
 import ActivityLogPanel from "@/components/dashboard/activity-log-panel";
 import ExportModal from "@/components/dashboard/export-modal";
@@ -280,10 +281,6 @@ export default function Dashboard() {
                   </Button>
                 }
               />
-              <DependencyManager
-                dashboardId={dashboardId}
-                activities={activities}
-              />
               <Button
                 onClick={() => {
                   // Create a test notification
@@ -301,13 +298,6 @@ export default function Dashboard() {
               >
                 Testar Notificação
               </Button>
-              <Button 
-                onClick={() => setNewActivityModalOpen(true)}
-                className="flex items-center gap-2"
-              >
-                <Plus className="h-4 w-4" />
-                Nova Atividade
-              </Button>
             </div>
           </div>
 
@@ -318,25 +308,25 @@ export default function Dashboard() {
             customCharts={customCharts}
           />
           
-          <ActivityTable 
+          <ActivitiesPanel 
             activities={metrics.filteredActivities}
-            customColumns={customColumns}
+            dashboardId={dashboardId}
             searchTerm={searchTerm}
             onSearchChange={setSearchTerm}
-            filterStatus={filterStatus}
-            onFilterStatusChange={setFilterStatus}
-            filterResponsible={filterResponsible}
-            onFilterResponsibleChange={setFilterResponsible}
-            startDate={startDate}
-            onStartDateChange={setStartDate}
-            endDate={endDate}
-            onEndDateChange={setEndDate}
-            onActivityUpdate={updateActivity}
-            onActivityDelete={deleteActivity}
-            onActivitiesImport={handleBulkImport}
-            onCustomColumnsUpdate={() => window.location.reload()}
-            onExport={handleExport}
-            dashboardId={dashboardId}
+            onNewActivity={() => setNewActivityModalOpen(true)}
+            onUpdateActivity={updateActivity}
+            onDeleteActivity={deleteActivity}
+            onEditActivity={(activity) => {
+              // TODO: Implement edit activity modal
+              console.log('Edit activity:', activity);
+            }}
+            onCreateSubActivity={(parentId) => {
+              // TODO: Implement create sub-activity modal with parent ID
+              console.log('Create sub-activity for parent:', parentId);
+              setNewActivityModalOpen(true);
+            }}
+            onBulkImport={handleBulkImport}
+            customColumns={customColumns}
           />
         </main>
       </div>
