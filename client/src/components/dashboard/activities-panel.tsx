@@ -47,12 +47,15 @@ const ActivitiesPanel: React.FC<ActivitiesPanelProps> = ({
   const [viewMode, setViewMode] = useState<'hierarchical' | 'table'>('hierarchical');
   const [showDependencies, setShowDependencies] = useState(false);
 
-  const filteredActivities = (activities || []).filter(activity =>
-    activity?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    activity?.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    activity?.discipline?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    activity?.responsible?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredActivities = (activities || []).filter(activity => {
+    const searchText = (searchTerm || '').toLowerCase();
+    return (
+      activity?.name?.toLowerCase().includes(searchText) ||
+      activity?.description?.toLowerCase().includes(searchText) ||
+      activity?.discipline?.toLowerCase().includes(searchText) ||
+      activity?.responsible?.toLowerCase().includes(searchText)
+    );
+  });
 
   const getStatusCounts = () => {
     const counts = {
