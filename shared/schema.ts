@@ -152,6 +152,61 @@ export const notificationPreferences = pgTable("notification_preferences", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
+// Dashboard Backups and Versioning
+export const dashboardBackups = pgTable("dashboard_backups", {
+  id: serial("id").primaryKey(),
+  dashboardId: integer("dashboard_id").references(() => dashboards.id).notNull(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  version: text("version").notNull(), // e.g., "v1.0.0", "v1.1.0"
+  backupType: text("backup_type").notNull(), // manual, automatic, scheduled
+  triggerEvent: text("trigger_event"), // activity_change, structure_change, user_request
+  dashboardData: jsonb("dashboard_data").notNull(),
+  activitiesData: jsonb("activities_data").notNull(),
+  projectsData: jsonb("projects_data").notNull(),
+  customColumnsData: jsonb("custom_columns_data").notNull(),
+  customChartsData: jsonb("custom_charts_data").notNull(),
+  metadata: jsonb("metadata"), // additional backup metadata
+  description: text("description"),
+  fileSize: integer("file_size"), // backup size in bytes
+  checksum: text("checksum"), // MD5 checksum for integrity
+  isRestorable: boolean("is_restorable").default(true).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  expiresAt: timestamp("expires_at"), // optional expiration
+});
+
+export const dashboardVersions = pgTable("dashboard_versions", {
+  id: serial("id").primaryKey(),
+  dashboardId: integer("dashboard_id").references(() => dashboards.id).notNull(),
+  parentVersionId: integer("parent_version_id"),
+  version: text("version").notNull(),
+  versionName: text("version_name"), // user-friendly name
+  changes: jsonb("changes").notNull(), // detailed change log
+  changedBy: integer("changed_by").references(() => users.id).notNull(),
+  changeType: text("change_type").notNull(), // major, minor, patch
+  releaseNotes: text("release_notes"),
+  isActive: boolean("is_active").default(false).notNull(),
+  isDraft: boolean("is_draft").default(false).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  publishedAt: timestamp("published_at"),
+});
+
+export const backupSchedules = pgTable("backup_schedules", {
+  id: serial("id").primaryKey(),
+  dashboardId: integer("dashboard_id").references(() => dashboards.id).notNull(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  scheduleType: text("schedule_type").notNull(), // daily, weekly, monthly
+  frequency: integer("frequency").default(1).notNull(), // every N days/weeks/months
+  time: text("time"), // HH:MM format
+  dayOfWeek: integer("day_of_week"), // 0-6 for weekly
+  dayOfMonth: integer("day_of_month"), // 1-31 for monthly
+  maxBackups: integer("max_backups").default(10).notNull(), // retention limit
+  isActive: boolean("is_active").default(true).notNull(),
+  lastRun: timestamp("last_run"),
+  nextRun: timestamp("next_run"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).omit({ id: true, createdAt: true, updatedAt: true });
 export const insertDashboardSchema = createInsertSchema(dashboards).omit({ id: true, createdAt: true, updatedAt: true });
@@ -163,6 +218,9 @@ export const insertCustomColumnSchema = createInsertSchema(customColumns).omit({
 export const insertCustomChartSchema = createInsertSchema(customCharts).omit({ id: true, createdAt: true });
 export const insertNotificationSchema = createInsertSchema(notifications).omit({ id: true, createdAt: true });
 export const insertNotificationPreferencesSchema = createInsertSchema(notificationPreferences).omit({ id: true, createdAt: true, updatedAt: true });
+export const insertDashboardBackupSchema = createInsertSchema(dashboardBackups).omit({ id: true, createdAt: true });
+export const insertDashboardVersionSchema = createInsertSchema(dashboardVersions).omit({ id: true, createdAt: true, publishedAt: true });
+export const insertBackupScheduleSchema = createInsertSchema(backupSchedules).omit({ id: true, createdAt: true, updatedAt: true, lastRun: true, nextRun: true });
 
 // Types
 export type User = typeof users.$inferSelect;
@@ -185,3 +243,9 @@ export type Notification = typeof notifications.$inferSelect;
 export type InsertNotification = z.infer<typeof insertNotificationSchema>;
 export type NotificationPreferences = typeof notificationPreferences.$inferSelect;
 export type InsertNotificationPreferences = z.infer<typeof insertNotificationPreferencesSchema>;
+export type DashboardBackup = typeof dashboardBackups.$inferSelect;
+export type InsertDashboardBackup = z.infer<typeof insertDashboardBackupSchema>;
+export type DashboardVersion = typeof dashboardVersions.$inferSelect;
+export type InsertDashboardVersion = z.infer<typeof insertDashboardVersionSchema>;
+export type BackupSchedule = typeof backupSchedules.$inferSelect;
+export type InsertBackupSchedule = z.infer<typeof insertBackupScheduleSchema>;

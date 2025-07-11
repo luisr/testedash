@@ -3,12 +3,14 @@ import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 import {
   users, dashboards, projects, activities, dashboardShares, activityLogs, customColumns, customCharts,
-  notifications, notificationPreferences,
+  notifications, notificationPreferences, dashboardBackups, dashboardVersions, backupSchedules,
   type User, type InsertUser, type Dashboard, type InsertDashboard, type Project, type InsertProject,
   type Activity, type InsertActivity, type DashboardShare, type InsertDashboardShare,
   type ActivityLog, type InsertActivityLog, type CustomColumn, type InsertCustomColumn,
   type CustomChart, type InsertCustomChart, type Notification, type InsertNotification,
-  type NotificationPreferences, type InsertNotificationPreferences
+  type NotificationPreferences, type InsertNotificationPreferences,
+  type DashboardBackup, type InsertDashboardBackup, type DashboardVersion, type InsertDashboardVersion,
+  type BackupSchedule, type InsertBackupSchedule
 } from "@shared/schema";
 
 // Check if DATABASE_URL is properly configured or build from individual components
@@ -102,6 +104,23 @@ export interface IStorage {
   
   // Dashboard Users (for notifications)
   getDashboardUsers(dashboardId: number): Promise<User[]>;
+  
+  // Dashboard Backups
+  getDashboardBackups(dashboardId: number, limit?: number): Promise<DashboardBackup[]>;
+  createDashboardBackup(backup: InsertDashboardBackup): Promise<DashboardBackup>;
+  deleteDashboardBackup(backupId: number): Promise<boolean>;
+  restoreDashboardBackup(backupId: number): Promise<boolean>;
+  
+  // Dashboard Versions
+  getDashboardVersions(dashboardId: number): Promise<DashboardVersion[]>;
+  createDashboardVersion(version: InsertDashboardVersion): Promise<DashboardVersion>;
+  setActiveVersion(dashboardId: number, versionId: number): Promise<boolean>;
+  
+  // Backup Schedules
+  getBackupSchedules(dashboardId: number): Promise<BackupSchedule[]>;
+  createBackupSchedule(schedule: InsertBackupSchedule): Promise<BackupSchedule>;
+  updateBackupSchedule(scheduleId: number, schedule: Partial<InsertBackupSchedule>): Promise<BackupSchedule | undefined>;
+  deleteBackupSchedule(scheduleId: number): Promise<boolean>;
 }
 
 // Mock data for development
@@ -751,6 +770,247 @@ export class DatabaseStorage implements IStorage {
     } catch (error) {
       console.error('Error getting dashboard users:', error);
       return [];
+    }
+  }
+
+  // Dashboard Backups
+  async getDashboardBackups(dashboardId: number, limit: number = 50): Promise<DashboardBackup[]> {
+    if (!db) return [];
+
+    try {
+      const result = await db
+        .select()
+        .from(dashboardBackups)
+        .where(eq(dashboardBackups.dashboardId, dashboardId))
+        .orderBy(desc(dashboardBackups.createdAt))
+        .limit(limit);
+
+      return result;
+    } catch (error) {
+      console.error('Error fetching dashboard backups:', error);
+      return [];
+    }
+  }
+
+  async createDashboardBackup(backup: InsertDashboardBackup): Promise<DashboardBackup> {
+    if (!db) throw new Error('Database not available');
+
+    try {
+      const result = await db
+        .insert(dashboardBackups)
+        .values(backup)
+        .returning();
+
+      return result[0];
+    } catch (error) {
+      console.error('Error creating dashboard backup:', error);
+      throw error;
+    }
+  }
+
+  async deleteDashboardBackup(backupId: number): Promise<boolean> {
+    if (!db) return false;
+
+    try {
+      const result = await db
+        .delete(dashboardBackups)
+        .where(eq(dashboardBackups.id, backupId));
+
+      return result.count > 0;
+    } catch (error) {
+      console.error('Error deleting dashboard backup:', error);
+      return false;
+    }
+  }
+
+  async restoreDashboardBackup(backupId: number): Promise<boolean> {
+    if (!db) return false;
+
+    try {
+      // Get backup data
+      const backup = await db
+        .select()
+        .from(dashboardBackups)
+        .where(eq(dashboardBackups.id, backupId))
+        .limit(1);
+
+      if (backup.length === 0) {
+        throw new Error('Backup not found');
+      }
+
+      const backupData = backup[0];
+      
+      // Begin transaction to restore data
+      await db.transaction(async (tx) => {
+        // Restore dashboard data
+        await tx
+          .update(dashboards)
+          .set(backupData.dashboardData as any)
+          .where(eq(dashboards.id, backupData.dashboardId));
+
+        // Delete existing activities and restore from backup
+        await tx
+          .delete(activities)
+          .where(eq(activities.dashboardId, backupData.dashboardId));
+
+        if (Array.isArray(backupData.activitiesData)) {
+          for (const activity of backupData.activitiesData as any[]) {
+            await tx.insert(activities).values(activity);
+          }
+        }
+
+        // Restore custom columns
+        await tx
+          .delete(customColumns)
+          .where(eq(customColumns.dashboardId, backupData.dashboardId));
+
+        if (Array.isArray(backupData.customColumnsData)) {
+          for (const column of backupData.customColumnsData as any[]) {
+            await tx.insert(customColumns).values(column);
+          }
+        }
+
+        // Restore custom charts
+        await tx
+          .delete(customCharts)
+          .where(eq(customCharts.dashboardId, backupData.dashboardId));
+
+        if (Array.isArray(backupData.customChartsData)) {
+          for (const chart of backupData.customChartsData as any[]) {
+            await tx.insert(customCharts).values(chart);
+          }
+        }
+      });
+
+      return true;
+    } catch (error) {
+      console.error('Error restoring dashboard backup:', error);
+      return false;
+    }
+  }
+
+  // Dashboard Versions
+  async getDashboardVersions(dashboardId: number): Promise<DashboardVersion[]> {
+    if (!db) return [];
+
+    try {
+      const result = await db
+        .select()
+        .from(dashboardVersions)
+        .where(eq(dashboardVersions.dashboardId, dashboardId))
+        .orderBy(desc(dashboardVersions.createdAt));
+
+      return result;
+    } catch (error) {
+      console.error('Error fetching dashboard versions:', error);
+      return [];
+    }
+  }
+
+  async createDashboardVersion(version: InsertDashboardVersion): Promise<DashboardVersion> {
+    if (!db) throw new Error('Database not available');
+
+    try {
+      const result = await db
+        .insert(dashboardVersions)
+        .values(version)
+        .returning();
+
+      return result[0];
+    } catch (error) {
+      console.error('Error creating dashboard version:', error);
+      throw error;
+    }
+  }
+
+  async setActiveVersion(dashboardId: number, versionId: number): Promise<boolean> {
+    if (!db) return false;
+
+    try {
+      await db.transaction(async (tx) => {
+        // Set all versions as inactive
+        await tx
+          .update(dashboardVersions)
+          .set({ isActive: false })
+          .where(eq(dashboardVersions.dashboardId, dashboardId));
+
+        // Set the specific version as active
+        await tx
+          .update(dashboardVersions)
+          .set({ isActive: true, publishedAt: new Date() })
+          .where(eq(dashboardVersions.id, versionId));
+      });
+
+      return true;
+    } catch (error) {
+      console.error('Error setting active version:', error);
+      return false;
+    }
+  }
+
+  // Backup Schedules
+  async getBackupSchedules(dashboardId: number): Promise<BackupSchedule[]> {
+    if (!db) return [];
+
+    try {
+      const result = await db
+        .select()
+        .from(backupSchedules)
+        .where(eq(backupSchedules.dashboardId, dashboardId))
+        .orderBy(desc(backupSchedules.createdAt));
+
+      return result;
+    } catch (error) {
+      console.error('Error fetching backup schedules:', error);
+      return [];
+    }
+  }
+
+  async createBackupSchedule(schedule: InsertBackupSchedule): Promise<BackupSchedule> {
+    if (!db) throw new Error('Database not available');
+
+    try {
+      const result = await db
+        .insert(backupSchedules)
+        .values(schedule)
+        .returning();
+
+      return result[0];
+    } catch (error) {
+      console.error('Error creating backup schedule:', error);
+      throw error;
+    }
+  }
+
+  async updateBackupSchedule(scheduleId: number, schedule: Partial<InsertBackupSchedule>): Promise<BackupSchedule | undefined> {
+    if (!db) return undefined;
+
+    try {
+      const result = await db
+        .update(backupSchedules)
+        .set({ ...schedule, updatedAt: new Date() })
+        .where(eq(backupSchedules.id, scheduleId))
+        .returning();
+
+      return result[0];
+    } catch (error) {
+      console.error('Error updating backup schedule:', error);
+      return undefined;
+    }
+  }
+
+  async deleteBackupSchedule(scheduleId: number): Promise<boolean> {
+    if (!db) return false;
+
+    try {
+      const result = await db
+        .delete(backupSchedules)
+        .where(eq(backupSchedules.id, scheduleId));
+
+      return result.count > 0;
+    } catch (error) {
+      console.error('Error deleting backup schedule:', error);
+      return false;
     }
   }
 }

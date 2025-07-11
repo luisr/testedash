@@ -16,7 +16,8 @@ import SimpleModal from "@/components/dashboard/simple-modal";
 import { NotificationPopup } from "@/components/notifications/notification-popup";
 import { NotificationPreferencesDialog } from "@/components/notifications/notification-preferences-dialog";
 import { Button } from "@/components/ui/button";
-import { Plus, FolderOpen, Users, FileText, Upload } from "lucide-react";
+import { Plus, FolderOpen, Users, FileText, Upload, Archive } from "lucide-react";
+import { BackupSimple } from "@/components/dashboard/backup-simple";
 
 export default function Dashboard() {
   const { id } = useParams<{ id?: string }>();
@@ -265,6 +266,19 @@ export default function Dashboard() {
                 <FileText className="h-4 w-4" />
                 Relatórios
               </Button>
+              <BackupSimple
+                dashboardId={dashboardId}
+                userId={userId}
+                trigger={
+                  <Button
+                    variant="outline"
+                    className="flex items-center gap-2"
+                  >
+                    <Archive className="h-4 w-4" />
+                    Backup
+                  </Button>
+                }
+              />
               <Button
                 onClick={() => {
                   // Create a test notification

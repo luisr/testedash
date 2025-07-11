@@ -4,7 +4,8 @@ import { storage } from "./storage";
 import { 
   insertUserSchema, insertDashboardSchema, insertProjectSchema, insertActivitySchema,
   insertDashboardShareSchema, insertActivityLogSchema, insertCustomColumnSchema, insertCustomChartSchema,
-  insertNotificationSchema, insertNotificationPreferencesSchema
+  insertNotificationSchema, insertNotificationPreferencesSchema, insertDashboardBackupSchema,
+  insertDashboardVersionSchema, insertBackupScheduleSchema
 } from "@shared/schema";
 import { z } from "zod";
 
@@ -755,6 +756,204 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (error instanceof z.ZodError) {
         return res.status(400).json({ message: "Invalid input", errors: error.errors });
       }
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Dashboard Backups
+  app.get("/api/dashboards/:dashboardId/backups", async (req, res) => {
+    try {
+      const dashboardId = parseInt(req.params.dashboardId);
+      const limit = parseInt(req.query.limit as string) || 50;
+      const backups = await storage.getDashboardBackups(dashboardId, limit);
+      res.json(backups);
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.post("/api/dashboards/:dashboardId/backups", async (req, res) => {
+    try {
+      const dashboardId = parseInt(req.params.dashboardId);
+      const backupData = insertDashboardBackupSchema.parse(req.body);
+      
+      // Create backup with comprehensive data
+      const backup = await storage.createDashboardBackup({
+        ...backupData,
+        dashboardId,
+      });
+      
+      res.status(201).json(backup);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid input", errors: error.errors });
+      }
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.post("/api/dashboards/:dashboardId/backups/auto", async (req, res) => {
+    try {
+      const dashboardId = parseInt(req.params.dashboardId);
+      const userId = parseInt(req.body.userId) || 1;
+      
+      // Get comprehensive dashboard data
+      const dashboard = await storage.getDashboard(dashboardId);
+      const activities = await storage.getActivitiesByDashboardId(dashboardId);
+      const projects = await storage.getProjectsByDashboardId(dashboardId);
+      const customColumns = await storage.getCustomColumns(dashboardId);
+      const customCharts = await storage.getCustomCharts(dashboardId);
+      
+      const backupData = {
+        dashboardId,
+        userId,
+        version: `v${new Date().toISOString().substring(0, 10)}-${Date.now()}`,
+        backupType: "automatic" as const,
+        triggerEvent: "user_request",
+        dashboardData: dashboard || {},
+        activitiesData: activities || [],
+        projectsData: projects || [],
+        customColumnsData: customColumns || [],
+        customChartsData: customCharts || [],
+        description: "Backup automático criado pelo usuário",
+        fileSize: JSON.stringify({
+          dashboard: dashboard || {},
+          activities: activities || [],
+          projects: projects || [],
+          customColumns: customColumns || [],
+          customCharts: customCharts || []
+        }).length,
+        metadata: {
+          totalActivities: activities?.length || 0,
+          totalProjects: projects?.length || 0,
+          totalCustomColumns: customColumns?.length || 0,
+          totalCustomCharts: customCharts?.length || 0,
+          createdBy: userId,
+          createdOn: new Date().toISOString()
+        }
+      };
+      
+      const backup = await storage.createDashboardBackup(backupData);
+      res.status(201).json(backup);
+    } catch (error) {
+      console.error("Error creating automatic backup:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.delete("/api/backups/:backupId", async (req, res) => {
+    try {
+      const backupId = parseInt(req.params.backupId);
+      const success = await storage.deleteDashboardBackup(backupId);
+      res.json({ success });
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.post("/api/backups/:backupId/restore", async (req, res) => {
+    try {
+      const backupId = parseInt(req.params.backupId);
+      const success = await storage.restoreDashboardBackup(backupId);
+      res.json({ success });
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Dashboard Versions
+  app.get("/api/dashboards/:dashboardId/versions", async (req, res) => {
+    try {
+      const dashboardId = parseInt(req.params.dashboardId);
+      const versions = await storage.getDashboardVersions(dashboardId);
+      res.json(versions);
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.post("/api/dashboards/:dashboardId/versions", async (req, res) => {
+    try {
+      const dashboardId = parseInt(req.params.dashboardId);
+      const versionData = insertDashboardVersionSchema.parse(req.body);
+      
+      const version = await storage.createDashboardVersion({
+        ...versionData,
+        dashboardId,
+      });
+      
+      res.status(201).json(version);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid input", errors: error.errors });
+      }
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.put("/api/dashboards/:dashboardId/versions/:versionId/activate", async (req, res) => {
+    try {
+      const dashboardId = parseInt(req.params.dashboardId);
+      const versionId = parseInt(req.params.versionId);
+      
+      const success = await storage.setActiveVersion(dashboardId, versionId);
+      res.json({ success });
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Backup Schedules
+  app.get("/api/dashboards/:dashboardId/backup-schedules", async (req, res) => {
+    try {
+      const dashboardId = parseInt(req.params.dashboardId);
+      const schedules = await storage.getBackupSchedules(dashboardId);
+      res.json(schedules);
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.post("/api/dashboards/:dashboardId/backup-schedules", async (req, res) => {
+    try {
+      const dashboardId = parseInt(req.params.dashboardId);
+      const scheduleData = insertBackupScheduleSchema.parse(req.body);
+      
+      const schedule = await storage.createBackupSchedule({
+        ...scheduleData,
+        dashboardId,
+      });
+      
+      res.status(201).json(schedule);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid input", errors: error.errors });
+      }
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.put("/api/backup-schedules/:scheduleId", async (req, res) => {
+    try {
+      const scheduleId = parseInt(req.params.scheduleId);
+      const scheduleData = insertBackupScheduleSchema.partial().parse(req.body);
+      
+      const schedule = await storage.updateBackupSchedule(scheduleId, scheduleData);
+      res.json(schedule);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid input", errors: error.errors });
+      }
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.delete("/api/backup-schedules/:scheduleId", async (req, res) => {
+    try {
+      const scheduleId = parseInt(req.params.scheduleId);
+      const success = await storage.deleteBackupSchedule(scheduleId);
+      res.json({ success });
+    } catch (error) {
       res.status(500).json({ message: "Internal server error" });
     }
   });
