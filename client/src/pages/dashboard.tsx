@@ -13,6 +13,7 @@ import ShareModalEnhanced from "@/components/dashboard/share-modal-enhanced";
 import ActivityLogPanel from "@/components/dashboard/activity-log-panel";
 import ExportModal from "@/components/dashboard/export-modal";
 import NewActivityModal from "@/components/dashboard/new-activity-modal";
+import DependencyModal from "@/components/dashboard/dependency-modal";
 import SimpleModal from "@/components/dashboard/simple-modal";
 import { NotificationPopup } from "@/components/notifications/notification-popup";
 import { NotificationPreferencesDialog } from "@/components/notifications/notification-preferences-dialog";
@@ -31,6 +32,7 @@ export default function Dashboard() {
   const [exportModalOpen, setExportModalOpen] = useState(false);
   const [activityLogOpen, setActivityLogOpen] = useState(false);
   const [newActivityModalOpen, setNewActivityModalOpen] = useState(false);
+  const [dependencyModalOpen, setDependencyModalOpen] = useState(false);
   const [modalType, setModalType] = useState<'projects' | 'users' | 'reports' | 'import' | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
@@ -328,10 +330,7 @@ export default function Dashboard() {
             onExport={handleExport}
             dashboardId={dashboardId}
             onNewActivity={() => setNewActivityModalOpen(true)}
-            onManageDependencies={() => {
-              // TODO: Implementar modal de dependências
-              console.log('Abrir modal de dependências');
-            }}
+            onManageDependencies={() => setDependencyModalOpen(true)}
           />
         </main>
       </div>
@@ -364,6 +363,13 @@ export default function Dashboard() {
           handleActivityUpdate(activityData, 'create');
         }}
         projects={projects}
+      />
+      
+      <DependencyModal
+        isOpen={dependencyModalOpen}
+        onClose={() => setDependencyModalOpen(false)}
+        activities={activities}
+        dashboardId={dashboardId}
       />
       
       <SimpleModal

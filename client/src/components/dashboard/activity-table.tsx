@@ -179,22 +179,40 @@ export default function ActivityTable({
     // Se for o mesmo lugar, não fazer nada
     if (sourceIndex === destIndex) return;
 
-    // Lógica simples: se arrastou para baixo, torna subatividade da atividade anterior
+    // Encontrar a atividade que está sendo arrastada
+    const draggedActivity = currentActivities.find(a => a.id === activityId);
+    if (!draggedActivity) return;
+
+    // Lógica para definir parent baseada na posição
     if (destIndex > sourceIndex) {
-      // Arrastou para baixo - encontrar atividade anterior para ser parent
-      const prevActivity = currentActivities[destIndex - 1];
-      if (prevActivity) {
+      // Arrastou para baixo - pode ser subatividade da atividade anterior
+      const targetActivity = currentActivities[destIndex - 1];
+      if (targetActivity && targetActivity.id !== activityId) {
+        console.log(`Tornando atividade ${activityId} subatividade de ${targetActivity.id}`);
+        // Torna subatividade da atividade anterior
         onActivityUpdate(activityId, {
-          parentActivityId: prevActivity.id,
+          parentActivityId: targetActivity.id,
           sortOrder: 0
         });
       }
     } else {
-      // Arrastou para cima - torna atividade principal
-      onActivityUpdate(activityId, {
-        parentActivityId: null,
-        sortOrder: destIndex
-      });
+      // Arrastou para cima - verifica se deve ser atividade principal ou subatividade
+      const targetActivity = currentActivities[destIndex];
+      if (targetActivity && targetActivity.parentActivityId) {
+        console.log(`Tornando atividade ${activityId} subatividade do mesmo parent: ${targetActivity.parentActivityId}`);
+        // Se a atividade de destino é uma subatividade, mantém a mesma hierarquia
+        onActivityUpdate(activityId, {
+          parentActivityId: targetActivity.parentActivityId,
+          sortOrder: destIndex
+        });
+      } else {
+        console.log(`Tornando atividade ${activityId} principal`);
+        // Torna atividade principal
+        onActivityUpdate(activityId, {
+          parentActivityId: null,
+          sortOrder: destIndex
+        });
+      }
     }
   };
 
