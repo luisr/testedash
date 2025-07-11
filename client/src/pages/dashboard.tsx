@@ -18,6 +18,7 @@ import { NotificationPreferencesDialog } from "@/components/notifications/notifi
 import { Button } from "@/components/ui/button";
 import { Plus, FolderOpen, Users, FileText, Upload, Archive } from "lucide-react";
 import { BackupSimple } from "@/components/dashboard/backup-simple";
+import { DependencyManager } from "@/components/dashboard/dependency-manager";
 
 export default function Dashboard() {
   const { id } = useParams<{ id?: string }>();
@@ -278,6 +279,10 @@ export default function Dashboard() {
                     Backup
                   </Button>
                 }
+              />
+              <DependencyManager
+                dashboardId={dashboardId}
+                activities={activities}
               />
               <Button
                 onClick={() => {

@@ -5,9 +5,13 @@ import {
   insertUserSchema, insertDashboardSchema, insertProjectSchema, insertActivitySchema,
   insertDashboardShareSchema, insertActivityLogSchema, insertCustomColumnSchema, insertCustomChartSchema,
   insertNotificationSchema, insertNotificationPreferencesSchema, insertDashboardBackupSchema,
-  insertDashboardVersionSchema, insertBackupScheduleSchema
+  insertDashboardVersionSchema, insertBackupScheduleSchema, insertActivityDependencySchema, insertActivityConstraintSchema
 } from "@shared/schema";
+import { recalculateDashboardSchedule } from "./dependency-scheduler";
 import { z } from "zod";
+import { sql } from "drizzle-orm";
+import { drizzle } from "drizzle-orm/postgres-js";
+import postgres from "postgres";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Users
@@ -955,6 +959,232 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ success });
     } catch (error) {
       res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Activity Dependencies
+  app.get("/api/dashboards/:dashboardId/dependencies", async (req, res) => {
+    try {
+      const dashboardId = parseInt(req.params.dashboardId);
+      const dependencies = await storage.getActivityDependencies(dashboardId);
+      res.json(dependencies);
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.get("/api/activities/:activityId/dependencies", async (req, res) => {
+    try {
+      const activityId = parseInt(req.params.activityId);
+      const dependencies = await storage.getActivityDependenciesByActivity(activityId);
+      res.json(dependencies);
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.post("/api/activity-dependencies", async (req, res) => {
+    try {
+      const dependencyData = insertActivityDependencySchema.parse(req.body);
+      const dependency = await storage.createActivityDependency(dependencyData);
+      res.status(201).json(dependency);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid input", errors: error.errors });
+      }
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.put("/api/activity-dependencies/:dependencyId", async (req, res) => {
+    try {
+      const dependencyId = parseInt(req.params.dependencyId);
+      const dependencyData = insertActivityDependencySchema.partial().parse(req.body);
+      const dependency = await storage.updateActivityDependency(dependencyId, dependencyData);
+      res.json(dependency);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid input", errors: error.errors });
+      }
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.delete("/api/activity-dependencies/:dependencyId", async (req, res) => {
+    try {
+      const dependencyId = parseInt(req.params.dependencyId);
+      const success = await storage.deleteActivityDependency(dependencyId);
+      res.json({ success });
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Activity Constraints
+  app.get("/api/dashboards/:dashboardId/constraints", async (req, res) => {
+    try {
+      const dashboardId = parseInt(req.params.dashboardId);
+      const constraints = await storage.getActivityConstraints(dashboardId);
+      res.json(constraints);
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.get("/api/activities/:activityId/constraints", async (req, res) => {
+    try {
+      const activityId = parseInt(req.params.activityId);
+      const constraints = await storage.getActivityConstraintsByActivity(activityId);
+      res.json(constraints);
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.post("/api/activity-constraints", async (req, res) => {
+    try {
+      const constraintData = insertActivityConstraintSchema.parse(req.body);
+      const constraint = await storage.createActivityConstraint(constraintData);
+      res.status(201).json(constraint);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid input", errors: error.errors });
+      }
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.put("/api/activity-constraints/:constraintId", async (req, res) => {
+    try {
+      const constraintId = parseInt(req.params.constraintId);
+      const constraintData = insertActivityConstraintSchema.partial().parse(req.body);
+      const constraint = await storage.updateActivityConstraint(constraintId, constraintData);
+      res.json(constraint);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid input", errors: error.errors });
+      }
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.delete("/api/activity-constraints/:constraintId", async (req, res) => {
+    try {
+      const constraintId = parseInt(req.params.constraintId);
+      const success = await storage.deleteActivityConstraint(constraintId);
+      res.json({ success });
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Schedule Recalculation
+  app.post("/api/dashboards/:dashboardId/recalculate-schedule", async (req, res) => {
+    try {
+      const dashboardId = parseInt(req.params.dashboardId);
+      const calculations = await recalculateDashboardSchedule(dashboardId);
+      res.json({
+        success: true,
+        calculations,
+        message: "Schedule recalculated successfully"
+      });
+    } catch (error) {
+      console.error("Error recalculating schedule:", error);
+      res.status(500).json({ 
+        success: false, 
+        message: error instanceof Error ? error.message : "Internal server error" 
+      });
+    }
+  });
+
+  // Temporary migration endpoint
+  app.post("/api/migrate-dependencies", async (req, res) => {
+    try {
+      console.log('🔄 Starting dependency migration...');
+      
+      // Get database connection
+      let connectionString = process.env.DATABASE_URL;
+      if (!connectionString || !connectionString.startsWith('postgresql://')) {
+        const { PGUSER, PGPASSWORD, PGHOST, PGPORT, PGDATABASE } = process.env;
+        if (PGUSER && PGPASSWORD && PGHOST && PGPORT && PGDATABASE) {
+          connectionString = `postgresql://${PGUSER}:${PGPASSWORD}@${PGHOST}:${PGPORT}/${PGDATABASE}?sslmode=require`;
+        }
+      }
+      
+      if (!connectionString) {
+        throw new Error('Database connection not configured');
+      }
+      
+      const client = postgres(connectionString);
+      const db = drizzle(client);
+      
+      // Create activity dependencies table
+      await db.execute(sql`
+        CREATE TABLE IF NOT EXISTS activity_dependencies (
+          id SERIAL PRIMARY KEY,
+          predecessor_id INTEGER NOT NULL REFERENCES activities(id),
+          successor_id INTEGER NOT NULL REFERENCES activities(id),
+          dependency_type TEXT NOT NULL DEFAULT 'finish_to_start',
+          lag_time INTEGER DEFAULT 0,
+          is_active BOOLEAN DEFAULT true,
+          created_at TIMESTAMP DEFAULT NOW(),
+          updated_at TIMESTAMP DEFAULT NOW()
+        );
+      `);
+      
+      // Create activity constraints table
+      await db.execute(sql`
+        CREATE TABLE IF NOT EXISTS activity_constraints (
+          id SERIAL PRIMARY KEY,
+          activity_id INTEGER NOT NULL REFERENCES activities(id),
+          constraint_type TEXT NOT NULL,
+          constraint_date TIMESTAMP NOT NULL,
+          priority TEXT DEFAULT 'medium',
+          description TEXT,
+          is_active BOOLEAN DEFAULT true,
+          created_at TIMESTAMP DEFAULT NOW(),
+          updated_at TIMESTAMP DEFAULT NOW()
+        );
+      `);
+      
+      // Add new columns to activities table
+      await db.execute(sql`
+        ALTER TABLE activities 
+        ADD COLUMN IF NOT EXISTS duration INTEGER,
+        ADD COLUMN IF NOT EXISTS buffer_time INTEGER,
+        ADD COLUMN IF NOT EXISTS is_auto_scheduled BOOLEAN,
+        ADD COLUMN IF NOT EXISTS critical_path BOOLEAN;
+      `);
+      
+      // Create indexes for better performance
+      await db.execute(sql`CREATE INDEX IF NOT EXISTS idx_activity_dependencies_predecessor ON activity_dependencies(predecessor_id);`);
+      await db.execute(sql`CREATE INDEX IF NOT EXISTS idx_activity_dependencies_successor ON activity_dependencies(successor_id);`);
+      await db.execute(sql`CREATE INDEX IF NOT EXISTS idx_activity_constraints_activity ON activity_constraints(activity_id);`);
+      await db.execute(sql`CREATE INDEX IF NOT EXISTS idx_activities_duration ON activities(duration);`);
+      await db.execute(sql`CREATE INDEX IF NOT EXISTS idx_activities_critical_path ON activities(critical_path);`);
+      
+      // Update existing activities with default values
+      const activitiesResult = await db.execute(sql`
+        UPDATE activities 
+        SET 
+          duration = CASE 
+            WHEN planned_start_date IS NOT NULL AND planned_end_date IS NOT NULL 
+            THEN EXTRACT(DAY FROM (planned_end_date - planned_start_date))::INTEGER
+            ELSE 1
+          END,
+          buffer_time = 0,
+          is_auto_scheduled = true,
+          critical_path = false
+        WHERE duration IS NULL;
+      `);
+      
+      await client.end();
+      console.log('✅ Dependency migration completed successfully!');
+      res.json({ success: true, message: 'Migration completed successfully' });
+      
+    } catch (error) {
+      console.error('❌ Error during migration:', error);
+      res.status(500).json({ error: 'Migration failed', details: (error as Error).message });
     }
   });
 

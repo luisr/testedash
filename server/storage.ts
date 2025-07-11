@@ -4,13 +4,15 @@ import postgres from "postgres";
 import {
   users, dashboards, projects, activities, dashboardShares, activityLogs, customColumns, customCharts,
   notifications, notificationPreferences, dashboardBackups, dashboardVersions, backupSchedules,
+  activityDependencies, activityConstraints,
   type User, type InsertUser, type Dashboard, type InsertDashboard, type Project, type InsertProject,
   type Activity, type InsertActivity, type DashboardShare, type InsertDashboardShare,
   type ActivityLog, type InsertActivityLog, type CustomColumn, type InsertCustomColumn,
   type CustomChart, type InsertCustomChart, type Notification, type InsertNotification,
   type NotificationPreferences, type InsertNotificationPreferences,
   type DashboardBackup, type InsertDashboardBackup, type DashboardVersion, type InsertDashboardVersion,
-  type BackupSchedule, type InsertBackupSchedule
+  type BackupSchedule, type InsertBackupSchedule, type ActivityDependency, type InsertActivityDependency,
+  type ActivityConstraint, type InsertActivityConstraint
 } from "@shared/schema";
 
 // Check if DATABASE_URL is properly configured or build from individual components
@@ -121,6 +123,20 @@ export interface IStorage {
   createBackupSchedule(schedule: InsertBackupSchedule): Promise<BackupSchedule>;
   updateBackupSchedule(scheduleId: number, schedule: Partial<InsertBackupSchedule>): Promise<BackupSchedule | undefined>;
   deleteBackupSchedule(scheduleId: number): Promise<boolean>;
+  
+  // Activity Dependencies
+  getActivityDependencies(dashboardId: number): Promise<ActivityDependency[]>;
+  getActivityDependenciesByActivity(activityId: number): Promise<ActivityDependency[]>;
+  createActivityDependency(dependency: InsertActivityDependency): Promise<ActivityDependency>;
+  updateActivityDependency(dependencyId: number, dependency: Partial<InsertActivityDependency>): Promise<ActivityDependency | undefined>;
+  deleteActivityDependency(dependencyId: number): Promise<boolean>;
+  
+  // Activity Constraints
+  getActivityConstraints(dashboardId: number): Promise<ActivityConstraint[]>;
+  getActivityConstraintsByActivity(activityId: number): Promise<ActivityConstraint[]>;
+  createActivityConstraint(constraint: InsertActivityConstraint): Promise<ActivityConstraint>;
+  updateActivityConstraint(constraintId: number, constraint: Partial<InsertActivityConstraint>): Promise<ActivityConstraint | undefined>;
+  deleteActivityConstraint(constraintId: number): Promise<boolean>;
 }
 
 // Mock data for development
@@ -138,10 +154,10 @@ const mockProjects: Project[] = [
 ];
 
 const mockActivities: Activity[] = [
-  { id: 1, name: 'Análise de Requisitos', description: 'Levantamento e análise dos requisitos do projeto', projectId: 1, dashboardId: 1, discipline: 'Análise', responsible: 'João Silva', priority: 'high', status: 'completed', plannedStartDate: new Date('2024-01-01'), plannedEndDate: new Date('2024-01-15'), actualStartDate: new Date('2024-01-01'), actualEndDate: new Date('2024-01-14'), baselineStartDate: new Date('2024-01-01'), baselineEndDate: new Date('2024-01-15'), plannedValue: '10000', actualCost: '9500', earnedValue: '10000', completionPercentage: '100', associatedRisk: 'baixo', requiredResources: ['Analista Senior'], dependencies: [], documentLink: null, createdAt: new Date(), updatedAt: new Date() },
-  { id: 2, name: 'Desenvolvimento Frontend', description: 'Implementação da interface do usuário', projectId: 1, dashboardId: 1, discipline: 'Desenvolvimento', responsible: 'Maria Santos', priority: 'medium', status: 'in_progress', plannedStartDate: new Date('2024-01-15'), plannedEndDate: new Date('2024-03-15'), actualStartDate: new Date('2024-01-16'), actualEndDate: null, baselineStartDate: new Date('2024-01-15'), baselineEndDate: new Date('2024-03-15'), plannedValue: '25000', actualCost: '18000', earnedValue: '15000', completionPercentage: '60', associatedRisk: 'médio', requiredResources: ['Desenvolvedor Frontend'], dependencies: ['Análise de Requisitos'], documentLink: null, createdAt: new Date(), updatedAt: new Date() },
-  { id: 3, name: 'Desenvolvimento Backend', description: 'Implementação da API e lógica de negócio', projectId: 1, dashboardId: 1, discipline: 'Desenvolvimento', responsible: 'Pedro Costa', priority: 'high', status: 'in_progress', plannedStartDate: new Date('2024-01-20'), plannedEndDate: new Date('2024-04-20'), actualStartDate: new Date('2024-01-22'), actualEndDate: null, baselineStartDate: new Date('2024-01-20'), baselineEndDate: new Date('2024-04-20'), plannedValue: '30000', actualCost: '12000', earnedValue: '9000', completionPercentage: '30', associatedRisk: 'alto', requiredResources: ['Desenvolvedor Backend'], dependencies: ['Análise de Requisitos'], documentLink: null, createdAt: new Date(), updatedAt: new Date() },
-  { id: 4, name: 'Testes de Integração', description: 'Testes de integração entre frontend e backend', projectId: 1, dashboardId: 1, discipline: 'Qualidade', responsible: 'Ana Lima', priority: 'medium', status: 'not_started', plannedStartDate: new Date('2024-04-01'), plannedEndDate: new Date('2024-05-01'), actualStartDate: null, actualEndDate: null, baselineStartDate: new Date('2024-04-01'), baselineEndDate: new Date('2024-05-01'), plannedValue: '15000', actualCost: '0', earnedValue: '0', completionPercentage: '0', associatedRisk: 'baixo', requiredResources: ['Testador QA'], dependencies: ['Desenvolvimento Frontend', 'Desenvolvimento Backend'], documentLink: null, createdAt: new Date(), updatedAt: new Date() }
+  { id: 1, name: 'Análise de Requisitos', description: 'Levantamento e análise dos requisitos do projeto', projectId: 1, dashboardId: 1, discipline: 'Análise', responsible: 'João Silva', priority: 'high', status: 'completed', plannedStartDate: new Date('2024-01-01'), plannedEndDate: new Date('2024-01-15'), actualStartDate: new Date('2024-01-01'), actualEndDate: new Date('2024-01-14'), baselineStartDate: new Date('2024-01-01'), baselineEndDate: new Date('2024-01-15'), plannedValue: '10000', actualCost: '9500', earnedValue: '10000', completionPercentage: '100', associatedRisk: 'baixo', requiredResources: ['Analista Senior'], dependencies: [], documentLink: null, duration: 14, bufferTime: 0, isAutoScheduled: true, criticalPath: false, createdAt: new Date(), updatedAt: new Date() },
+  { id: 2, name: 'Desenvolvimento Frontend', description: 'Implementação da interface do usuário', projectId: 1, dashboardId: 1, discipline: 'Desenvolvimento', responsible: 'Maria Santos', priority: 'medium', status: 'in_progress', plannedStartDate: new Date('2024-01-15'), plannedEndDate: new Date('2024-03-15'), actualStartDate: new Date('2024-01-16'), actualEndDate: null, baselineStartDate: new Date('2024-01-15'), baselineEndDate: new Date('2024-03-15'), plannedValue: '25000', actualCost: '18000', earnedValue: '15000', completionPercentage: '60', associatedRisk: 'médio', requiredResources: ['Desenvolvedor Frontend'], dependencies: ['Análise de Requisitos'], documentLink: null, duration: 60, bufferTime: 5, isAutoScheduled: true, criticalPath: true, createdAt: new Date(), updatedAt: new Date() },
+  { id: 3, name: 'Desenvolvimento Backend', description: 'Implementação da API e lógica de negócio', projectId: 1, dashboardId: 1, discipline: 'Desenvolvimento', responsible: 'Pedro Costa', priority: 'high', status: 'in_progress', plannedStartDate: new Date('2024-01-20'), plannedEndDate: new Date('2024-04-20'), actualStartDate: new Date('2024-01-22'), actualEndDate: null, baselineStartDate: new Date('2024-01-20'), baselineEndDate: new Date('2024-04-20'), plannedValue: '30000', actualCost: '12000', earnedValue: '9000', completionPercentage: '30', associatedRisk: 'alto', requiredResources: ['Desenvolvedor Backend'], dependencies: ['Análise de Requisitos'], documentLink: null, duration: 90, bufferTime: 3, isAutoScheduled: true, criticalPath: true, createdAt: new Date(), updatedAt: new Date() },
+  { id: 4, name: 'Testes de Integração', description: 'Testes de integração entre frontend e backend', projectId: 1, dashboardId: 1, discipline: 'Qualidade', responsible: 'Ana Lima', priority: 'medium', status: 'not_started', plannedStartDate: new Date('2024-04-01'), plannedEndDate: new Date('2024-05-01'), actualStartDate: null, actualEndDate: null, baselineStartDate: new Date('2024-04-01'), baselineEndDate: new Date('2024-05-01'), plannedValue: '15000', actualCost: '0', earnedValue: '0', completionPercentage: '0', associatedRisk: 'baixo', requiredResources: ['Testador QA'], dependencies: ['Desenvolvimento Frontend', 'Desenvolvimento Backend'], documentLink: null, duration: 30, bufferTime: 2, isAutoScheduled: true, criticalPath: false, createdAt: new Date(), updatedAt: new Date() }
 ];
 
 const mockActivityLogs: ActivityLog[] = [
@@ -381,6 +397,10 @@ export class DatabaseStorage implements IStorage {
       baselineEndDate: activity.baselineEndDate || null,
       requiredResources: activity.requiredResources || null,
       dependencies: activity.dependencies || null,
+      duration: activity.duration || null,
+      bufferTime: activity.bufferTime || null,
+      isAutoScheduled: activity.isAutoScheduled || null,
+      criticalPath: activity.criticalPath || null,
       createdAt: new Date(),
       updatedAt: new Date()
     };
@@ -1013,6 +1033,176 @@ export class DatabaseStorage implements IStorage {
       return false;
     }
   }
+
+  // Activity Dependencies
+  async getActivityDependencies(dashboardId: number): Promise<ActivityDependency[]> {
+    if (!db) return [];
+
+    try {
+      const result = await db
+        .select()
+        .from(activityDependencies)
+        .innerJoin(activities, eq(activityDependencies.predecessorId, activities.id))
+        .where(eq(activities.dashboardId, dashboardId));
+
+      return result.map(r => r.activity_dependencies);
+    } catch (error) {
+      console.error('Error fetching activity dependencies:', error);
+      return [];
+    }
+  }
+
+  async getActivityDependenciesByActivity(activityId: number): Promise<ActivityDependency[]> {
+    if (!db) return [];
+
+    try {
+      const result = await db
+        .select()
+        .from(activityDependencies)
+        .where(
+          or(
+            eq(activityDependencies.predecessorId, activityId),
+            eq(activityDependencies.successorId, activityId)
+          )
+        );
+
+      return result;
+    } catch (error) {
+      console.error('Error fetching activity dependencies by activity:', error);
+      return [];
+    }
+  }
+
+  async createActivityDependency(dependency: InsertActivityDependency): Promise<ActivityDependency> {
+    if (!db) throw new Error('Database not available');
+
+    try {
+      const result = await db
+        .insert(activityDependencies)
+        .values(dependency)
+        .returning();
+
+      return result[0];
+    } catch (error) {
+      console.error('Error creating activity dependency:', error);
+      throw error;
+    }
+  }
+
+  async updateActivityDependency(dependencyId: number, dependency: Partial<InsertActivityDependency>): Promise<ActivityDependency | undefined> {
+    if (!db) return undefined;
+
+    try {
+      const result = await db
+        .update(activityDependencies)
+        .set({ ...dependency, updatedAt: new Date() })
+        .where(eq(activityDependencies.id, dependencyId))
+        .returning();
+
+      return result[0];
+    } catch (error) {
+      console.error('Error updating activity dependency:', error);
+      return undefined;
+    }
+  }
+
+  async deleteActivityDependency(dependencyId: number): Promise<boolean> {
+    if (!db) return false;
+
+    try {
+      const result = await db
+        .delete(activityDependencies)
+        .where(eq(activityDependencies.id, dependencyId));
+
+      return result.count > 0;
+    } catch (error) {
+      console.error('Error deleting activity dependency:', error);
+      return false;
+    }
+  }
+
+  // Activity Constraints
+  async getActivityConstraints(dashboardId: number): Promise<ActivityConstraint[]> {
+    if (!db) return [];
+
+    try {
+      const result = await db
+        .select()
+        .from(activityConstraints)
+        .innerJoin(activities, eq(activityConstraints.activityId, activities.id))
+        .where(eq(activities.dashboardId, dashboardId));
+
+      return result.map(r => r.activity_constraints);
+    } catch (error) {
+      console.error('Error fetching activity constraints:', error);
+      return [];
+    }
+  }
+
+  async getActivityConstraintsByActivity(activityId: number): Promise<ActivityConstraint[]> {
+    if (!db) return [];
+
+    try {
+      const result = await db
+        .select()
+        .from(activityConstraints)
+        .where(eq(activityConstraints.activityId, activityId));
+
+      return result;
+    } catch (error) {
+      console.error('Error fetching activity constraints by activity:', error);
+      return [];
+    }
+  }
+
+  async createActivityConstraint(constraint: InsertActivityConstraint): Promise<ActivityConstraint> {
+    if (!db) throw new Error('Database not available');
+
+    try {
+      const result = await db
+        .insert(activityConstraints)
+        .values(constraint)
+        .returning();
+
+      return result[0];
+    } catch (error) {
+      console.error('Error creating activity constraint:', error);
+      throw error;
+    }
+  }
+
+  async updateActivityConstraint(constraintId: number, constraint: Partial<InsertActivityConstraint>): Promise<ActivityConstraint | undefined> {
+    if (!db) return undefined;
+
+    try {
+      const result = await db
+        .update(activityConstraints)
+        .set({ ...constraint, updatedAt: new Date() })
+        .where(eq(activityConstraints.id, constraintId))
+        .returning();
+
+      return result[0];
+    } catch (error) {
+      console.error('Error updating activity constraint:', error);
+      return undefined;
+    }
+  }
+
+  async deleteActivityConstraint(constraintId: number): Promise<boolean> {
+    if (!db) return false;
+
+    try {
+      const result = await db
+        .delete(activityConstraints)
+        .where(eq(activityConstraints.id, constraintId));
+
+      return result.count > 0;
+    } catch (error) {
+      console.error('Error deleting activity constraint:', error);
+      return false;
+    }
+  }
 }
 
 export const storage = new DatabaseStorage();
+export { db };

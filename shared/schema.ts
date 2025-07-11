@@ -62,6 +62,10 @@ export const activities = pgTable("activities", {
   requiredResources: text("required_resources").array(),
   dependencies: text("dependencies").array(),
   documentLink: text("document_link"),
+  duration: integer("duration"), // Duration in days
+  bufferTime: integer("buffer_time").default(0), // Buffer time in days
+  isAutoScheduled: boolean("is_auto_scheduled").default(true), // Whether dates are auto-calculated
+  criticalPath: boolean("critical_path").default(false), // Whether this activity is on critical path
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -207,6 +211,31 @@ export const backupSchedules = pgTable("backup_schedules", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
+// Activity Dependencies Table
+export const activityDependencies = pgTable("activity_dependencies", {
+  id: serial("id").primaryKey(),
+  predecessorId: integer("predecessor_id").notNull().references(() => activities.id),
+  successorId: integer("successor_id").notNull().references(() => activities.id),
+  dependencyType: text("dependency_type").notNull().default("finish_to_start"), // finish_to_start, start_to_start, finish_to_finish, start_to_finish
+  lagTime: integer("lag_time").default(0), // Lag time in days (can be negative for lead time)
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Activity Constraints Table
+export const activityConstraints = pgTable("activity_constraints", {
+  id: serial("id").primaryKey(),
+  activityId: integer("activity_id").notNull().references(() => activities.id),
+  constraintType: text("constraint_type").notNull(), // must_start_on, must_finish_on, start_no_earlier_than, start_no_later_than, finish_no_earlier_than, finish_no_later_than
+  constraintDate: timestamp("constraint_date").notNull(),
+  priority: text("priority").default("medium"), // low, medium, high
+  description: text("description"),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).omit({ id: true, createdAt: true, updatedAt: true });
 export const insertDashboardSchema = createInsertSchema(dashboards).omit({ id: true, createdAt: true, updatedAt: true });
@@ -221,6 +250,8 @@ export const insertNotificationPreferencesSchema = createInsertSchema(notificati
 export const insertDashboardBackupSchema = createInsertSchema(dashboardBackups).omit({ id: true, createdAt: true });
 export const insertDashboardVersionSchema = createInsertSchema(dashboardVersions).omit({ id: true, createdAt: true, publishedAt: true });
 export const insertBackupScheduleSchema = createInsertSchema(backupSchedules).omit({ id: true, createdAt: true, updatedAt: true, lastRun: true, nextRun: true });
+export const insertActivityDependencySchema = createInsertSchema(activityDependencies).omit({ id: true, createdAt: true, updatedAt: true });
+export const insertActivityConstraintSchema = createInsertSchema(activityConstraints).omit({ id: true, createdAt: true, updatedAt: true });
 
 // Types
 export type User = typeof users.$inferSelect;
@@ -249,3 +280,7 @@ export type DashboardVersion = typeof dashboardVersions.$inferSelect;
 export type InsertDashboardVersion = z.infer<typeof insertDashboardVersionSchema>;
 export type BackupSchedule = typeof backupSchedules.$inferSelect;
 export type InsertBackupSchedule = z.infer<typeof insertBackupScheduleSchema>;
+export type ActivityDependency = typeof activityDependencies.$inferSelect;
+export type InsertActivityDependency = z.infer<typeof insertActivityDependencySchema>;
+export type ActivityConstraint = typeof activityConstraints.$inferSelect;
+export type InsertActivityConstraint = z.infer<typeof insertActivityConstraintSchema>;
