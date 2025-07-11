@@ -122,6 +122,10 @@ export default function ActivityTable({
 
   // Função para criar estrutura hierárquica
   const buildHierarchy = (activities: Activity[]): ActivityWithChildren[] => {
+    if (!activities || !Array.isArray(activities)) {
+      return [];
+    }
+
     const activityMap = new Map<number, ActivityWithChildren>();
     const rootActivities: ActivityWithChildren[] = [];
 
@@ -156,6 +160,10 @@ export default function ActivityTable({
 
   // Função para achatar hierarquia em lista para exibição
   const flattenHierarchy = (activities: ActivityWithChildren[]): ActivityWithChildren[] => {
+    if (!activities || !Array.isArray(activities)) {
+      return [];
+    }
+
     const result: ActivityWithChildren[] = [];
     
     const addToResult = (activity: ActivityWithChildren) => {

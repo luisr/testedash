@@ -36,7 +36,7 @@ export default function KPICards({ metrics, dashboardId, activities, projects, o
     },
     {
       title: "SPI Médio",
-      value: metrics.averageSPI.toFixed(2),
+      value: (metrics.averageSPI || 0).toFixed(2),
       icon: TrendingDown,
       trend: "-5%",
       trendText: "abaixo do ideal",
@@ -46,7 +46,7 @@ export default function KPICards({ metrics, dashboardId, activities, projects, o
     },
     {
       title: "CPI Médio",
-      value: metrics.averageCPI.toFixed(2),
+      value: (metrics.averageCPI || 0).toFixed(2),
       icon: TrendingUp,
       trend: "+8%",
       trendText: "acima do orçamento",
@@ -56,9 +56,9 @@ export default function KPICards({ metrics, dashboardId, activities, projects, o
     },
     {
       title: "Tarefas Concluídas",
-      value: metrics.completedActivities,
+      value: metrics.completedActivities || 0,
       icon: CheckCircle,
-      trend: `${metrics.overallCompletionPercentage.toFixed(0)}%`,
+      trend: `${(metrics.overallCompletionPercentage || 0).toFixed(0)}%`,
       trendText: "da meta mensal",
       trendUp: true,
       bgColor: "bg-emerald-100 dark:bg-emerald-900/20",
