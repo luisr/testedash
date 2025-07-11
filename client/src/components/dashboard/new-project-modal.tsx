@@ -62,13 +62,20 @@ export function NewProjectModal({ trigger, isOpen, onOpenChange, dashboardId }: 
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          ...projectData,
+          name: projectData.name,
+          description: projectData.description,
           dashboardId,
+          budget: projectData.budget.toString(), // Convert budget to string
+          status: projectData.status,
+          startDate: projectData.startDate || null,
+          endDate: projectData.endDate || null,
+          managerId: projectData.managerId,
         }),
       });
       
       if (!response.ok) {
-        throw new Error("Erro ao criar projeto");
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Erro ao criar projeto");
       }
       
       return response.json();
