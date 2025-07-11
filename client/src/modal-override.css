@@ -1,0 +1,175 @@
+/* OVERRIDE ABSOLUTO PARA MODAIS E POPUPS */
+
+/* Força aplicação em todas as variações de modal/popup */
+[data-radix-popper-content-wrapper] > *,
+[data-radix-popper-content] > *,
+[role="dialog"] > *,
+[role="alertdialog"] > *,
+[aria-modal="true"] > *,
+.modal > *,
+.popup > *,
+.popover > *,
+.dropdown-menu > *,
+.notification-popup > *,
+.notification-container > *,
+.notification-content > * {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 250, 252, 0.98) 100%) !important;
+  backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1) !important;
+  color: #0f172a !important;
+}
+
+/* Tema escuro */
+.dark [data-radix-popper-content-wrapper] > *,
+.dark [data-radix-popper-content] > *,
+.dark [role="dialog"] > *,
+.dark [role="alertdialog"] > *,
+.dark [aria-modal="true"] > *,
+.dark .modal > *,
+.dark .popup > *,
+.dark .popover > *,
+.dark .dropdown-menu > *,
+.dark .notification-popup > *,
+.dark .notification-container > *,
+.dark .notification-content > * {
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.98) 0%, rgba(30, 41, 59, 0.98) 100%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
+  color: #f8fafc !important;
+}
+
+/* Força aplicação direta */
+[data-radix-popper-content-wrapper],
+[data-radix-popper-content],
+[role="dialog"],
+[role="alertdialog"],
+[aria-modal="true"],
+.modal,
+.popup,
+.popover,
+.dropdown-menu,
+.notification-popup,
+.notification-container,
+.notification-content {
+  background: transparent !important;
+  backdrop-filter: blur(8px) !important;
+  border: none !important;
+}
+
+/* Zerar todos os elementos internos */
+[data-radix-popper-content-wrapper] div,
+[data-radix-popper-content] div,
+[role="dialog"] div,
+[role="alertdialog"] div,
+[aria-modal="true"] div,
+.modal div,
+.popup div,
+.popover div,
+.dropdown-menu div,
+.notification-popup div,
+.notification-container div,
+.notification-content div {
+  background-color: transparent !important;
+  background-image: none !important;
+  background: none !important;
+}
+
+/* Aplicar apenas no primeiro nível */
+[data-radix-popper-content-wrapper] > div:first-child,
+[data-radix-popper-content] > div:first-child,
+[role="dialog"] > div:first-child,
+[role="alertdialog"] > div:first-child,
+[aria-modal="true"] > div:first-child,
+.modal > div:first-child,
+.popup > div:first-child,
+.popover > div:first-child,
+.dropdown-menu > div:first-child,
+.notification-popup > div:first-child,
+.notification-container > div:first-child,
+.notification-content > div:first-child {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 250, 252, 0.98) 100%) !important;
+  backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1) !important;
+  color: #0f172a !important;
+  padding: 16px !important;
+}
+
+.dark [data-radix-popper-content-wrapper] > div:first-child,
+.dark [data-radix-popper-content] > div:first-child,
+.dark [role="dialog"] > div:first-child,
+.dark [role="alertdialog"] > div:first-child,
+.dark [aria-modal="true"] > div:first-child,
+.dark .modal > div:first-child,
+.dark .popup > div:first-child,
+.dark .popover > div:first-child,
+.dark .dropdown-menu > div:first-child,
+.dark .notification-popup > div:first-child,
+.dark .notification-container > div:first-child,
+.dark .notification-content > div:first-child {
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.98) 0%, rgba(30, 41, 59, 0.98) 100%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
+  color: #f8fafc !important;
+}
+
+/* Força aplicação em texto */
+[data-radix-popper-content-wrapper] *,
+[data-radix-popper-content] *,
+[role="dialog"] *,
+[role="alertdialog"] *,
+[aria-modal="true"] *,
+.modal *,
+.popup *,
+.popover *,
+.dropdown-menu *,
+.notification-popup *,
+.notification-container *,
+.notification-content * {
+  color: inherit !important;
+}
+
+/* Remover todas as classes de background amarelo/âmbar */
+[data-radix-popper-content-wrapper] [class*="bg-yellow"],
+[data-radix-popper-content] [class*="bg-yellow"],
+[role="dialog"] [class*="bg-yellow"],
+[role="alertdialog"] [class*="bg-yellow"],
+[aria-modal="true"] [class*="bg-yellow"],
+.modal [class*="bg-yellow"],
+.popup [class*="bg-yellow"],
+.popover [class*="bg-yellow"],
+.dropdown-menu [class*="bg-yellow"],
+.notification-popup [class*="bg-yellow"],
+.notification-container [class*="bg-yellow"],
+.notification-content [class*="bg-yellow"],
+[data-radix-popper-content-wrapper] [class*="bg-amber"],
+[data-radix-popper-content] [class*="bg-amber"],
+[role="dialog"] [class*="bg-amber"],
+[role="alertdialog"] [class*="bg-amber"],
+[aria-modal="true"] [class*="bg-amber"],
+.modal [class*="bg-amber"],
+.popup [class*="bg-amber"],
+.popover [class*="bg-amber"],
+.dropdown-menu [class*="bg-amber"],
+.notification-popup [class*="bg-amber"],
+.notification-container [class*="bg-amber"],
+.notification-content [class*="bg-amber"],
+[data-radix-popper-content-wrapper] [class*="bg-orange"],
+[data-radix-popper-content] [class*="bg-orange"],
+[role="dialog"] [class*="bg-orange"],
+[role="alertdialog"] [class*="bg-orange"],
+[aria-modal="true"] [class*="bg-orange"],
+.modal [class*="bg-orange"],
+.popup [class*="bg-orange"],
+.popover [class*="bg-orange"],
+.dropdown-menu [class*="bg-orange"],
+.notification-popup [class*="bg-orange"],
+.notification-container [class*="bg-orange"],
+.notification-content [class*="bg-orange"] {
+  background-color: transparent !important;
+  background-image: none !important;
+  background: none !important;
+}

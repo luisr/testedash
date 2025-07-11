@@ -68,6 +68,56 @@ body {
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
 }
 
+/* Modais e Popups */
+[data-radix-popper-content-wrapper],
+[data-radix-popper-content],
+[role="dialog"],
+[role="alertdialog"],
+[aria-modal="true"],
+.modal,
+.popup,
+.popover,
+.dropdown-menu {
+  background: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1) !important;
+  color: #0f172a !important;
+}
+
+.dark [data-radix-popper-content-wrapper],
+.dark [data-radix-popper-content],
+.dark [role="dialog"],
+.dark [role="alertdialog"],
+.dark [aria-modal="true"],
+.dark .modal,
+.dark .popup,
+.dark .popover,
+.dark .dropdown-menu {
+  background: rgba(15, 23, 42, 0.95) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
+  color: #f8fafc !important;
+}
+
+/* Overlays de modal */
+[data-radix-dialog-overlay],
+[data-radix-popover-overlay],
+.modal-overlay,
+.overlay {
+  background: rgba(15, 23, 42, 0.4) !important;
+  backdrop-filter: blur(8px) !important;
+}
+
+.dark [data-radix-dialog-overlay],
+.dark [data-radix-popover-overlay],
+.dark .modal-overlay,
+.dark .overlay {
+  background: rgba(0, 0, 0, 0.5) !important;
+  backdrop-filter: blur(8px) !important;
+}
+
 /* KPI Cards específicos */
 .kpi-card {
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%) !important;
@@ -154,6 +204,53 @@ button[data-variant="default"], .bg-primary {
 .dark .bg-amber-50, .dark .bg-amber-100, .dark .bg-amber-200, .dark .bg-amber-300, .dark .bg-amber-400, .dark .bg-amber-500, .dark .bg-amber-600, .dark .bg-amber-700, .dark .bg-amber-800, .dark .bg-amber-900,
 .dark .bg-orange-50, .dark .bg-orange-100, .dark .bg-orange-200, .dark .bg-orange-300, .dark .bg-orange-400, .dark .bg-orange-500, .dark .bg-orange-600, .dark .bg-orange-700, .dark .bg-orange-800, .dark .bg-orange-900 {
   background-color: rgba(30, 41, 59, 0.8) !important;
+}
+
+/* Notificações específicas */
+.notification-popup,
+.notification-container,
+.notification-content {
+  background: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1) !important;
+  color: #0f172a !important;
+}
+
+.dark .notification-popup,
+.dark .notification-container,
+.dark .notification-content {
+  background: rgba(15, 23, 42, 0.95) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
+  color: #f8fafc !important;
+}
+
+/* Força aplicação em todos os elementos filhos de modais */
+[data-radix-popper-content-wrapper] *,
+[data-radix-popper-content] *,
+[role="dialog"] *,
+[role="alertdialog"] *,
+[aria-modal="true"] *,
+.modal *,
+.popup *,
+.popover *,
+.dropdown-menu * {
+  color: inherit !important;
+}
+
+/* Força remoção de background em elementos internos dos modais */
+[data-radix-popper-content-wrapper] div,
+[data-radix-popper-content] div,
+[role="dialog"] div,
+[role="alertdialog"] div,
+[aria-modal="true"] div,
+.modal div,
+.popup div,
+.popover div,
+.dropdown-menu div {
+  background-color: transparent !important;
 }
 
 /* Aplicar apenas nos containers principais */

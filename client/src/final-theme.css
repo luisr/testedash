@@ -1,0 +1,208 @@
+/* FORÇA FINAL DO TEMA MODERNO - MÁXIMA PRIORIDADE */
+
+/* Força remoção de TODAS as cores amarelas/âmbar globalmente */
+* {
+  background-color: transparent !important;
+  background-image: none !important;
+}
+
+/* Aplicar gradiente moderno apenas nos containers principais */
+html {
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%) !important;
+  min-height: 100vh !important;
+}
+
+body {
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%) !important;
+  min-height: 100vh !important;
+}
+
+#root {
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%) !important;
+  min-height: 100vh !important;
+}
+
+.dashboard-container {
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%) !important;
+  min-height: 100vh !important;
+}
+
+/* Tema escuro */
+.dark html {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;
+}
+
+.dark body {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;
+}
+
+.dark #root {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;
+}
+
+.dark .dashboard-container {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;
+}
+
+/* Força aplicação direta em modais */
+[data-radix-popper-content-wrapper],
+[data-radix-popper-content],
+[role="dialog"],
+[role="alertdialog"],
+[aria-modal="true"],
+.modal,
+.popup,
+.popover,
+.dropdown-menu,
+.notification-popup,
+.notification-container,
+.notification-content {
+  background: rgba(255, 255, 255, 0.98) !important;
+  backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1) !important;
+  color: #0f172a !important;
+}
+
+.dark [data-radix-popper-content-wrapper],
+.dark [data-radix-popper-content],
+.dark [role="dialog"],
+.dark [role="alertdialog"],
+.dark [aria-modal="true"],
+.dark .modal,
+.dark .popup,
+.dark .popover,
+.dark .dropdown-menu,
+.dark .notification-popup,
+.dark .notification-container,
+.dark .notification-content {
+  background: rgba(15, 23, 42, 0.98) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
+  color: #f8fafc !important;
+}
+
+/* Cards com glassmorphism */
+.card,
+[class*="card"]:not(.dashboard-container) {
+  background: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1) !important;
+  transition: all 0.3s ease !important;
+}
+
+.dark .card,
+.dark [class*="card"]:not(.dashboard-container) {
+  background: rgba(15, 23, 42, 0.95) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Sidebar moderna */
+.sidebar-container {
+  background: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(20px) !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+.dark .sidebar-container {
+  background: rgba(15, 23, 42, 0.95) !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Botões com gradiente */
+button[data-variant="default"],
+.bg-primary,
+.btn-primary {
+  background: linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%) !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 12px !important;
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4) !important;
+  transition: all 0.3s ease !important;
+}
+
+button[data-variant="default"]:hover,
+.bg-primary:hover,
+.btn-primary:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.6) !important;
+}
+
+/* Remover TODAS as cores amarelas/âmbar */
+[class*="bg-yellow"],
+[class*="bg-amber"],
+[class*="bg-orange"],
+[class*="yellow"],
+[class*="amber"],
+[class*="orange"] {
+  background-color: transparent !important;
+  background-image: none !important;
+  background: none !important;
+}
+
+/* Aplicar fundo neutro onde necessário */
+.bg-yellow-50,
+.bg-amber-50,
+.bg-orange-50 {
+  background-color: rgba(248, 250, 252, 0.5) !important;
+}
+
+.dark .bg-yellow-50,
+.dark .bg-amber-50,
+.dark .bg-orange-50 {
+  background-color: rgba(30, 41, 59, 0.5) !important;
+}
+
+/* Garantir que overlay não interfira */
+[data-radix-dialog-overlay],
+[data-radix-popover-overlay],
+.modal-overlay {
+  background: rgba(15, 23, 42, 0.4) !important;
+  backdrop-filter: blur(8px) !important;
+}
+
+.dark [data-radix-dialog-overlay],
+.dark [data-radix-popover-overlay],
+.dark .modal-overlay {
+  background: rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Força aplicação em elementos específicos */
+.min-h-screen,
+.h-screen,
+.flex.min-h-screen,
+.flex.h-screen {
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%) !important;
+}
+
+.dark .min-h-screen,
+.dark .h-screen,
+.dark .flex.min-h-screen,
+.dark .flex.h-screen {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;
+}
+
+/* Força aplicação em texto */
+.text-foreground {
+  color: #0f172a !important;
+}
+
+.dark .text-foreground {
+  color: #f8fafc !important;
+}
+
+/* Hover effects para cards */
+.card:hover,
+[class*="card"]:not(.dashboard-container):hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15) !important;
+}
+
+.dark .card:hover,
+.dark [class*="card"]:not(.dashboard-container):hover {
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4) !important;
+}

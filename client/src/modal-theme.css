@@ -1,0 +1,147 @@
+/* TEMA ESPECÍFICO PARA MODAIS E POPUPS */
+
+/* Zerar completamente todos os backgrounds em modais */
+[data-radix-popper-content-wrapper],
+[data-radix-popper-content],
+[role="dialog"],
+[role="alertdialog"],
+[aria-modal="true"],
+.modal,
+.popup,
+.popover,
+.dropdown-menu {
+  background-color: transparent !important;
+  background-image: none !important;
+  background: none !important;
+}
+
+/* Aplicar tema moderno aos modais */
+[data-radix-popper-content-wrapper],
+[data-radix-popper-content],
+[role="dialog"],
+[role="alertdialog"],
+[aria-modal="true"],
+.modal,
+.popup,
+.popover,
+.dropdown-menu {
+  background: rgba(255, 255, 255, 0.98) !important;
+  backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1) !important;
+  color: #0f172a !important;
+}
+
+/* Tema escuro para modais */
+.dark [data-radix-popper-content-wrapper],
+.dark [data-radix-popper-content],
+.dark [role="dialog"],
+.dark [role="alertdialog"],
+.dark [aria-modal="true"],
+.dark .modal,
+.dark .popup,
+.dark .popover,
+.dark .dropdown-menu {
+  background: rgba(15, 23, 42, 0.98) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
+  color: #f8fafc !important;
+}
+
+/* Remover qualquer background amarelo/âmbar dos modais */
+[data-radix-popper-content-wrapper] [class*="bg-"],
+[data-radix-popper-content] [class*="bg-"],
+[role="dialog"] [class*="bg-"],
+[role="alertdialog"] [class*="bg-"],
+[aria-modal="true"] [class*="bg-"],
+.modal [class*="bg-"],
+.popup [class*="bg-"],
+.popover [class*="bg-"],
+.dropdown-menu [class*="bg-"] {
+  background-color: transparent !important;
+  background-image: none !important;
+  background: none !important;
+}
+
+/* Zerar todos os elementos internos */
+[data-radix-popper-content-wrapper] *,
+[data-radix-popper-content] *,
+[role="dialog"] *,
+[role="alertdialog"] *,
+[aria-modal="true"] *,
+.modal *,
+.popup *,
+.popover *,
+.dropdown-menu * {
+  background-color: transparent !important;
+  background-image: none !important;
+  background: none !important;
+}
+
+/* Aplicar apenas nos containers diretos */
+[data-radix-popper-content-wrapper] > div,
+[data-radix-popper-content] > div,
+[role="dialog"] > div,
+[role="alertdialog"] > div,
+[aria-modal="true"] > div,
+.modal > div,
+.popup > div,
+.popover > div,
+.dropdown-menu > div {
+  background: rgba(255, 255, 255, 0.9) !important;
+  backdrop-filter: blur(20px) !important;
+  border-radius: 12px !important;
+  padding: 16px !important;
+}
+
+.dark [data-radix-popper-content-wrapper] > div,
+.dark [data-radix-popper-content] > div,
+.dark [role="dialog"] > div,
+.dark [role="alertdialog"] > div,
+.dark [aria-modal="true"] > div,
+.dark .modal > div,
+.dark .popup > div,
+.dark .popover > div,
+.dark .dropdown-menu > div {
+  background: rgba(15, 23, 42, 0.9) !important;
+}
+
+/* Overlays */
+[data-radix-dialog-overlay],
+[data-radix-popover-overlay],
+.modal-overlay,
+.overlay {
+  background: rgba(15, 23, 42, 0.4) !important;
+  backdrop-filter: blur(8px) !important;
+}
+
+.dark [data-radix-dialog-overlay],
+.dark [data-radix-popover-overlay],
+.dark .modal-overlay,
+.dark .overlay {
+  background: rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Força aplicação em notificações */
+.notification-popup,
+.notification-container,
+.notification-content,
+.notification-item {
+  background: rgba(255, 255, 255, 0.98) !important;
+  backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1) !important;
+  color: #0f172a !important;
+}
+
+.dark .notification-popup,
+.dark .notification-container,
+.dark .notification-content,
+.dark .notification-item {
+  background: rgba(15, 23, 42, 0.98) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
+  color: #f8fafc !important;
+}
