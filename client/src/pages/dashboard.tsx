@@ -12,9 +12,7 @@ import ShareModal from "@/components/dashboard/share-modal";
 import ActivityLogPanel from "@/components/dashboard/activity-log-panel";
 import ExportModal from "@/components/dashboard/export-modal";
 import NewActivityModal from "@/components/dashboard/new-activity-modal";
-import ProjectsModal from "@/components/dashboard/projects-modal";
-import UsersModal from "@/components/dashboard/users-modal";
-import ReportsModal from "@/components/dashboard/reports-modal";
+import SimpleModal from "@/components/dashboard/simple-modal";
 import { NotificationPopup } from "@/components/notifications/notification-popup";
 import { NotificationPreferencesDialog } from "@/components/notifications/notification-preferences-dialog";
 import { Button } from "@/components/ui/button";
@@ -30,9 +28,7 @@ export default function Dashboard() {
   const [exportModalOpen, setExportModalOpen] = useState(false);
   const [activityLogOpen, setActivityLogOpen] = useState(false);
   const [newActivityModalOpen, setNewActivityModalOpen] = useState(false);
-  const [projectsModalOpen, setProjectsModalOpen] = useState(false);
-  const [usersModalOpen, setUsersModalOpen] = useState(false);
-  const [reportsModalOpen, setReportsModalOpen] = useState(false);
+  const [modalType, setModalType] = useState<'projects' | 'users' | 'reports' | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
   const [filterResponsible, setFilterResponsible] = useState("all");
@@ -227,7 +223,7 @@ export default function Dashboard() {
             </div>
             <div className="flex items-center gap-2 flex-wrap">
               <Button
-                onClick={() => setProjectsModalOpen(true)}
+                onClick={() => setModalType('projects')}
                 variant="outline"
                 className="flex items-center gap-2"
               >
@@ -235,7 +231,7 @@ export default function Dashboard() {
                 Projetos
               </Button>
               <Button
-                onClick={() => setUsersModalOpen(true)}
+                onClick={() => setModalType('users')}
                 variant="outline"
                 className="flex items-center gap-2"
               >
@@ -243,7 +239,7 @@ export default function Dashboard() {
                 Usuários
               </Button>
               <Button
-                onClick={() => setReportsModalOpen(true)}
+                onClick={() => setModalType('reports')}
                 variant="outline"
                 className="flex items-center gap-2"
               >
@@ -332,46 +328,10 @@ export default function Dashboard() {
         projects={projects}
       />
       
-      <ProjectsModal
-        isOpen={projectsModalOpen}
-        onClose={() => setProjectsModalOpen(false)}
-        projects={projects}
-        activities={activities}
-        onCreateProject={(projectData) => {
-          // TODO: Implement project creation
-          console.log('Creating project:', projectData);
-        }}
-        onUpdateProject={(id, projectData) => {
-          // TODO: Implement project update
-          console.log('Updating project:', id, projectData);
-        }}
-        onDeleteProject={(id) => {
-          // TODO: Implement project deletion
-          console.log('Deleting project:', id);
-        }}
-      />
-      
-      <UsersModal
-        isOpen={usersModalOpen}
-        onClose={() => setUsersModalOpen(false)}
-        users={[]} // TODO: Get users from API
-        onCreateUser={(userData) => {
-          // TODO: Implement user creation
-          console.log('Creating user:', userData);
-        }}
-        onUpdateUser={(id, userData) => {
-          // TODO: Implement user update
-          console.log('Updating user:', id, userData);
-        }}
-        onDeleteUser={(id) => {
-          // TODO: Implement user deletion
-          console.log('Deleting user:', id);
-        }}
-      />
-      
-      <ReportsModal
-        isOpen={reportsModalOpen}
-        onClose={() => setReportsModalOpen(false)}
+      <SimpleModal
+        isOpen={modalType !== null}
+        onClose={() => setModalType(null)}
+        type={modalType || 'projects'}
         projects={projects}
         activities={activities}
         users={[]} // TODO: Get users from API
