@@ -165,7 +165,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const projects = await storage.getProjectsByDashboardId(dashboardId);
       res.json(projects);
     } catch (error) {
-      res.status(500).json({ message: "Internal server error" });
+      console.error("Error getting projects:", error);
+      res.status(500).json({ message: "Internal server error", error: error instanceof Error ? error.message : 'Unknown error' });
     }
   });
 
@@ -175,10 +176,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const project = await storage.createProject(projectData);
       res.status(201).json(project);
     } catch (error) {
+      console.error("Error creating project:", error);
       if (error instanceof z.ZodError) {
         return res.status(400).json({ message: "Invalid input", errors: error.errors });
       }
-      res.status(500).json({ message: "Internal server error" });
+      res.status(500).json({ message: "Internal server error", error: error instanceof Error ? error.message : 'Unknown error' });
     }
   });
 

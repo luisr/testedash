@@ -29,6 +29,7 @@ export const projects = pgTable("projects", {
   name: text("name").notNull(),
   description: text("description"),
   dashboardId: integer("dashboard_id").references(() => dashboards.id),
+  // managerId: integer("manager_id").references(() => users.id), // Project manager - temporarily removed
   status: text("status").default("active"), // active, completed, paused, cancelled
   budget: decimal("budget", { precision: 15, scale: 2 }).default("0"),
   actualCost: decimal("actual_cost", { precision: 15, scale: 2 }).default("0"),

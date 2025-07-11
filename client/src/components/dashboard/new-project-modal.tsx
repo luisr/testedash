@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
-import { FolderPlus, DollarSign, Calendar, Users } from "lucide-react";
+import { FolderPlus, DollarSign, Calendar } from "lucide-react";
 
 interface NewProjectModalProps {
   trigger?: React.ReactNode;
@@ -22,7 +22,7 @@ interface NewProjectData {
   budget: number;
   startDate: string;
   endDate: string;
-  managerId: number;
+  // managerId: number; // Temporarily removed
   status: "planning" | "active" | "on_hold" | "completed";
 }
 
@@ -34,7 +34,6 @@ export function NewProjectModal({ trigger, isOpen, onOpenChange, dashboardId }: 
     budget: 0,
     startDate: "",
     endDate: "",
-    managerId: 1,
     status: "planning"
   });
   
@@ -44,15 +43,15 @@ export function NewProjectModal({ trigger, isOpen, onOpenChange, dashboardId }: 
   const open = isOpen !== undefined ? isOpen : localOpen;
   const setOpen = onOpenChange || setLocalOpen;
 
-  // Fetch users for manager selection
-  const { data: users = [] } = useQuery({
-    queryKey: ["/api/users"],
-    queryFn: async () => {
-      const response = await fetch("/api/users");
-      if (!response.ok) throw new Error("Erro ao carregar usuários");
-      return response.json();
-    },
-  });
+  // Fetch users for manager selection - temporarily disabled
+  // const { data: users = [] } = useQuery({
+  //   queryKey: ["/api/users"],
+  //   queryFn: async () => {
+  //     const response = await fetch("/api/users");
+  //     if (!response.ok) throw new Error("Erro ao carregar usuários");
+  //     return response.json();
+  //   },
+  // });
 
   const createProjectMutation = useMutation({
     mutationFn: async (projectData: NewProjectData) => {
@@ -69,7 +68,7 @@ export function NewProjectModal({ trigger, isOpen, onOpenChange, dashboardId }: 
           status: projectData.status,
           startDate: projectData.startDate || null,
           endDate: projectData.endDate || null,
-          managerId: projectData.managerId,
+          // managerId: projectData.managerId, // Temporarily removed until column is added
         }),
       });
       
@@ -134,7 +133,6 @@ export function NewProjectModal({ trigger, isOpen, onOpenChange, dashboardId }: 
       budget: 0,
       startDate: "",
       endDate: "",
-      managerId: 1,
       status: "planning"
     });
   };
@@ -252,6 +250,7 @@ export function NewProjectModal({ trigger, isOpen, onOpenChange, dashboardId }: 
               />
             </div>
 
+            {/* Manager selection temporarily removed
             <div className="space-y-2">
               <Label htmlFor="managerId" className="flex items-center gap-2">
                 <Users className="h-4 w-4" />
@@ -273,6 +272,7 @@ export function NewProjectModal({ trigger, isOpen, onOpenChange, dashboardId }: 
                 </SelectContent>
               </Select>
             </div>
+            */}
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
