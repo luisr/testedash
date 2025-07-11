@@ -103,28 +103,23 @@ html {
 /* Override any conflicting background colors */
 .bg-muted\/30,
 .bg-muted,
-.bg-background,
-[class*="bg-"] {
+.bg-background {
   background-color: hsl(var(--background)) !important;
 }
 
 /* Force removal of any yellow/amber backgrounds */
-body, html, #root, .min-h-screen, main, div {
+body, html, #root, .min-h-screen, main {
   background-color: hsl(var(--background)) !important;
 }
 
-/* Specific overrides for common problem areas */
-.bg-muted\/30 {
-  background-color: hsl(var(--background)) !important;
-}
-
+/* Specific overrides for problem areas */
 .bg-amber-50,
 .bg-yellow-50,
 .bg-orange-50,
 .bg-amber-100,
 .bg-yellow-100,
 .bg-orange-100 {
-  background-color: hsl(var(--background)) !important;
+  background-color: hsl(var(--secondary)) !important;
 }
 
 .dark .bg-amber-900,
@@ -133,7 +128,7 @@ body, html, #root, .min-h-screen, main, div {
 .dark .bg-amber-800,
 .dark .bg-yellow-800,
 .dark .bg-orange-800 {
-  background-color: hsl(var(--background)) !important;
+  background-color: hsl(var(--secondary)) !important;
 }
 
 /* Ensure cards use proper Apple styling */
@@ -141,6 +136,55 @@ body, html, #root, .min-h-screen, main, div {
 [class*="card"] {
   background-color: hsl(var(--card)) !important;
   border-color: hsl(var(--border)) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Apple-style buttons */
+.btn-primary,
+.bg-primary {
+  background-color: hsl(var(--primary)) !important;
+  color: hsl(var(--primary-foreground)) !important;
+  border-radius: 8px !important;
+}
+
+/* Apple-style inputs */
+.form-control,
+input[type="text"],
+input[type="email"],
+input[type="password"],
+select,
+textarea {
+  background-color: hsl(var(--input)) !important;
+  border-color: hsl(var(--border)) !important;
+  border-radius: 8px !important;
+  padding: 8px 12px !important;
+}
+
+/* Apple-style sidebar */
+.sidebar-container {
+  background-color: hsl(var(--card)) !important;
+  border-color: hsl(var(--border)) !important;
+}
+
+/* Apple-style shadows */
+.shadow-elegant {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06) !important;
+}
+
+.shadow-elegant-lg {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06) !important;
+}
+
+/* Apple-style hover effects */
+.hover-lift:hover {
+  transform: translateY(-1px) !important;
+  transition: all 0.2s ease !important;
+}
+
+.focus-ring:focus {
+  outline: 2px solid hsl(var(--ring)) !important;
+  outline-offset: 2px !important;
 }
 
 /* Force sidebar to use proper colors */

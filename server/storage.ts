@@ -52,6 +52,7 @@ export interface IStorage {
   getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   updateUser(id: number, user: Partial<InsertUser>): Promise<User | undefined>;
+  deleteUser(id: number): Promise<boolean>;
 
   // Dashboards
   getDashboard(id: number): Promise<Dashboard | undefined>;
@@ -235,6 +236,19 @@ export class DatabaseStorage implements IStorage {
       return mockUsers[userIndex];
     }
     return undefined;
+  }
+
+  async deleteUser(id: number): Promise<boolean> {
+    if (db) {
+      const result = await db.delete(users).where(eq(users.id, id)).returning();
+      return result.length > 0;
+    }
+    const userIndex = mockUsers.findIndex(u => u.id === id);
+    if (userIndex >= 0) {
+      mockUsers.splice(userIndex, 1);
+      return true;
+    }
+    return false;
   }
 
   // Dashboards
