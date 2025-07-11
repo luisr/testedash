@@ -72,16 +72,18 @@ export default function DependencyManager({ dashboardId, activities, trigger }: 
         }
       });
 
-      setDependencies([...dependencies, response]);
-      toast({
-        title: "Dependência adicionada",
-        description: "A dependência foi criada com sucesso."
-      });
-    } catch (error) {
+      if (response) {
+        setDependencies([...dependencies, response]);
+        toast({
+          title: "Dependência adicionada",
+          description: "A dependência foi criada com sucesso."
+        });
+      }
+    } catch (error: any) {
       console.error('Error adding dependency:', error);
       toast({
         title: "Erro ao adicionar dependência",
-        description: "Não foi possível criar a dependência.",
+        description: error.message || "Não foi possível criar a dependência.",
         variant: "destructive"
       });
     }
@@ -138,6 +140,7 @@ export default function DependencyManager({ dashboardId, activities, trigger }: 
         return;
       }
 
+      // successorId é a atividade que depende, predecessorId é a atividade da qual depende
       addDependency(parseInt(selectedActivity), parseInt(selectedDependency), selectedType);
       setSelectedActivity('');
       setSelectedDependency('');

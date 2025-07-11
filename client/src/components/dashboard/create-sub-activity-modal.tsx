@@ -53,17 +53,28 @@ export default function CreateSubActivityModal({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validação básica
+    if (!formData.name.trim()) {
+      toast({
+        title: "Nome obrigatório",
+        description: "Por favor, informe um nome para a subtarefa.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
       const subActivityData = {
         ...formData,
-        plannedStartDate: formData.plannedStartDate?.toISOString(),
-        plannedEndDate: formData.plannedEndDate?.toISOString(),
+        plannedStartDate: formData.plannedStartDate ? formData.plannedStartDate.toISOString().split('T')[0] : null,
+        plannedEndDate: formData.plannedEndDate ? formData.plannedEndDate.toISOString().split('T')[0] : null,
         completionPercentage: formData.completionPercentage.toString()
       };
 
-      await apiRequest(`/api/activities/${parentActivity.id}/sub-activity`, {
+      const response = await apiRequest(`/api/activities/${parentActivity.id}/sub-activity`, {
         method: 'POST',
         body: JSON.stringify(subActivityData),
         headers: {
@@ -91,11 +102,11 @@ export default function CreateSubActivityModal({
 
       setOpen(false);
       onSuccess();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error creating sub-activity:', error);
       toast({
         title: "Erro ao criar subtarefa",
-        description: "Houve um problema ao criar a subtarefa. Tente novamente.",
+        description: error.message || "Houve um problema ao criar a subtarefa. Tente novamente.",
         variant: "destructive"
       });
     } finally {
