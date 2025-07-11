@@ -125,15 +125,55 @@ export default function TableConfigModal({
       
       setImportPreview(data.slice(0, 5)); // Preview first 5 rows
       
-      // Auto-map columns
+      // Auto-map columns with intelligent matching
       const mapping: Record<string, string> = {};
+      const normalizeText = (text: string) => text.toLowerCase()
+        .replace(/[áàâãä]/g, 'a')
+        .replace(/[éèêë]/g, 'e')
+        .replace(/[íìîï]/g, 'i')
+        .replace(/[óòôõö]/g, 'o')
+        .replace(/[úùûü]/g, 'u')
+        .replace(/[ç]/g, 'c')
+        .replace(/[^a-z0-9]/g, '');
+
       headers.forEach(header => {
-        const lowerHeader = header.toLowerCase();
-        const matchingColumn = standardColumns.find(col => 
-          col.label.toLowerCase().includes(lowerHeader) || 
-          col.key.toLowerCase().includes(lowerHeader) ||
-          lowerHeader.includes(col.label.toLowerCase())
-        );
+        const normalizedHeader = normalizeText(header);
+        
+        // Exact and partial matches with keywords
+        const matchingColumn = standardColumns.find(col => {
+          const normalizedLabel = normalizeText(col.label);
+          const normalizedKey = normalizeText(col.key);
+          
+          // Exact matches
+          if (normalizedHeader === normalizedLabel || normalizedHeader === normalizedKey) {
+            return true;
+          }
+          
+          // Keyword-based matching
+          const keywordMatches = {
+            'name': ['nome', 'atividade', 'tarefa', 'task'],
+            'description': ['descricao', 'desc', 'detalhes', 'observacoes'],
+            'discipline': ['disciplina', 'area', 'setor', 'departamento'],
+            'responsible': ['responsavel', 'usuario', 'pessoa', 'encarregado'],
+            'status': ['status', 'situacao', 'estado', 'fase'],
+            'priority': ['prioridade', 'urgencia', 'importancia'],
+            'plannedStartDate': ['inicioplaneado', 'planejadoinicio', 'startdate', 'datainicio'],
+            'plannedEndDate': ['fimplanejado', 'planejadofim', 'enddate', 'datafim'],
+            'actualStartDate': ['inicioreal', 'realinicio', 'actualstart'],
+            'actualEndDate': ['fimreal', 'realfim', 'actualend'],
+            'plannedValue': ['valorplanejado', 'planejado', 'orcamento', 'budget'],
+            'actualCost': ['custoreal', 'gastoreal', 'real', 'custo'],
+            'earnedValue': ['valoragregado', 'earned', 'agregado'],
+            'completionPercentage': ['percentual', 'conclusao', 'progresso', 'percentage', 'percent'],
+            'associatedRisk': ['risco', 'risk', 'riscos']
+          };
+          
+          const keywords = keywordMatches[col.key as keyof typeof keywordMatches] || [];
+          return keywords.some(keyword => 
+            normalizedHeader.includes(keyword) || keyword.includes(normalizedHeader)
+          );
+        });
+        
         if (matchingColumn) {
           mapping[header] = matchingColumn.key;
         }
@@ -182,13 +222,43 @@ export default function TableConfigModal({
             const mappedKey = importMapping[header];
             
             if (mappedKey) {
-              // Map to standard column
+              // Map to standard column with intelligent type conversion
               if (mappedKey === 'completionPercentage') {
-                activity[mappedKey] = value ? parseFloat(value) : 0;
+                const numValue = parseFloat(value.replace('%', ''));
+                activity[mappedKey] = isNaN(numValue) ? 0 : numValue;
               } else if (mappedKey.includes('Date')) {
-                activity[mappedKey] = value ? new Date(value).toISOString() : null;
+                if (value) {
+                  const date = new Date(value);
+                  activity[mappedKey] = isNaN(date.getTime()) ? null : date.toISOString();
+                } else {
+                  activity[mappedKey] = null;
+                }
               } else if (mappedKey.includes('Value') || mappedKey.includes('Cost')) {
-                activity[mappedKey] = value ? parseFloat(value) : 0;
+                const numValue = parseFloat(value.replace(/[^\d.-]/g, ''));
+                activity[mappedKey] = isNaN(numValue) ? 0 : numValue;
+              } else if (mappedKey === 'status') {
+                // Map status values
+                const statusMap: Record<string, string> = {
+                  'nao iniciado': 'not_started',
+                  'não iniciado': 'not_started',
+                  'em andamento': 'in_progress',
+                  'concluido': 'completed',
+                  'concluído': 'completed',
+                  'atrasado': 'delayed',
+                  'cancelado': 'cancelled'
+                };
+                activity[mappedKey] = statusMap[value.toLowerCase()] || value;
+              } else if (mappedKey === 'priority') {
+                // Map priority values
+                const priorityMap: Record<string, string> = {
+                  'baixa': 'low',
+                  'media': 'medium',
+                  'média': 'medium',
+                  'alta': 'high',
+                  'critica': 'critical',
+                  'crítica': 'critical'
+                };
+                activity[mappedKey] = priorityMap[value.toLowerCase()] || value;
               } else {
                 activity[mappedKey] = value;
               }
@@ -394,17 +464,28 @@ export default function TableConfigModal({
                 
                 {importPreview.length > 0 && (
                   <div className="space-y-4">
+                    <div className="bg-blue-50 p-3 rounded-lg">
+                      <h4 className="font-medium text-blue-900 mb-1">Mapeamento Automático</h4>
+                      <p className="text-sm text-blue-700">
+                        {Object.keys(importMapping).filter(k => importMapping[k]).length} de {Object.keys(importPreview[0]).length} colunas mapeadas automaticamente
+                      </p>
+                    </div>
                     <div>
                       <h4 className="font-medium mb-2">Mapeamento de Colunas</h4>
                       <div className="grid grid-cols-2 gap-4">
                         {Object.keys(importPreview[0]).map(header => (
                           <div key={header} className="space-y-1">
-                            <Label className="text-xs">{header}</Label>
+                            <Label className="text-xs flex items-center gap-2">
+                              {header}
+                              {importMapping[header] && (
+                                <span className="text-green-600 text-xs">✓ Mapeado</span>
+                              )}
+                            </Label>
                             <Select 
                               value={importMapping[header] || '__new__'}
                               onValueChange={(value) => setImportMapping({...importMapping, [header]: value === '__new__' ? '' : value})}
                             >
-                              <SelectTrigger>
+                              <SelectTrigger className={importMapping[header] ? 'border-green-500 bg-green-50' : ''}>
                                 <SelectValue placeholder="Selecione uma coluna" />
                               </SelectTrigger>
                               <SelectContent>
