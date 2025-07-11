@@ -303,14 +303,14 @@ export const customKPIs = pgTable("custom_kpis", {
   dashboardId: integer("dashboard_id").references(() => dashboards.id).notNull(),
   name: text("name").notNull(),
   description: text("description"),
-  dataSource: text("data_source").notNull(), // activities, projects, custom
+  dataSource: text("data_source").notNull().default("activities"), // activities, projects, custom
   field: text("field").notNull(),
   aggregation: text("aggregation").notNull(), // count, sum, avg, min, max, percentage
   filters: jsonb("filters").default('[]').notNull(),
   icon: text("icon").notNull(),
   color: text("color").notNull(),
   format: text("format").notNull(), // number, currency, percentage, days
-  target: decimal("target"),
+  target: text("target"),
   targetComparison: text("target_comparison").default('gt').notNull(),
   isActive: boolean("is_active").default(true).notNull(),
   order: integer("order").default(1).notNull(),

@@ -50,7 +50,7 @@ interface KPIFilter {
 interface KPIManagerProps {
   dashboardId: number;
   activities: any[];
-  projects: any[];
+  projects: any[]; // Mantido para compatibilidade mas não utilizado
   onKPIsUpdate: (kpis: CustomKPI[]) => void;
 }
 
@@ -104,7 +104,7 @@ export default function CustomKPIManager({ dashboardId, activities, projects, on
   const [newKPI, setNewKPI] = useState<Partial<CustomKPI>>({
     name: '',
     description: '',
-    dataSource: 'activities',
+    dataSource: 'activities', // Fixo em activities - única fonte de dados
     field: 'status',
     aggregation: 'count',
     filters: [],
@@ -139,7 +139,8 @@ export default function CustomKPIManager({ dashboardId, activities, projects, on
   };
 
   const calculatePreviewValue = () => {
-    const dataSource = newKPI.dataSource === 'activities' ? activities : projects;
+    // Sempre usar activities como fonte de dados
+    const dataSource = activities;
     const field = newKPI.field;
     const aggregation = newKPI.aggregation;
 
@@ -176,7 +177,11 @@ export default function CustomKPIManager({ dashboardId, activities, projects, on
         value = filteredData.length;
         break;
       case 'sum':
-        value = filteredData.reduce((sum, item) => sum + (parseFloat(item[field]) || 0), 0);
+        if (field === 'completionPercentage' || field === 'plannedBudget' || field === 'actualBudget') {
+          value = filteredData.reduce((sum, item) => sum + (parseFloat(item[field]) || 0), 0);
+        } else {
+          value = filteredData.reduce((sum, item) => sum + (parseFloat(item[field]) || 0), 0);
+        }
         break;
       case 'avg':
         const sum = filteredData.reduce((sum, item) => sum + (parseFloat(item[field]) || 0), 0);
@@ -189,8 +194,17 @@ export default function CustomKPIManager({ dashboardId, activities, projects, on
         value = Math.max(...filteredData.map(item => parseFloat(item[field]) || 0));
         break;
       case 'percentage':
-        const total = dataSource.length;
-        value = total > 0 ? (filteredData.length / total) * 100 : 0;
+        // Para porcentagem, calcular ratio específico baseado no campo
+        if (field === 'status') {
+          // Porcentagem de tarefas com status específico
+          value = activities.length > 0 ? (filteredData.length / activities.length) * 100 : 0;
+        } else if (field === 'completionPercentage') {
+          // Média de progresso
+          const totalProgress = filteredData.reduce((sum, item) => sum + (parseFloat(item.completionPercentage) || 0), 0);
+          value = filteredData.length > 0 ? totalProgress / filteredData.length : 0;
+        } else {
+          value = activities.length > 0 ? (filteredData.length / activities.length) * 100 : 0;
+        }
         break;
     }
 
@@ -270,7 +284,7 @@ export default function CustomKPIManager({ dashboardId, activities, projects, on
     setNewKPI({
       name: '',
       description: '',
-      dataSource: 'activities',
+      dataSource: 'activities', // Fixo em activities
       field: 'status',
       aggregation: 'count',
       filters: [],
@@ -307,11 +321,18 @@ export default function CustomKPIManager({ dashboardId, activities, projects, on
     }
   };
 
-  const getFieldOptions = (dataSource: string) => {
-    const source = dataSource === 'activities' ? activities : projects;
+  const getFieldOptions = () => {
+    // Sempre usar activities como fonte de dados
+    const source = activities;
     if (!source || source.length === 0) return [];
 
-    const fields = Object.keys(source[0] || {});
+    // Campos específicos das atividades que fazem sentido para KPIs
+    const allowedFields = [
+      'status', 'priority', 'completionPercentage', 'plannedBudget', 'actualBudget',
+      'responsible', 'discipline', 'plannedStartDate', 'plannedEndDate', 'actualStartDate', 'actualEndDate'
+    ];
+
+    const fields = Object.keys(source[0] || {}).filter(field => allowedFields.includes(field));
     return fields.map(field => ({
       value: field,
       label: field.charAt(0).toUpperCase() + field.slice(1).replace(/([A-Z])/g, ' $1')
@@ -453,16 +474,12 @@ export default function CustomKPIManager({ dashboardId, activities, projects, on
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="data-source">Fonte de Dados</Label>
-                <Select value={newKPI.dataSource} onValueChange={(value) => setNewKPI(prev => ({ ...prev, dataSource: value as any }))}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="activities">Atividades</SelectItem>
-                    <SelectItem value="projects">Projetos</SelectItem>
-                  </SelectContent>
-                </Select>
+                <Label>Fonte de Dados</Label>
+                <div className="flex items-center space-x-2 p-2 border rounded-md bg-muted">
+                  <Activity className="w-4 h-4 text-blue-500" />
+                  <span className="text-sm font-medium">Atividades</span>
+                  <Badge variant="secondary" className="ml-auto">Fonte única</Badge>
+                </div>
               </div>
               
               <div className="space-y-2">
@@ -472,7 +489,7 @@ export default function CustomKPIManager({ dashboardId, activities, projects, on
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {getFieldOptions(newKPI.dataSource!).map(field => (
+                    {getFieldOptions().map(field => (
                       <SelectItem key={field.value} value={field.value}>
                         {field.label}
                       </SelectItem>

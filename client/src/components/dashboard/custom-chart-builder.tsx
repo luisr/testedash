@@ -42,7 +42,7 @@ interface CustomChart {
   name: string;
   description?: string;
   type: 'bar' | 'pie' | 'line' | 'area';
-  dataSource: 'activities' | 'projects' | 'custom';
+  dataSource: 'activities'; // Fixo em activities
   xAxis: string;
   yAxis: string;
   groupBy?: string;
@@ -63,7 +63,7 @@ interface ChartFilter {
 interface ChartBuilderProps {
   dashboardId: number;
   activities: any[];
-  projects: any[];
+  projects: any[]; // Mantido para compatibilidade mas não utilizado
   onChartsUpdate: (charts: CustomChart[]) => void;
 }
 
@@ -74,10 +74,7 @@ const chartTypes = [
   { value: 'area', label: 'Gráfico de Área', icon: TrendingUp }
 ];
 
-const dataSourceOptions = [
-  { value: 'activities', label: 'Atividades' },
-  { value: 'projects', label: 'Projetos' }
-];
+// Removido dataSourceOptions - sempre usar activities como fonte de dados
 
 const aggregationOptions = [
   { value: 'count', label: 'Contagem' },
@@ -104,7 +101,7 @@ export default function CustomChartBuilder({ dashboardId, activities, projects, 
     name: '',
     description: '',
     type: 'bar',
-    dataSource: 'activities',
+    dataSource: 'activities', // Fixo em activities - única fonte de dados
     xAxis: 'status',
     yAxis: 'count',
     aggregation: 'count',
@@ -175,7 +172,8 @@ export default function CustomChartBuilder({ dashboardId, activities, projects, 
   };
 
   const generatePreviewData = () => {
-    const dataSource = newChart.dataSource === 'activities' ? activities : projects;
+    // Sempre usar activities como fonte de dados
+    const dataSource = activities;
     const xField = newChart.xAxis;
     const yField = newChart.yAxis;
     const aggregation = newChart.aggregation;
@@ -197,7 +195,11 @@ export default function CustomChartBuilder({ dashboardId, activities, projects, 
           value = items.length;
           break;
         case 'sum':
-          value = items.reduce((sum, item) => sum + (parseFloat(item[yField]) || 0), 0);
+          if (yField === 'completionPercentage' || yField === 'plannedBudget' || yField === 'actualBudget') {
+            value = items.reduce((sum, item) => sum + (parseFloat(item[yField]) || 0), 0);
+          } else {
+            value = items.reduce((sum, item) => sum + (parseFloat(item[yField]) || 0), 0);
+          }
           break;
         case 'avg':
           value = items.reduce((sum, item) => sum + (parseFloat(item[yField]) || 0), 0) / items.length;
@@ -286,8 +288,9 @@ export default function CustomChartBuilder({ dashboardId, activities, projects, 
     }
   };
 
-  const getFieldOptions = (dataSource: string) => {
-    const source = dataSource === 'activities' ? activities : projects;
+  const getFieldOptions = () => {
+    // Sempre usar activities como fonte de dados
+    const source = activities;
     if (!source || source.length === 0) return [];
 
     const fields = Object.keys(source[0] || {});
@@ -461,19 +464,12 @@ export default function CustomChartBuilder({ dashboardId, activities, projects, 
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="data-source">Fonte de Dados</Label>
-                  <Select value={newChart.dataSource} onValueChange={(value) => setNewChart(prev => ({ ...prev, dataSource: value as any }))}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {dataSourceOptions.map(option => (
-                        <SelectItem key={option.value} value={option.value}>
-                          {option.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <Label>Fonte de Dados</Label>
+                  <div className="flex items-center space-x-2 p-2 border rounded-md bg-muted">
+                    <Database className="w-4 h-4 text-blue-500" />
+                    <span className="text-sm font-medium">Atividades</span>
+                    <Badge variant="secondary" className="ml-auto">Fonte única</Badge>
+                  </div>
                 </div>
                 
                 <div className="space-y-2">
@@ -499,7 +495,7 @@ export default function CustomChartBuilder({ dashboardId, activities, projects, 
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      {getFieldOptions(newChart.dataSource!).map(field => (
+                      {getFieldOptions().map(field => (
                         <SelectItem key={field.value} value={field.value}>
                           {field.label}
                         </SelectItem>
@@ -515,7 +511,7 @@ export default function CustomChartBuilder({ dashboardId, activities, projects, 
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      {getFieldOptions(newChart.dataSource!).map(field => (
+                      {getFieldOptions().map(field => (
                         <SelectItem key={field.value} value={field.value}>
                           {field.label}
                         </SelectItem>
