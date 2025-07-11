@@ -15,6 +15,75 @@ import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Setup authentication tables
+  const { setupAuthTables } = await import('./setup-auth.js');
+  await setupAuthTables();
+
+  // Authentication routes
+  app.post("/api/auth/login", async (req, res) => {
+    try {
+      const { email, password } = req.body;
+      
+      if (!email || !password) {
+        return res.status(400).json({ message: "Email e senha são obrigatórios" });
+      }
+
+      // Import bcrypt for password verification
+      const bcrypt = await import('bcrypt');
+      
+      // Get user by email
+      const user = await storage.getUserByEmail(email);
+      if (!user || !user.isActive) {
+        return res.status(401).json({ message: "Credenciais inválidas" });
+      }
+
+      // Verify password
+      const isPasswordValid = await bcrypt.compare(password, user.passwordHash || '');
+      if (!isPasswordValid) {
+        return res.status(401).json({ message: "Credenciais inválidas" });
+      }
+
+      // Return user data without password hash
+      const { passwordHash, ...userWithoutPassword } = user;
+      res.json({ 
+        success: true, 
+        user: userWithoutPassword,
+        message: "Login realizado com sucesso"
+      });
+    } catch (error) {
+      console.error("Login error:", error);
+      res.status(500).json({ message: "Erro interno do servidor" });
+    }
+  });
+
+  app.get("/api/auth/user-collaborations/:userId", async (req, res) => {
+    try {
+      const userId = parseInt(req.params.userId);
+      const collaborations = await storage.getUserProjectCollaborations(userId);
+      res.json(collaborations);
+    } catch (error) {
+      console.error("Error fetching user collaborations:", error);
+      res.status(500).json({ message: "Erro interno do servidor" });
+    }
+  });
+
+  app.get("/api/auth/project-access/:userId/:projectId", async (req, res) => {
+    try {
+      const userId = parseInt(req.params.userId);
+      const projectId = parseInt(req.params.projectId);
+      
+      const collaboration = await storage.checkUserProjectAccess(userId, projectId);
+      if (!collaboration) {
+        return res.status(403).json({ message: "Acesso negado a este projeto" });
+      }
+
+      res.json(collaboration);
+    } catch (error) {
+      console.error("Error checking project access:", error);
+      res.status(500).json({ message: "Erro interno do servidor" });
+    }
+  });
+
   // Users
   app.get("/api/users/:id", async (req, res) => {
     try {

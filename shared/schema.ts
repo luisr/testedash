@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, boolean, timestamp, decimal, jsonb } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, timestamp, decimal, jsonb, varchar, index } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -8,6 +8,45 @@ export const users = pgTable("users", {
   name: text("name").notNull(),
   avatar: text("avatar"),
   role: text("role").notNull().default("user"), // user, admin, manager
+  passwordHash: text("password_hash"), // For simple authentication
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Sessions table for authentication
+export const sessions = pgTable(
+  "sessions",
+  {
+    sid: varchar("sid").primaryKey(),
+    sess: jsonb("sess").notNull(),
+    expire: timestamp("expire").notNull(),
+  },
+  (table) => [index("IDX_session_expire").on(table.expire)],
+);
+
+// Project collaborators table
+export const projectCollaborators = pgTable("project_collaborators", {
+  id: serial("id").primaryKey(),
+  projectId: integer("project_id").references(() => projects.id, { onDelete: "cascade" }),
+  userId: integer("user_id").references(() => users.id, { onDelete: "cascade" }),
+  role: text("role").notNull().default("viewer"), // viewer, contributor, manager, admin
+  // Granular permissions
+  canView: boolean("can_view").default(true),
+  canEdit: boolean("can_edit").default(false),
+  canCreate: boolean("can_create").default(false),
+  canDelete: boolean("can_delete").default(false),
+  canManageActivities: boolean("can_manage_activities").default(false),
+  canViewReports: boolean("can_view_reports").default(true),
+  canExportData: boolean("can_export_data").default(false),
+  canManageCollaborators: boolean("can_manage_collaborators").default(false),
+  // Access control
+  isActive: boolean("is_active").default(true),
+  invitedById: integer("invited_by_id").references(() => users.id),
+  invitedAt: timestamp("invited_at").defaultNow(),
+  acceptedAt: timestamp("accepted_at"),
+  expiresAt: timestamp("expires_at"),
+  notes: text("notes"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -312,10 +351,13 @@ export const insertActivityConstraintSchema = createInsertSchema(activityConstra
 export const insertCustomStatusSchema = createInsertSchema(customStatuses).omit({ id: true, createdAt: true });
 export const insertCustomKPISchema = createInsertSchema(customKPIs).omit({ id: true, createdAt: true });
 export const insertDateChangesAuditSchema = createInsertSchema(dateChangesAudit).omit({ id: true, createdAt: true });
+export const insertProjectCollaboratorSchema = createInsertSchema(projectCollaborators).omit({ id: true, createdAt: true, updatedAt: true });
 
 // Types
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
+export type ProjectCollaborator = typeof projectCollaborators.$inferSelect;
+export type InsertProjectCollaborator = z.infer<typeof insertProjectCollaboratorSchema>;
 export type Dashboard = typeof dashboards.$inferSelect;
 export type InsertDashboard = z.infer<typeof insertDashboardSchema>;
 export type Project = typeof projects.$inferSelect;

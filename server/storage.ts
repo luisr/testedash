@@ -4,7 +4,7 @@ import postgres from "postgres";
 import {
   users, dashboards, projects, activities, dashboardShares, activityLogs, customColumns, customCharts,
   notifications, notificationPreferences, dashboardBackups, dashboardVersions, backupSchedules,
-  activityDependencies, activityConstraints,
+  activityDependencies, activityConstraints, projectCollaborators,
   type User, type InsertUser, type Dashboard, type InsertDashboard, type Project, type InsertProject,
   type Activity, type InsertActivity, type DashboardShare, type InsertDashboardShare,
   type ActivityLog, type InsertActivityLog, type CustomColumn, type InsertCustomColumn,
@@ -15,7 +15,8 @@ import {
   type ActivityConstraint, type InsertActivityConstraint,
   customStatuses, customKPIs, dateChangesAudit,
   type CustomStatus, type CustomKPI, type DateChangesAudit,
-  type InsertCustomStatus, type InsertCustomKPI, type InsertDateChangesAudit
+  type InsertCustomStatus, type InsertCustomKPI, type InsertDateChangesAudit,
+  type ProjectCollaborator, type InsertProjectCollaborator
 } from "@shared/schema";
 
 // Check if DATABASE_URL is properly configured or build from individual components
@@ -53,6 +54,18 @@ export interface IStorage {
   createUser(user: InsertUser): Promise<User>;
   updateUser(id: number, user: Partial<InsertUser>): Promise<User | undefined>;
   deleteUser(id: number): Promise<boolean>;
+  
+  // Authentication
+  authenticateUser(email: string, password: string): Promise<User | null>;
+  createUserWithPassword(userData: InsertUser & { password: string }): Promise<User>;
+  
+  // Project collaborators
+  getProjectCollaborators(projectId: number): Promise<(ProjectCollaborator & { user: User })[]>;
+  getUserProjectCollaborations(userId: number): Promise<(ProjectCollaborator & { project: Project })[]>;
+  addProjectCollaborator(collaboratorData: InsertProjectCollaborator): Promise<ProjectCollaborator>;
+  updateProjectCollaborator(id: number, collaboratorData: Partial<InsertProjectCollaborator>): Promise<ProjectCollaborator>;
+  removeProjectCollaborator(id: number): Promise<void>;
+  checkUserProjectAccess(userId: number, projectId: number): Promise<ProjectCollaborator | null>;
 
   // Dashboards
   getDashboard(id: number): Promise<Dashboard | undefined>;
@@ -803,21 +816,13 @@ export class DatabaseStorage implements IStorage {
         .where(eq(users.id, dashboard[0].ownerId || 1));
       
       // Get shared users
-      const sharedUsers = await db.select({
-        id: users.id,
-        email: users.email,
-        name: users.name,
-        avatar: users.avatar,
-        role: users.role,
-        createdAt: users.createdAt,
-        updatedAt: users.updatedAt
-      })
+      const sharedUsers = await db.select()
         .from(dashboardShares)
         .innerJoin(users, eq(dashboardShares.userId, users.id))
         .where(eq(dashboardShares.dashboardId, dashboardId));
       
       // Combine owner and shared users, remove duplicates
-      const allUsers = [...owner, ...sharedUsers];
+      const allUsers = [...owner, ...sharedUsers.map(su => su.users)];
       const uniqueUsers = allUsers.filter((user, index, self) => 
         self.findIndex(u => u.id === user.id) === index
       );
@@ -888,6 +893,193 @@ export class DatabaseStorage implements IStorage {
       await db.delete(customKPIs).where(eq(customKPIs.id, id));
     } catch (error) {
       console.error('Error deleting custom KPI:', error);
+    }
+  }
+
+  // Authentication methods
+  async authenticateUser(email: string, password: string): Promise<User | null> {
+    if (!db) return null;
+    
+    try {
+      const bcrypt = await import('bcrypt');
+      const [user] = await db.select().from(users).where(eq(users.email, email));
+      
+      if (!user || !user.isActive) return null;
+      
+      if (user.passwordHash && await bcrypt.compare(password, user.passwordHash)) {
+        return user;
+      }
+      return null;
+    } catch (error) {
+      console.error('Error authenticating user:', error);
+      return null;
+    }
+  }
+
+  async createUserWithPassword(userData: InsertUser & { password: string }): Promise<User> {
+    if (!db) throw new Error('Database not available');
+    
+    try {
+      const bcrypt = await import('bcrypt');
+      const passwordHash = await bcrypt.hash(userData.password, 10);
+      
+      const { password, ...userDataWithoutPassword } = userData;
+      const [user] = await db
+        .insert(users)
+        .values({
+          ...userDataWithoutPassword,
+          passwordHash,
+          isActive: true
+        })
+        .returning();
+      return user;
+    } catch (error) {
+      console.error('Error creating user with password:', error);
+      throw error;
+    }
+  }
+
+  // Project collaborators methods
+  async getProjectCollaborators(projectId: number): Promise<(ProjectCollaborator & { user: User })[]> {
+    if (!db) return [];
+    
+    try {
+      const result = await db
+        .select({
+          id: projectCollaborators.id,
+          projectId: projectCollaborators.projectId,
+          userId: projectCollaborators.userId,
+          role: projectCollaborators.role,
+          canView: projectCollaborators.canView,
+          canEdit: projectCollaborators.canEdit,
+          canCreate: projectCollaborators.canCreate,
+          canDelete: projectCollaborators.canDelete,
+          canManageActivities: projectCollaborators.canManageActivities,
+          canViewReports: projectCollaborators.canViewReports,
+          canExportData: projectCollaborators.canExportData,
+          canManageCollaborators: projectCollaborators.canManageCollaborators,
+          isActive: projectCollaborators.isActive,
+          invitedById: projectCollaborators.invitedById,
+          invitedAt: projectCollaborators.invitedAt,
+          acceptedAt: projectCollaborators.acceptedAt,
+          expiresAt: projectCollaborators.expiresAt,
+          notes: projectCollaborators.notes,
+          createdAt: projectCollaborators.createdAt,
+          updatedAt: projectCollaborators.updatedAt,
+          user: users
+        })
+        .from(projectCollaborators)
+        .leftJoin(users, eq(projectCollaborators.userId, users.id))
+        .where(eq(projectCollaborators.projectId, projectId));
+      
+      return result;
+    } catch (error) {
+      console.error('Error getting project collaborators:', error);
+      return [];
+    }
+  }
+
+  async getUserProjectCollaborations(userId: number): Promise<(ProjectCollaborator & { project: Project })[]> {
+    if (!db) return [];
+    
+    try {
+      const result = await db
+        .select({
+          id: projectCollaborators.id,
+          projectId: projectCollaborators.projectId,
+          userId: projectCollaborators.userId,
+          role: projectCollaborators.role,
+          canView: projectCollaborators.canView,
+          canEdit: projectCollaborators.canEdit,
+          canCreate: projectCollaborators.canCreate,
+          canDelete: projectCollaborators.canDelete,
+          canManageActivities: projectCollaborators.canManageActivities,
+          canViewReports: projectCollaborators.canViewReports,
+          canExportData: projectCollaborators.canExportData,
+          canManageCollaborators: projectCollaborators.canManageCollaborators,
+          isActive: projectCollaborators.isActive,
+          invitedById: projectCollaborators.invitedById,
+          invitedAt: projectCollaborators.invitedAt,
+          acceptedAt: projectCollaborators.acceptedAt,
+          expiresAt: projectCollaborators.expiresAt,
+          notes: projectCollaborators.notes,
+          createdAt: projectCollaborators.createdAt,
+          updatedAt: projectCollaborators.updatedAt,
+          project: projects
+        })
+        .from(projectCollaborators)
+        .leftJoin(projects, eq(projectCollaborators.projectId, projects.id))
+        .where(and(
+          eq(projectCollaborators.userId, userId),
+          eq(projectCollaborators.isActive, true)
+        ));
+      
+      return result;
+    } catch (error) {
+      console.error('Error getting user project collaborations:', error);
+      return [];
+    }
+  }
+
+  async addProjectCollaborator(collaboratorData: InsertProjectCollaborator): Promise<ProjectCollaborator> {
+    if (!db) throw new Error('Database not available');
+    
+    try {
+      const [collaborator] = await db
+        .insert(projectCollaborators)
+        .values(collaboratorData)
+        .returning();
+      return collaborator;
+    } catch (error) {
+      console.error('Error adding project collaborator:', error);
+      throw error;
+    }
+  }
+
+  async updateProjectCollaborator(id: number, collaboratorData: Partial<InsertProjectCollaborator>): Promise<ProjectCollaborator> {
+    if (!db) throw new Error('Database not available');
+    
+    try {
+      const [collaborator] = await db
+        .update(projectCollaborators)
+        .set({ ...collaboratorData, updatedAt: new Date() })
+        .where(eq(projectCollaborators.id, id))
+        .returning();
+      return collaborator;
+    } catch (error) {
+      console.error('Error updating project collaborator:', error);
+      throw error;
+    }
+  }
+
+  async removeProjectCollaborator(id: number): Promise<void> {
+    if (!db) return;
+    
+    try {
+      await db
+        .delete(projectCollaborators)
+        .where(eq(projectCollaborators.id, id));
+    } catch (error) {
+      console.error('Error removing project collaborator:', error);
+    }
+  }
+
+  async checkUserProjectAccess(userId: number, projectId: number): Promise<ProjectCollaborator | null> {
+    if (!db) return null;
+    
+    try {
+      const [collaboration] = await db
+        .select()
+        .from(projectCollaborators)
+        .where(and(
+          eq(projectCollaborators.userId, userId),
+          eq(projectCollaborators.projectId, projectId),
+          eq(projectCollaborators.isActive, true)
+        ));
+      return collaboration || null;
+    } catch (error) {
+      console.error('Error checking user project access:', error);
+      return null;
     }
   }
 
