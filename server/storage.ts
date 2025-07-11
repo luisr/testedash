@@ -166,8 +166,8 @@ export interface IStorage {
 
 // Mock data for development
 const mockUsers: User[] = [
-  { id: 1, email: 'admin@example.com', name: 'João Silva', avatar: null, role: 'admin', passwordHash: null, isActive: true, isSuperUser: false, createdAt: new Date(), updatedAt: new Date() },
-  { id: 2, email: 'user@example.com', name: 'Maria Santos', avatar: null, role: 'user', passwordHash: null, isActive: true, isSuperUser: false, createdAt: new Date(), updatedAt: new Date() }
+  { id: 1, email: 'admin@example.com', name: 'João Silva', avatar: null, role: 'admin', passwordHash: null, isActive: true, isSuperUser: false, mustChangePassword: false, createdAt: new Date(), updatedAt: new Date() },
+  { id: 2, email: 'user@example.com', name: 'Maria Santos', avatar: null, role: 'user', passwordHash: null, isActive: true, isSuperUser: false, mustChangePassword: false, createdAt: new Date(), updatedAt: new Date() }
 ];
 
 const mockDashboards: Dashboard[] = [
@@ -234,6 +234,7 @@ export class DatabaseStorage implements IStorage {
       passwordHash: user.passwordHash || null,
       isActive: user.isActive ?? true,
       isSuperUser: user.isSuperUser ?? false,
+      mustChangePassword: user.mustChangePassword ?? true,
       createdAt: new Date(),
       updatedAt: new Date()
     };
@@ -256,8 +257,20 @@ export class DatabaseStorage implements IStorage {
 
   async deleteUser(id: number): Promise<boolean> {
     if (db) {
-      const result = await db.delete(users).where(eq(users.id, id)).returning();
-      return result.length > 0;
+      try {
+        // First, update any dashboards owned by this user to assign them to an admin
+        const adminUser = await db.select().from(users).where(eq(users.role, 'admin')).limit(1);
+        if (adminUser.length > 0) {
+          await db.update(dashboards).set({ ownerId: adminUser[0].id }).where(eq(dashboards.ownerId, id));
+        }
+        
+        // Delete the user
+        const result = await db.delete(users).where(eq(users.id, id)).returning();
+        return result.length > 0;
+      } catch (error) {
+        console.error('Error deleting user:', error);
+        throw error;
+      }
     }
     const userIndex = mockUsers.findIndex(u => u.id === id);
     if (userIndex >= 0) {
@@ -1030,34 +1043,15 @@ export class DatabaseStorage implements IStorage {
     
     try {
       const result = await db
-        .select({
-          id: projectCollaborators.id,
-          projectId: projectCollaborators.projectId,
-          userId: projectCollaborators.userId,
-          role: projectCollaborators.role,
-          canView: projectCollaborators.canView,
-          canEdit: projectCollaborators.canEdit,
-          canCreate: projectCollaborators.canCreate,
-          canDelete: projectCollaborators.canDelete,
-          canManageActivities: projectCollaborators.canManageActivities,
-          canViewReports: projectCollaborators.canViewReports,
-          canExportData: projectCollaborators.canExportData,
-          canManageCollaborators: projectCollaborators.canManageCollaborators,
-          isActive: projectCollaborators.isActive,
-          invitedById: projectCollaborators.invitedById,
-          invitedAt: projectCollaborators.invitedAt,
-          acceptedAt: projectCollaborators.acceptedAt,
-          expiresAt: projectCollaborators.expiresAt,
-          notes: projectCollaborators.notes,
-          createdAt: projectCollaborators.createdAt,
-          updatedAt: projectCollaborators.updatedAt,
-          user: users
-        })
+        .select()
         .from(projectCollaborators)
         .leftJoin(users, eq(projectCollaborators.userId, users.id))
         .where(eq(projectCollaborators.projectId, projectId));
       
-      return result;
+      return result.map(row => ({
+        ...row.project_collaborators,
+        user: row.users || {} as User
+      })) as (ProjectCollaborator & { user: User })[];
     } catch (error) {
       console.error('Error getting project collaborators:', error);
       return [];
@@ -1069,29 +1063,7 @@ export class DatabaseStorage implements IStorage {
     
     try {
       const result = await db
-        .select({
-          id: projectCollaborators.id,
-          projectId: projectCollaborators.projectId,
-          userId: projectCollaborators.userId,
-          role: projectCollaborators.role,
-          canView: projectCollaborators.canView,
-          canEdit: projectCollaborators.canEdit,
-          canCreate: projectCollaborators.canCreate,
-          canDelete: projectCollaborators.canDelete,
-          canManageActivities: projectCollaborators.canManageActivities,
-          canViewReports: projectCollaborators.canViewReports,
-          canExportData: projectCollaborators.canExportData,
-          canManageCollaborators: projectCollaborators.canManageCollaborators,
-          isActive: projectCollaborators.isActive,
-          invitedById: projectCollaborators.invitedById,
-          invitedAt: projectCollaborators.invitedAt,
-          acceptedAt: projectCollaborators.acceptedAt,
-          expiresAt: projectCollaborators.expiresAt,
-          notes: projectCollaborators.notes,
-          createdAt: projectCollaborators.createdAt,
-          updatedAt: projectCollaborators.updatedAt,
-          project: projects
-        })
+        .select()
         .from(projectCollaborators)
         .leftJoin(projects, eq(projectCollaborators.projectId, projects.id))
         .where(and(
@@ -1099,7 +1071,10 @@ export class DatabaseStorage implements IStorage {
           eq(projectCollaborators.isActive, true)
         ));
       
-      return result;
+      return result.map(row => ({
+        ...row.project_collaborators,
+        project: row.projects || {} as Project
+      })) as (ProjectCollaborator & { project: Project })[];
     } catch (error) {
       console.error('Error getting user project collaborations:', error);
       return [];

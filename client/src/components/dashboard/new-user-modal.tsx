@@ -43,7 +43,8 @@ export default function NewUserModal({
         body: JSON.stringify({
           ...formData,
           // Default password will be set on backend
-          password: 'BeachPark@123'
+          password: 'BeachPark@123',
+          mustChangePassword: true
         }),
       });
 

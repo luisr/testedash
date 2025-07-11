@@ -27,7 +27,10 @@ import {
   Filter
 } from "lucide-react";
 import beachParkLogo from "@assets/pngegg_1752264509099.png";
-// Components will be added back once loading issues are resolved
+import NewUserModal from "@/components/dashboard/new-user-modal";
+import NewProjectModal from "@/components/dashboard/new-project-modal";
+import EditUserModal from "@/components/dashboard/edit-user-modal";
+import ChangePasswordModal from "@/components/auth/change-password-modal";
 
 interface User {
   id: number;
@@ -591,8 +594,8 @@ export default function AdminDashboard() {
         </Tabs>
       </div>
 
-      {/* Modals - Temporarily commented out */}
-      {/* <NewUserModal
+      {/* Modals */}
+      <NewUserModal
         isOpen={showNewUserModal}
         onClose={() => setShowNewUserModal(false)}
         onUserCreated={fetchUsers}
@@ -623,7 +626,7 @@ export default function AdminDashboard() {
           userId={user.id}
           onPasswordChanged={() => setShowChangePasswordModal(false)}
         />
-      )} */}
+      )}
     </div>
   );
 }
