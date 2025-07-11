@@ -24,6 +24,8 @@ import { Button } from "@/components/ui/button";
 import { Plus, FolderOpen, Users, FileText, Upload, Archive } from "lucide-react";
 import { BackupSimple } from "@/components/dashboard/backup-simple";
 import { DependencyManager } from "@/components/dashboard/dependency-manager";
+import { ActivityDateEditor } from "@/components/dashboard/activity-date-editor";
+import { DateAuditViewer } from "@/components/dashboard/date-audit-viewer";
 
 export default function Dashboard() {
   const { id } = useParams<{ id?: string }>();
@@ -303,6 +305,15 @@ export default function Dashboard() {
               >
                 Testar Notificação
               </Button>
+              <DateAuditViewer
+                dashboardId={dashboardId}
+                trigger={
+                  <Button variant="outline" className="gap-2">
+                    <Archive className="h-4 w-4" />
+                    Auditoria de Datas
+                  </Button>
+                }
+              />
             </div>
           </div>
 

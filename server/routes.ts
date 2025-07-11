@@ -5,7 +5,8 @@ import {
   insertUserSchema, insertDashboardSchema, insertProjectSchema, insertActivitySchema,
   insertDashboardShareSchema, insertActivityLogSchema, insertCustomColumnSchema, insertCustomChartSchema,
   insertNotificationSchema, insertNotificationPreferencesSchema, insertDashboardBackupSchema,
-  insertDashboardVersionSchema, insertBackupScheduleSchema, insertActivityDependencySchema, insertActivityConstraintSchema
+  insertDashboardVersionSchema, insertBackupScheduleSchema, insertActivityDependencySchema, insertActivityConstraintSchema,
+  insertDateChangesAuditSchema
 } from "@shared/schema";
 import { recalculateDashboardSchedule } from "./dependency-scheduler";
 import { z } from "zod";
@@ -1535,6 +1536,57 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error deleting backup schedule:', error);
       res.status(500).json({ error: 'Failed to delete backup schedule' });
+    }
+  });
+
+  // Date Changes Audit Routes
+  app.get('/api/date-changes-audit/:dashboardId', async (req, res) => {
+    try {
+      const dashboardId = parseInt(req.params.dashboardId);
+      const activityId = req.query.activityId ? parseInt(req.query.activityId as string) : undefined;
+      
+      const auditRecords = await storage.getDateChangesAudit(dashboardId, activityId);
+      res.json(auditRecords);
+    } catch (error) {
+      console.error('Error fetching date changes audit:', error);
+      res.status(500).json({ error: 'Failed to fetch date changes audit' });
+    }
+  });
+
+  app.post('/api/date-changes-audit', async (req, res) => {
+    try {
+      const auditData = insertDateChangesAuditSchema.parse(req.body);
+      const audit = await storage.createDateChangesAudit(auditData);
+      res.status(201).json(audit);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid input", errors: error.errors });
+      }
+      console.error('Error creating date changes audit:', error);
+      res.status(500).json({ error: 'Failed to create date changes audit' });
+    }
+  });
+
+  // Modified activity update route with audit
+  app.patch('/api/activities/:id/with-audit', async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const { activityData, userId, justification, changeReason } = req.body;
+      
+      const activityUpdateData = insertActivitySchema.partial().parse(activityData);
+      const activity = await storage.updateActivityWithDateAudit(id, activityUpdateData, userId, justification, changeReason);
+      
+      if (activity) {
+        res.json(activity);
+      } else {
+        res.status(404).json({ error: 'Activity not found' });
+      }
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid input", errors: error.errors });
+      }
+      console.error('Error updating activity with audit:', error);
+      res.status(500).json({ error: (error as Error).message || 'Failed to update activity' });
     }
   });
 

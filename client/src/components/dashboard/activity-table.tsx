@@ -30,6 +30,7 @@ import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { Activity } from "@shared/schema";
 import TableConfigModal from "./table-config-modal";
 import EditActivityModal from "./edit-activity-modal";
+import { ActivityDateEditor } from "./activity-date-editor";
 
 interface ActivityTableProps {
   activities: Activity[];
@@ -412,6 +413,14 @@ export default function ActivityTable({
                                 >
                                   <Edit2 className="w-4 h-4" />
                                 </Button>
+                                <ActivityDateEditor
+                                  activity={activity}
+                                  userId={1} // TODO: Get from auth context
+                                  onSuccess={() => {
+                                    // Refresh data after successful update
+                                    window.location.reload();
+                                  }}
+                                />
                                 <Button
                                   variant="ghost"
                                   size="icon"

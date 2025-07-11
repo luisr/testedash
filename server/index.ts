@@ -3,6 +3,7 @@ import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { setupBackupTables } from "./setup-backup-tables";
 import { backupScheduler } from "./backup-scheduler";
+import { setupAuditTable } from "./setup-audit-table";
 
 const app = express();
 app.use(express.json());
@@ -42,8 +43,9 @@ app.use((req, res, next) => {
   // Setup backup tables first
   try {
     await setupBackupTables();
+    await setupAuditTable();
   } catch (error) {
-    console.error('Failed to setup backup tables:', error);
+    console.error('Failed to setup tables:', error);
   }
   
   const server = await registerRoutes(app);

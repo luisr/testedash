@@ -276,6 +276,22 @@ export const customKPIs = pgTable("custom_kpis", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+// Date Changes Audit table
+export const dateChangesAudit = pgTable("date_changes_audit", {
+  id: serial("id").primaryKey(),
+  dashboardId: integer("dashboard_id").references(() => dashboards.id).notNull(),
+  activityId: integer("activity_id").references(() => activities.id).notNull(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  fieldName: text("field_name").notNull(), // 'plannedStartDate', 'plannedEndDate', 'actualStartDate', 'actualEndDate'
+  oldValue: timestamp("old_value"),
+  newValue: timestamp("new_value"),
+  justification: text("justification").notNull(),
+  changeReason: text("change_reason"), // 'client_request', 'resource_availability', 'technical_issue', 'scope_change', 'other'
+  impactDescription: text("impact_description"),
+  approvedBy: integer("approved_by").references(() => users.id), // Optional approval workflow
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).omit({ id: true, createdAt: true, updatedAt: true });
 export const insertDashboardSchema = createInsertSchema(dashboards).omit({ id: true, createdAt: true, updatedAt: true });
@@ -294,6 +310,7 @@ export const insertActivityDependencySchema = createInsertSchema(activityDepende
 export const insertActivityConstraintSchema = createInsertSchema(activityConstraints).omit({ id: true, createdAt: true, updatedAt: true });
 export const insertCustomStatusSchema = createInsertSchema(customStatuses).omit({ id: true, createdAt: true });
 export const insertCustomKPISchema = createInsertSchema(customKPIs).omit({ id: true, createdAt: true });
+export const insertDateChangesAuditSchema = createInsertSchema(dateChangesAudit).omit({ id: true, createdAt: true });
 
 // Types
 export type User = typeof users.$inferSelect;
@@ -330,3 +347,5 @@ export type CustomStatus = typeof customStatuses.$inferSelect;
 export type InsertCustomStatus = z.infer<typeof insertCustomStatusSchema>;
 export type CustomKPI = typeof customKPIs.$inferSelect;
 export type InsertCustomKPI = z.infer<typeof insertCustomKPISchema>;
+export type DateChangesAudit = typeof dateChangesAudit.$inferSelect;
+export type InsertDateChangesAudit = z.infer<typeof insertDateChangesAuditSchema>;

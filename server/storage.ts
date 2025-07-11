@@ -13,9 +13,9 @@ import {
   type DashboardBackup, type InsertDashboardBackup, type DashboardVersion, type InsertDashboardVersion,
   type BackupSchedule, type InsertBackupSchedule, type ActivityDependency, type InsertActivityDependency,
   type ActivityConstraint, type InsertActivityConstraint,
-  customStatuses, customKPIs,
-  type CustomStatus, type CustomKPI,
-  type InsertCustomStatus, type InsertCustomKPI
+  customStatuses, customKPIs, dateChangesAudit,
+  type CustomStatus, type CustomKPI, type DateChangesAudit,
+  type InsertCustomStatus, type InsertCustomKPI, type InsertDateChangesAudit
 } from "@shared/schema";
 
 // Check if DATABASE_URL is properly configured or build from individual components
@@ -140,6 +140,13 @@ export interface IStorage {
   createActivityConstraint(constraint: InsertActivityConstraint): Promise<ActivityConstraint>;
   updateActivityConstraint(constraintId: number, constraint: Partial<InsertActivityConstraint>): Promise<ActivityConstraint | undefined>;
   deleteActivityConstraint(constraintId: number): Promise<boolean>;
+  
+  // Date Changes Audit
+  getDateChangesAudit(dashboardId: number, activityId?: number): Promise<DateChangesAudit[]>;
+  createDateChangesAudit(audit: InsertDateChangesAudit): Promise<DateChangesAudit>;
+  
+  // Activity with Date Audit
+  updateActivityWithDateAudit(id: number, activity: Partial<InsertActivity>, userId: number, justification?: string, changeReason?: string): Promise<Activity | undefined>;
 }
 
 // Mock data for development
@@ -1268,6 +1275,98 @@ export class DatabaseStorage implements IStorage {
     } catch (error) {
       console.error('Error deleting activity constraint:', error);
       return false;
+    }
+  }
+
+  // Date Changes Audit
+  async getDateChangesAudit(dashboardId: number, activityId?: number): Promise<DateChangesAudit[]> {
+    if (!db) return [];
+
+    try {
+      const whereClause = activityId 
+        ? and(
+            eq(dateChangesAudit.dashboardId, dashboardId),
+            eq(dateChangesAudit.activityId, activityId)
+          )
+        : eq(dateChangesAudit.dashboardId, dashboardId);
+      
+      const results = await db.select().from(dateChangesAudit)
+        .where(whereClause)
+        .orderBy(desc(dateChangesAudit.createdAt));
+      
+      return results;
+    } catch (error) {
+      console.error('Error getting date changes audit:', error);
+      return [];
+    }
+  }
+
+  async createDateChangesAudit(audit: InsertDateChangesAudit): Promise<DateChangesAudit> {
+    if (!db) throw new Error('Database not available');
+
+    try {
+      const result = await db
+        .insert(dateChangesAudit)
+        .values(audit)
+        .returning();
+
+      return result[0];
+    } catch (error) {
+      console.error('Error creating date changes audit:', error);
+      throw error;
+    }
+  }
+
+  async updateActivityWithDateAudit(id: number, activity: Partial<InsertActivity>, userId: number, justification?: string, changeReason?: string): Promise<Activity | undefined> {
+    if (!db) return undefined;
+
+    try {
+      // First get the current activity to compare dates
+      const currentActivity = await this.getActivity(id);
+      if (!currentActivity) return undefined;
+      
+      const dateFields = ['plannedStartDate', 'plannedEndDate', 'actualStartDate', 'actualEndDate'];
+      const auditPromises: Promise<DateChangesAudit>[] = [];
+      
+      // Check for date changes and create audit entries
+      for (const field of dateFields) {
+        const oldValue = currentActivity[field as keyof Activity] as Date | null;
+        const newValue = activity[field as keyof Partial<InsertActivity>] as Date | null;
+        
+        // Only create audit if date actually changed
+        if (oldValue?.getTime() !== newValue?.getTime()) {
+          if (justification) {
+            auditPromises.push(this.createDateChangesAudit({
+              dashboardId: currentActivity.dashboardId!,
+              activityId: id,
+              userId,
+              fieldName: field,
+              oldValue,
+              newValue,
+              justification,
+              changeReason,
+              impactDescription: `Data ${field} alterada de ${oldValue?.toLocaleDateString() || 'não definida'} para ${newValue?.toLocaleDateString() || 'não definida'}`
+            }));
+          } else {
+            throw new Error(`Justificativa obrigatória para alteração de data no campo ${field}`);
+          }
+        }
+      }
+      
+      // Create all audit entries
+      await Promise.all(auditPromises);
+      
+      // Then update the activity
+      const result = await db
+        .update(activities)
+        .set({ ...activity, updatedAt: new Date() })
+        .where(eq(activities.id, id))
+        .returning();
+
+      return result[0];
+    } catch (error) {
+      console.error('Error updating activity with date audit:', error);
+      throw error;
     }
   }
 }
