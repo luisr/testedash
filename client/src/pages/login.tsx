@@ -51,11 +51,11 @@ export default function Login() {
         {/* Logo/Header */}
         <div className="text-center space-y-2">
           <div className="flex justify-center">
-            <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center">
-              <Shield className="w-8 h-8 text-white" />
+            <div className="w-16 h-16 rounded-2xl flex items-center justify-center bg-white p-2">
+              <img src="/attached_assets/pngegg_1752264509099.png" alt="BeachPark Logo" className="w-12 h-12 object-contain" />
             </div>
           </div>
-          <h1 className="text-3xl font-bold text-foreground">ProjectHub</h1>
+          <h1 className="text-3xl font-bold text-foreground">Tô Sabendo</h1>
           <p className="text-muted-foreground">Sistema de Gerenciamento de Projetos</p>
         </div>
 

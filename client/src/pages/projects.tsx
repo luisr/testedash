@@ -179,11 +179,11 @@ export default function Projects() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center">
-                <Shield className="w-6 h-6 text-white" />
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-white p-1">
+                <img src="/attached_assets/pngegg_1752264509099.png" alt="BeachPark Logo" className="w-8 h-8 object-contain" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-foreground">ProjectHub</h1>
+                <h1 className="text-2xl font-bold text-foreground">Tô Sabendo</h1>
                 <p className="text-sm text-muted-foreground">Seus Projetos</p>
               </div>
             </div>

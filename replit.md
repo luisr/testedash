@@ -1,8 +1,8 @@
-# Project Dashboard System
+# Tô Sabendo - Project Dashboard System
 
 ## Overview
 
-This is a full-stack React application for managing project dashboards with activity tracking, metrics visualization, and team collaboration features. The application uses a modern tech stack with TypeScript, Express.js backend, React frontend with ShadCN UI components, and PostgreSQL database with Drizzle ORM.
+This is a full-stack React application for managing project dashboards with activity tracking, metrics visualization, and team collaboration features. The application uses a modern tech stack with TypeScript, Express.js backend, React frontend with ShadCN UI components, and PostgreSQL database with Drizzle ORM. The system is branded as "Tô Sabendo" and incorporates BeachPark's visual identity.
 
 ## User Preferences
 
@@ -180,3 +180,13 @@ The application is designed for seamless deployment on platforms like Replit, Ve
 - **Email Validation**: Fixed duplicate email error handling with proper user feedback
 - **Theme Forcing System**: Created multiple CSS files (theme-fix.css, force-theme.css) to forcibly apply modern theme and eliminate yellow/amber colors
 - **Dashboard Container Classes**: Applied specific CSS classes to dashboard containers to ensure consistent theme application
+
+### January 11, 2025 - Complete System Rebranding and Super User Integration
+- **Complete Rebranding**: Successfully changed system name from "ProjectHub" to "Tô Sabendo" across all components
+- **BeachPark Logo Integration**: Integrated BeachPark logo across all key UI components (sidebar, login, projects page)
+- **Super User Management**: Implemented comprehensive super user system with database schema and UI components
+- **Super User Modal**: Added modal for promoting/demoting super users, accessible only by existing super users
+- **Access Control**: Implemented super user access control for consolidated dashboard (Dashboard ID 1)
+- **Visual Identity**: Complete BeachPark branding with logo integration maintaining premium Apple-style design
+- **Database Integration**: Super user functionality fully integrated with PostgreSQL database
+- **User Management**: Luis Ribeiro (luis.ribeiro@beachpark.com.br) established as primary super user
