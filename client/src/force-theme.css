@@ -7,6 +7,13 @@ html, body, #root, main, div, section, article, aside, header, footer, nav {
   background: none !important;
 }
 
+/* Forçar remoção de todas as classes de cor problemáticas */
+[class*="bg-"], [style*="background"] {
+  background-color: transparent !important;
+  background-image: none !important;
+  background: none !important;
+}
+
 /* Aplicar gradiente moderno APENAS aos containers principais */
 html {
   background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%) !important;
@@ -47,16 +54,33 @@ body {
 }
 
 /* Cards com glassmorphism */
-.card, [class*="card"] {
+.card, [class*="card"], [data-radix-popper-content-wrapper] {
   background: rgba(255, 255, 255, 0.9) !important;
   backdrop-filter: blur(20px) !important;
   border: 1px solid rgba(255, 255, 255, 0.2) !important;
   border-radius: 16px !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1) !important;
 }
 
-.dark .card, .dark [class*="card"] {
+.dark .card, .dark [class*="card"], .dark [data-radix-popper-content-wrapper] {
   background: rgba(15, 23, 42, 0.9) !important;
   border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* KPI Cards específicos */
+.kpi-card {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%) !important;
+  backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  border-radius: 20px !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1) !important;
+}
+
+.dark .kpi-card {
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.95) 100%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
 }
 
 /* Sidebar */
@@ -84,11 +108,103 @@ button[data-variant="default"], .bg-primary {
   background-color: unset !important;
 }
 
+/* Forçar aplicação específica no dashboard */
+.dashboard-container {
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%) !important;
+  min-height: 100vh !important;
+}
+
+.dark .dashboard-container {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;
+}
+
+/* KPI Cards com visual premium */
+.kpi-card-container {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%) !important;
+  backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  border-radius: 20px !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1) !important;
+  transition: all 0.3s ease !important;
+}
+
+.dark .kpi-card-container {
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.95) 100%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
+}
+
+.kpi-card-container:hover {
+  transform: translateY(-4px) !important;
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.15) !important;
+}
+
+.dark .kpi-card-container:hover {
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* Forçar remoção de qualquer cor amarela residual */
+.bg-yellow-50, .bg-yellow-100, .bg-yellow-200, .bg-yellow-300, .bg-yellow-400, .bg-yellow-500, .bg-yellow-600, .bg-yellow-700, .bg-yellow-800, .bg-yellow-900,
+.bg-amber-50, .bg-amber-100, .bg-amber-200, .bg-amber-300, .bg-amber-400, .bg-amber-500, .bg-amber-600, .bg-amber-700, .bg-amber-800, .bg-amber-900,
+.bg-orange-50, .bg-orange-100, .bg-orange-200, .bg-orange-300, .bg-orange-400, .bg-orange-500, .bg-orange-600, .bg-orange-700, .bg-orange-800, .bg-orange-900 {
+  background-color: rgba(248, 250, 252, 0.8) !important;
+}
+
+.dark .bg-yellow-50, .dark .bg-yellow-100, .dark .bg-yellow-200, .dark .bg-yellow-300, .dark .bg-yellow-400, .dark .bg-yellow-500, .dark .bg-yellow-600, .dark .bg-yellow-700, .dark .bg-yellow-800, .dark .bg-yellow-900,
+.dark .bg-amber-50, .dark .bg-amber-100, .dark .bg-amber-200, .dark .bg-amber-300, .dark .bg-amber-400, .dark .bg-amber-500, .dark .bg-amber-600, .dark .bg-amber-700, .dark .bg-amber-800, .dark .bg-amber-900,
+.dark .bg-orange-50, .dark .bg-orange-100, .dark .bg-orange-200, .dark .bg-orange-300, .dark .bg-orange-400, .dark .bg-orange-500, .dark .bg-orange-600, .dark .bg-orange-700, .dark .bg-orange-800, .dark .bg-orange-900 {
+  background-color: rgba(30, 41, 59, 0.8) !important;
+}
+
 /* Aplicar apenas nos containers principais */
-.min-h-screen, .h-screen {
+.min-h-screen, .h-screen, .flex.min-h-screen, .flex.h-screen {
   background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%) !important;
 }
 
-.dark .min-h-screen, .dark .h-screen {
+.dark .min-h-screen, .dark .h-screen, .dark .flex.min-h-screen, .dark .flex.h-screen {
   background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;
+}
+
+/* Garantir que a tabela tenha o design moderno */
+.table-container {
+  background: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1) !important;
+}
+
+.dark .table-container {
+  background: rgba(15, 23, 42, 0.95) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Status badges modernos */
+.status-badge {
+  padding: 6px 12px !important;
+  border-radius: 20px !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+  backdrop-filter: blur(10px) !important;
+}
+
+.status-completed {
+  background: linear-gradient(135deg, rgba(52, 199, 89, 0.2) 0%, rgba(52, 199, 89, 0.1) 100%) !important;
+  color: rgb(52, 199, 89) !important;
+  border: 1px solid rgba(52, 199, 89, 0.3) !important;
+}
+
+.status-in-progress {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(59, 130, 246, 0.1) 100%) !important;
+  color: rgb(59, 130, 246) !important;
+  border: 1px solid rgba(59, 130, 246, 0.3) !important;
+}
+
+.status-delayed {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.2) 0%, rgba(245, 158, 11, 0.1) 100%) !important;
+  color: rgb(245, 158, 11) !important;
+  border: 1px solid rgba(245, 158, 11, 0.3) !important;
 }

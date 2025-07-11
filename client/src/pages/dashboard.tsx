@@ -332,7 +332,7 @@ export default function Dashboard() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center dashboard-container">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
       </div>
     );
@@ -340,7 +340,7 @@ export default function Dashboard() {
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center dashboard-container">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-destructive mb-4">Erro ao carregar dashboard</h1>
           <p className="text-muted-foreground">{error}</p>
@@ -350,7 +350,7 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen flex" style={{ backgroundColor: 'hsl(var(--background))' }}>
+    <div className="min-h-screen flex dashboard-container">
       <Sidebar 
         isOpen={sidebarOpen} 
         onClose={() => setSidebarOpen(false)}
