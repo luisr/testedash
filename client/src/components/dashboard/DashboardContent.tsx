@@ -31,6 +31,12 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({
   const regularDashboard = useDashboardData(dashboardId);
   const consolidatedDashboard = useConsolidatedDashboard(user?.id);
 
+  // Debug logging
+  console.log('DashboardContent - Props:', { dashboardId, isConsolidatedDashboard });
+  console.log('DashboardContent - User:', user);
+  console.log('DashboardContent - Regular Dashboard:', regularDashboard);
+  console.log('DashboardContent - Consolidated Dashboard:', consolidatedDashboard);
+
   // Check super user access for consolidated dashboard
   if (isConsolidatedDashboard && !user?.isSuperUser) {
     return (
