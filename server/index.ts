@@ -2,6 +2,7 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { setupBackupTables } from "./setup-backup-tables";
+import { backupScheduler } from "./backup-scheduler";
 
 const app = express();
 app.use(express.json());
@@ -53,6 +54,10 @@ app.use((req, res, next) => {
   
   // Make notification service available to routes
   app.set('notificationService', notificationService);
+  
+  // Initialize backup scheduler
+  console.log('🔄 Initializing backup scheduler...');
+  // The backup scheduler is already initialized when imported
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;

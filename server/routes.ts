@@ -1192,6 +1192,210 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Dashboard Backup Routes
+  app.get('/api/dashboard-backups/:dashboardId', async (req, res) => {
+    try {
+      const dashboardId = parseInt(req.params.dashboardId);
+      const backups = await storage.getDashboardBackups(dashboardId);
+      res.json(backups);
+    } catch (error) {
+      console.error('Error fetching dashboard backups:', error);
+      res.status(500).json({ error: 'Failed to fetch dashboard backups' });
+    }
+  });
+
+  app.post('/api/dashboard-backups', async (req, res) => {
+    try {
+      const { dashboardId, userId, type, description } = req.body;
+      
+      // Create backup data
+      const dashboard = await storage.getDashboard(dashboardId);
+      const activities = await storage.getActivitiesByDashboardId(dashboardId);
+      const projects = await storage.getProjectsByDashboardId(dashboardId);
+      const customColumns = await storage.getCustomColumns(dashboardId);
+      const customCharts = await storage.getCustomCharts(dashboardId);
+      
+      const backupData = {
+        dashboard,
+        activities,
+        projects,
+        customColumns,
+        customCharts,
+        backupDate: new Date(),
+        version: '1.0.0'
+      };
+      
+      const dataString = JSON.stringify(backupData);
+      const crypto = require('crypto');
+      const checksum = crypto.createHash('md5').update(dataString).digest('hex');
+      
+      const backup = await storage.createDashboardBackup({
+        dashboardId,
+        userId,
+        version: '1.0.0',
+        backupType: type,
+        dashboardData: backupData.dashboard || {},
+        activitiesData: backupData.activities || [],
+        projectsData: backupData.projects || [],
+        customColumnsData: backupData.customColumns || [],
+        customChartsData: backupData.customCharts || [],
+        metadata: { manual: true, createdBy: userId },
+        description,
+        fileSize: Buffer.byteLength(dataString, 'utf8'),
+        checksum,
+        isRestorable: true
+      });
+      
+      res.json(backup);
+    } catch (error) {
+      console.error('Error creating dashboard backup:', error);
+      res.status(500).json({ error: 'Failed to create dashboard backup' });
+    }
+  });
+
+  app.post('/api/dashboard-backups/:backupId/restore', async (req, res) => {
+    try {
+      const backupId = parseInt(req.params.backupId);
+      const success = await storage.restoreDashboardBackup(backupId);
+      
+      if (success) {
+        res.json({ message: 'Dashboard restored successfully' });
+      } else {
+        res.status(404).json({ error: 'Backup not found or restore failed' });
+      }
+    } catch (error) {
+      console.error('Error restoring dashboard backup:', error);
+      res.status(500).json({ error: 'Failed to restore dashboard backup' });
+    }
+  });
+
+  // Dashboard Version Routes
+  app.get('/api/dashboard-versions/:dashboardId', async (req, res) => {
+    try {
+      const dashboardId = parseInt(req.params.dashboardId);
+      const versions = await storage.getDashboardVersions(dashboardId);
+      res.json(versions);
+    } catch (error) {
+      console.error('Error fetching dashboard versions:', error);
+      res.status(500).json({ error: 'Failed to fetch dashboard versions' });
+    }
+  });
+
+  app.post('/api/dashboard-versions', async (req, res) => {
+    try {
+      const { dashboardId, versionName, changeType, releaseNotes, changedBy } = req.body;
+      
+      // Auto-generate version number
+      const existingVersions = await storage.getDashboardVersions(dashboardId);
+      const latestVersion = existingVersions.find(v => v.isActive);
+      let newVersion = '1.0.0';
+      
+      if (latestVersion) {
+        const parts = latestVersion.version.split('.').map(Number);
+        if (changeType === 'major') {
+          parts[0]++;
+          parts[1] = 0;
+          parts[2] = 0;
+        } else if (changeType === 'minor') {
+          parts[1]++;
+          parts[2] = 0;
+        } else {
+          parts[2]++;
+        }
+        newVersion = parts.join('.');
+      }
+      
+      const version = await storage.createDashboardVersion({
+        dashboardId,
+        version: newVersion,
+        versionName,
+        changes: { type: changeType, timestamp: new Date() },
+        changedBy,
+        changeType,
+        releaseNotes,
+        isActive: false,
+        isDraft: false
+      });
+      
+      res.json(version);
+    } catch (error) {
+      console.error('Error creating dashboard version:', error);
+      res.status(500).json({ error: 'Failed to create dashboard version' });
+    }
+  });
+
+  app.post('/api/dashboard-versions/:versionId/activate', async (req, res) => {
+    try {
+      const versionId = parseInt(req.params.versionId);
+      const { dashboardId } = req.body;
+      
+      const success = await storage.setActiveVersion(dashboardId, versionId);
+      
+      if (success) {
+        res.json({ message: 'Version activated successfully' });
+      } else {
+        res.status(404).json({ error: 'Version not found or activation failed' });
+      }
+    } catch (error) {
+      console.error('Error activating dashboard version:', error);
+      res.status(500).json({ error: 'Failed to activate dashboard version' });
+    }
+  });
+
+  // Backup Schedule Routes
+  app.get('/api/backup-schedules/:dashboardId', async (req, res) => {
+    try {
+      const dashboardId = parseInt(req.params.dashboardId);
+      const schedules = await storage.getBackupSchedules(dashboardId);
+      res.json(schedules);
+    } catch (error) {
+      console.error('Error fetching backup schedules:', error);
+      res.status(500).json({ error: 'Failed to fetch backup schedules' });
+    }
+  });
+
+  app.post('/api/backup-schedules', async (req, res) => {
+    try {
+      const schedule = await storage.createBackupSchedule(req.body);
+      res.json(schedule);
+    } catch (error) {
+      console.error('Error creating backup schedule:', error);
+      res.status(500).json({ error: 'Failed to create backup schedule' });
+    }
+  });
+
+  app.patch('/api/backup-schedules/:scheduleId', async (req, res) => {
+    try {
+      const scheduleId = parseInt(req.params.scheduleId);
+      const schedule = await storage.updateBackupSchedule(scheduleId, req.body);
+      
+      if (schedule) {
+        res.json(schedule);
+      } else {
+        res.status(404).json({ error: 'Schedule not found' });
+      }
+    } catch (error) {
+      console.error('Error updating backup schedule:', error);
+      res.status(500).json({ error: 'Failed to update backup schedule' });
+    }
+  });
+
+  app.delete('/api/backup-schedules/:scheduleId', async (req, res) => {
+    try {
+      const scheduleId = parseInt(req.params.scheduleId);
+      const success = await storage.deleteBackupSchedule(scheduleId);
+      
+      if (success) {
+        res.json({ message: 'Schedule deleted successfully' });
+      } else {
+        res.status(404).json({ error: 'Schedule not found' });
+      }
+    } catch (error) {
+      console.error('Error deleting backup schedule:', error);
+      res.status(500).json({ error: 'Failed to delete backup schedule' });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

@@ -10,6 +10,7 @@ import ChartsSection from "@/components/dashboard/charts-section";
 import ActivityTable from "@/components/dashboard/activity-table";
 import ActivitiesPanel from "@/components/dashboard/activities-panel";
 import ProjectViews from "@/components/dashboard/project-views";
+import BackupManagement from "@/components/dashboard/backup-management";
 import ShareModalEnhanced from "@/components/dashboard/share-modal-enhanced";
 import ActivityLogPanel from "@/components/dashboard/activity-log-panel";
 import ExportModal from "@/components/dashboard/export-modal";
@@ -337,6 +338,11 @@ export default function Dashboard() {
           <ProjectViews 
             activities={activities}
             onUpdateActivity={updateActivity}
+          />
+          
+          <BackupManagement 
+            dashboardId={dashboardId}
+            userId={1}
           />
         </main>
       </div>
