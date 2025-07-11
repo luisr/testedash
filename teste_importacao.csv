@@ -1,6 +1,0 @@
-Atividade,Detalhes,Área,Pessoa,Situação,Urgência,Data Início,Data Fim,Orçamento,Gasto,Progresso,Observações
-Configuração Ambiente,Setup inicial do ambiente de desenvolvimento,DevOps,Roberto Silva,Concluído,Alta,2024-01-05,2024-01-12,5000,4800,100%,Finalizado sem problemas
-Modelagem Banco,Criação das tabelas e relacionamentos,Banco de Dados,Fernanda Costa,Em Andamento,Crítica,2024-01-10,2024-01-20,8000,6000,80%,Aguardando aprovação do DBA
-Interface Login,Desenvolvimento da tela de login,Frontend,Marcos Santos,Não Iniciado,Média,2024-01-15,2024-01-25,12000,0,0%,Aguardando mockups
-Integração API,Conexão com APIs externas,Backend,Paula Lima,Atrasado,Alta,2024-01-08,2024-01-18,15000,18000,90%,Problemas com timeout
-Testes Unitários,Criação de testes automatizados,Qualidade,João Oliveira,Em Andamento,Baixa,2024-01-20,2024-01-30,6000,3000,40%,Cobertura atual 60%

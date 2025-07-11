@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/components/dashboard/theme-provider";
 import { ThemeOverride } from "@/components/theme-override";
+import { AuthProvider } from "@/contexts/AuthContext";
 import Dashboard from "@/pages/dashboard";
 import Login from "@/pages/login";
 import Projects from "@/pages/projects";
@@ -28,13 +29,15 @@ function Router() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider>
-        <ThemeOverride />
-        <TooltipProvider>
-          <Toaster />
-          <Router />
-        </TooltipProvider>
-      </ThemeProvider>
+      <AuthProvider>
+        <ThemeProvider>
+          <ThemeOverride />
+          <TooltipProvider>
+            <Toaster />
+            <Router />
+          </TooltipProvider>
+        </ThemeProvider>
+      </AuthProvider>
     </QueryClientProvider>
   );
 }

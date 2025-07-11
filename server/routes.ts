@@ -20,6 +20,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
   await setupAuthTables();
 
   // Authentication routes
+  app.get("/api/auth/me", async (req, res) => {
+    try {
+      // For now, return the default super user (Luis Ribeiro)
+      const user = await storage.getUser(5);
+      if (user && user.isActive) {
+        const { passwordHash, ...userWithoutPassword } = user;
+        res.json(userWithoutPassword);
+      } else {
+        res.status(401).json({ message: "User not found" });
+      }
+    } catch (error) {
+      console.error("Auth check error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   app.post("/api/auth/login", async (req, res) => {
     try {
       const { email, password } = req.body;
