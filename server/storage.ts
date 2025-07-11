@@ -9,8 +9,18 @@ import {
   type CustomChart, type InsertCustomChart
 } from "@shared/schema";
 
-// Check if DATABASE_URL is properly configured
-const connectionString = process.env.DATABASE_URL;
+// Check if DATABASE_URL is properly configured or build from individual components
+let connectionString = process.env.DATABASE_URL;
+
+// If DATABASE_URL is not set or invalid, try to build it from individual components
+if (!connectionString || !connectionString.startsWith('postgresql://')) {
+  const { PGUSER, PGPASSWORD, PGHOST, PGPORT, PGDATABASE } = process.env;
+  if (PGUSER && PGPASSWORD && PGHOST && PGPORT && PGDATABASE) {
+    connectionString = `postgresql://${PGUSER}:${PGPASSWORD}@${PGHOST}:${PGPORT}/${PGDATABASE}?sslmode=require`;
+    console.log('Built DATABASE_URL from individual components');
+  }
+}
+
 let client: postgres.Sql | null = null;
 let db: ReturnType<typeof drizzle> | null = null;
 
@@ -18,6 +28,7 @@ if (connectionString && connectionString.startsWith('postgresql://')) {
   try {
     client = postgres(connectionString);
     db = drizzle(client);
+    console.log('✅ Database connected successfully');
   } catch (error) {
     console.error('Failed to connect to database:', error);
   }

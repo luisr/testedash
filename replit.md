@@ -76,9 +76,10 @@ The application uses optimistic updates and caching strategies to provide a smoo
 ## External Dependencies
 
 ### Database
-- **Neon Database**: Serverless PostgreSQL hosting
+- **PostgreSQL Database**: Production-ready PostgreSQL database with full schema
 - **Drizzle ORM**: Type-safe database toolkit with migration support
-- **Connection**: PostgreSQL connection via `@neondatabase/serverless`
+- **Connection**: Direct PostgreSQL connection via `postgres` package
+- **Status**: ✅ Connected and operational with real data
 
 ### UI Framework
 - **Radix UI**: Unstyled, accessible UI primitives
