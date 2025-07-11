@@ -4,6 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Folder, TrendingDown, TrendingUp, CheckCircle, Plus, Settings2 } from "lucide-react";
 import CustomKPIManager from "./custom-kpi-manager";
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 
 interface KPICardsProps {
   metrics: {
@@ -29,6 +30,12 @@ export default function KPICards({ metrics, dashboardId, activities, projects, o
   const totalBudget = projects?.reduce((sum, p) => sum + (parseFloat(p.budget) || 0), 0) || 0;
   const totalActualCost = projects?.reduce((sum, p) => sum + (parseFloat(p.actualCost) || 0), 0) || 0;
   const budgetVariance = totalBudget > 0 ? (((totalActualCost - totalBudget) / totalBudget) * 100) : 0;
+
+  // Buscar KPIs customizados
+  const { data: customKPIs = [] } = useQuery({
+    queryKey: ['/api/custom-kpis', dashboardId],
+    enabled: !!dashboardId,
+  });
 
   const kpis = [
     {
@@ -105,39 +112,71 @@ export default function KPICards({ metrics, dashboardId, activities, projects, o
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-      {kpis.map((kpi, index) => (
-        <Card key={index} className="card-enhanced group cursor-pointer">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div className="flex-1">
-                <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
-                  {kpi.title}
-                </p>
-                <p className="text-3xl font-bold text-foreground mt-2 group-hover:bg-gradient-to-r group-hover:from-blue-600 group-hover:to-cyan-600 group-hover:bg-clip-text group-hover:text-transparent transition-all">
-                  {kpi.value}
-                </p>
+        {/* KPIs Padrão */}
+        {kpis.map((kpi, index) => (
+          <Card key={index} className="card-enhanced group cursor-pointer">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
+                    {kpi.title}
+                  </p>
+                  <p className="text-3xl font-bold text-foreground mt-2 group-hover:bg-gradient-to-r group-hover:from-blue-600 group-hover:to-cyan-600 group-hover:bg-clip-text group-hover:text-transparent transition-all">
+                    {kpi.value}
+                  </p>
+                </div>
+                <div className={`w-14 h-14 bg-gradient-to-br from-primary/20 to-accent/20 rounded-xl flex items-center justify-center group-hover:scale-105 transition-transform shadow-lg`}>
+                  <kpi.icon className={`w-7 h-7 ${kpi.iconColor}`} />
+                </div>
               </div>
-              <div className={`w-14 h-14 bg-gradient-to-br from-primary/20 to-accent/20 rounded-xl flex items-center justify-center group-hover:scale-105 transition-transform shadow-lg`}>
-                <kpi.icon className={`w-7 h-7 ${kpi.iconColor}`} />
+              <div className="mt-6 pt-4 border-t border-border/50 flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <span className={`status-badge ${
+                    kpi.trendUp 
+                      ? 'status-completed' 
+                      : 'status-delayed'
+                  }`}>
+                    {kpi.trend}
+                  </span>
+                  <span className="text-sm text-muted-foreground font-medium">
+                    {kpi.trendText}
+                  </span>
+                </div>
               </div>
-            </div>
-            <div className="mt-6 pt-4 border-t border-border/50 flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <span className={`status-badge ${
-                  kpi.trendUp 
-                    ? 'status-completed' 
-                    : 'status-delayed'
-                }`}>
-                  {kpi.trend}
-                </span>
-                <span className="text-sm text-muted-foreground font-medium">
-                  {kpi.trendText}
-                </span>
+            </CardContent>
+          </Card>
+        ))}
+
+        {/* KPIs Customizados */}
+        {customKPIs.map((customKPI: any, index: number) => (
+          <Card key={`custom-${index}`} className="card-enhanced group cursor-pointer border-dashed border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-cyan-50">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-blue-700 uppercase tracking-wide">
+                    {customKPI.name}
+                  </p>
+                  <p className="text-3xl font-bold text-blue-800 mt-2 group-hover:bg-gradient-to-r group-hover:from-blue-600 group-hover:to-cyan-600 group-hover:bg-clip-text group-hover:text-transparent transition-all">
+                    {customKPI.value || 'N/A'}
+                  </p>
+                </div>
+                <div className="w-14 h-14 bg-gradient-to-br from-blue-100 to-cyan-100 rounded-xl flex items-center justify-center group-hover:scale-105 transition-transform shadow-lg">
+                  <Settings2 className="w-7 h-7 text-blue-600" />
+                </div>
               </div>
-            </div>
-          </CardContent>
-        </Card>
-      ))}
+              <div className="mt-6 pt-4 border-t border-blue-200 flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">
+                    Customizado
+                  </span>
+                  <span className="text-sm text-blue-600 font-medium">
+                    {customKPI.description || 'KPI personalizado'}
+                  </span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
       </div>
     </div>
   );

@@ -17,6 +17,7 @@ import HierarchicalActivities from './hierarchical-activities';
 import SimpleActivityTable from './simple-activity-table';
 import HierarchicalTaskTable from './hierarchical-task-table';
 import DependencyManager from './dependency-manager';
+import TableSettingsModal from './table-settings-modal';
 import { Activity } from '@/../shared/schema';
 
 interface ActivitiesPanelProps {
@@ -49,6 +50,7 @@ const ActivitiesPanel: React.FC<ActivitiesPanelProps> = ({
   const queryClient = useQueryClient();
   const [viewMode, setViewMode] = useState<'hierarchical' | 'table'>('hierarchical');
   const [showDependencies, setShowDependencies] = useState(false);
+  const [showTableSettings, setShowTableSettings] = useState(false);
 
   const filteredActivities = (activities || []).filter(activity => {
     const searchText = (searchTerm || '').toLowerCase();
@@ -170,6 +172,11 @@ const ActivitiesPanel: React.FC<ActivitiesPanelProps> = ({
                   {viewMode === 'hierarchical' ? 'Visualização em Tabela' : 'Visualização Hierárquica'}
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => setShowTableSettings(true)}>
+                  <Settings className="h-4 w-4 mr-2" />
+                  Configurações da Tabela
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => onBulkImport([])}>
                   <Upload className="h-4 w-4 mr-2" />
                   Importar Atividades
@@ -222,6 +229,13 @@ const ActivitiesPanel: React.FC<ActivitiesPanelProps> = ({
           }}
         />
       </CardContent>
+
+      {/* Modal de Configurações da Tabela */}
+      <TableSettingsModal
+        open={showTableSettings}
+        onClose={() => setShowTableSettings(false)}
+        dashboardId={dashboardId}
+      />
     </Card>
   );
 };

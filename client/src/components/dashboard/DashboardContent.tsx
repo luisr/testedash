@@ -11,6 +11,7 @@ import ActivitiesPanel from './activities-panel';
 import ActivitySummary from './activity-summary';
 import ProjectViews from './project-views';
 import BackupManagement from './backup-management';
+import CreateActivityModal from './create-activity-modal';
 import { Button } from '@/components/ui/button';
 
 interface DashboardContentProps {
@@ -29,6 +30,7 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({
   const [filterResponsible, setFilterResponsible] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+  const [showCreateActivityModal, setShowCreateActivityModal] = useState(false);
 
   // Get dashboard data
   const regularDashboard = useDashboardData(dashboardId);
@@ -153,7 +155,7 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({
         dashboardId={dashboardId}
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
-        onNewActivity={createActivity}
+        onNewActivity={() => setShowCreateActivityModal(true)}
         onUpdateActivity={updateActivity}
         onDeleteActivity={deleteActivity}
         onEditActivity={() => {}}
@@ -178,6 +180,13 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({
           }}
         />
       )}
+
+      {/* Modal para criar nova atividade */}
+      <CreateActivityModal
+        open={showCreateActivityModal}
+        onClose={() => setShowCreateActivityModal(false)}
+        dashboardId={dashboardId}
+      />
     </div>
   );
 };

@@ -1,10 +1,11 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { MoreHorizontal, Plus, BarChart3 } from "lucide-react";
+import { MoreHorizontal, Plus, BarChart3, Settings2 } from "lucide-react";
 import CustomChartBuilder from "./custom-chart-builder";
 import { useState } from "react";
-import { PieChart, Pie, Cell, ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
+import { PieChart, Pie, Cell, ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, BarChart, Bar } from 'recharts';
+import { useQuery } from "@tanstack/react-query";
 
 interface ChartsSectionProps {
   metrics: {
@@ -22,6 +23,12 @@ interface ChartsSectionProps {
 export default function ChartsSection({ metrics, customCharts, dashboardId, activities, projects, onChartsUpdate }: ChartsSectionProps) {
   const [isChartBuilderOpen, setIsChartBuilderOpen] = useState(false);
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
+
+  // Buscar gráficos customizados
+  const { data: customChartsData = [] } = useQuery({
+    queryKey: ['/api/custom-charts', dashboardId],
+    enabled: !!dashboardId,
+  });
 
   const statusData = [
     { name: 'Concluído', value: 35, color: '#10B981' },
@@ -167,6 +174,127 @@ export default function ChartsSection({ metrics, customCharts, dashboardId, acti
         </CardContent>
         </Card>
       </div>
+
+      {/* Gráficos Customizados */}
+      {customChartsData.length > 0 && (
+        <div className="mt-8">
+          <h3 className="text-lg font-semibold text-foreground mb-4">Gráficos Customizados</h3>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {customChartsData.map((chart: any, index: number) => (
+              <Card key={`custom-chart-${index}`} className="chart-container shadow-elegant hover-lift border-dashed border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-cyan-50">
+                <CardHeader className="flex flex-row items-center justify-between pb-4">
+                  <CardTitle className="text-lg font-semibold text-blue-800 flex items-center gap-2">
+                    <Settings2 className="w-5 h-5" />
+                    {chart.name}
+                  </CardTitle>
+                  <div className="flex items-center gap-2">
+                    <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">
+                      Customizado
+                    </span>
+                    <Button variant="ghost" size="icon" className="hover-lift focus-ring">
+                      <MoreHorizontal className="w-5 h-5" />
+                    </Button>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-64">
+                    <ResponsiveContainer width="100%" height="100%">
+                      {chart.type === 'bar' ? (
+                        <BarChart data={chart.data || []}>
+                          <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                          <XAxis 
+                            dataKey="name" 
+                            axisLine={false}
+                            tickLine={false}
+                            tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
+                          />
+                          <YAxis 
+                            axisLine={false}
+                            tickLine={false}
+                            tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
+                          />
+                          <Tooltip 
+                            contentStyle={{ 
+                              backgroundColor: 'hsl(var(--card))', 
+                              border: '1px solid hsl(var(--border))',
+                              borderRadius: '8px',
+                              boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
+                            }}
+                          />
+                          <Bar 
+                            dataKey="value" 
+                            fill="hsl(var(--primary))"
+                            radius={[4, 4, 0, 0]}
+                          />
+                        </BarChart>
+                      ) : chart.type === 'line' ? (
+                        <LineChart data={chart.data || []}>
+                          <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                          <XAxis 
+                            dataKey="name" 
+                            axisLine={false}
+                            tickLine={false}
+                            tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
+                          />
+                          <YAxis 
+                            axisLine={false}
+                            tickLine={false}
+                            tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
+                          />
+                          <Tooltip 
+                            contentStyle={{ 
+                              backgroundColor: 'hsl(var(--card))', 
+                              border: '1px solid hsl(var(--border))',
+                              borderRadius: '8px',
+                              boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
+                            }}
+                          />
+                          <Line 
+                            type="monotone" 
+                            dataKey="value" 
+                            stroke="hsl(var(--primary))" 
+                            strokeWidth={3}
+                            dot={{ fill: 'hsl(var(--primary))', strokeWidth: 2, r: 4 }}
+                          />
+                        </LineChart>
+                      ) : (
+                        <PieChart>
+                          <Pie
+                            data={chart.data || []}
+                            cx="50%"
+                            cy="50%"
+                            outerRadius={80}
+                            fill="#8884d8"
+                            dataKey="value"
+                            label={({ name, value }) => `${name}: ${value}`}
+                          >
+                            {(chart.data || []).map((entry: any, index: number) => (
+                              <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                            ))}
+                          </Pie>
+                          <Tooltip 
+                            contentStyle={{ 
+                              backgroundColor: 'hsl(var(--card))', 
+                              border: '1px solid hsl(var(--border))',
+                              borderRadius: '8px',
+                              boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
+                            }}
+                          />
+                        </PieChart>
+                      )}
+                    </ResponsiveContainer>
+                  </div>
+                  {chart.description && (
+                    <p className="text-sm text-blue-600 mt-2 italic">
+                      {chart.description}
+                    </p>
+                  )}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
