@@ -24,7 +24,7 @@ import {
 } from 'lucide-react';
 
 interface CustomKPI {
-  id: string;
+  id: number;
   name: string;
   description?: string;
   dataSource: 'activities' | 'projects' | 'custom';
@@ -213,7 +213,7 @@ export default function CustomKPIManager({ dashboardId, activities, projects, on
     }
   };
 
-  const saveKPI = async (kpi: CustomKPI) => {
+  const saveKPI = async (kpi: Omit<CustomKPI, 'id'>) => {
     try {
       const response = await fetch(`/api/custom-kpis`, {
         method: 'POST',
@@ -248,8 +248,7 @@ export default function CustomKPIManager({ dashboardId, activities, projects, on
       return;
     }
 
-    const kpi: CustomKPI = {
-      // Don't set ID - let the database generate it
+    const kpi: Omit<CustomKPI, 'id'> = {
       name: newKPI.name!,
       description: newKPI.description,
       dataSource: newKPI.dataSource!,
@@ -285,7 +284,7 @@ export default function CustomKPIManager({ dashboardId, activities, projects, on
     setShowCreateDialog(false);
   };
 
-  const deleteKPI = async (kpiId: string) => {
+  const deleteKPI = async (kpiId: number) => {
     try {
       const response = await fetch(`/api/custom-kpis/${kpiId}`, {
         method: 'DELETE'
