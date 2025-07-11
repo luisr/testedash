@@ -398,6 +398,66 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Dashboards - specific routes first
+  app.get("/api/dashboards/project/:projectId", async (req, res) => {
+    try {
+      const projectId = parseInt(req.params.projectId);
+      const project = await storage.getProject(projectId);
+      
+      if (!project) {
+        return res.status(404).json({ error: "Project not found" });
+      }
+      
+      // For now, just return the main dashboard (ID 1) as all projects are associated with it
+      const mainDashboard = await storage.getDashboard(1);
+      
+      if (mainDashboard) {
+        res.json(mainDashboard);
+      } else {
+        res.status(404).json({ error: "Dashboard not found for project" });
+      }
+    } catch (error) {
+      console.error("Error getting dashboard for project:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  app.post("/api/dashboards", async (req, res) => {
+    try {
+      const { name, description, theme, projectId } = req.body;
+      
+      const dashboardData = {
+        name,
+        description,
+        theme: theme || 'default',
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+      
+      const dashboard = await storage.createDashboard(dashboardData);
+      res.json(dashboard);
+    } catch (error) {
+      console.error("Error creating dashboard:", error);
+      res.status(500).json({ error: "Failed to create dashboard" });
+    }
+  });
+
+  app.get("/api/dashboards/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const dashboard = await storage.getDashboard(id);
+      
+      if (!dashboard) {
+        return res.status(404).json({ error: "Dashboard not found" });
+      }
+      
+      res.json(dashboard);
+    } catch (error) {
+      console.error("Error getting dashboard:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
   // Projects
   app.get("/api/projects", async (req, res) => {
     try {

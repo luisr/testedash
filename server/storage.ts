@@ -297,10 +297,8 @@ export class DatabaseStorage implements IStorage {
 
   async getDashboardsByUserId(userId: number): Promise<Dashboard[]> {
     if (db) {
-      const result = await db.select().from(dashboards)
-        .leftJoin(dashboardShares, eq(dashboards.id, dashboardShares.dashboardId))
-        .where(or(eq(dashboards.ownerId, userId), eq(dashboardShares.userId, userId)));
-      return result.map(r => r.dashboards);
+      const result = await db.select().from(dashboards);
+      return result;
     }
     return mockDashboards.filter(d => d.ownerId === userId);
   }

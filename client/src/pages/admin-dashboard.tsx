@@ -169,6 +169,15 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleProjectAccess = async (projectId: number) => {
+    try {
+      // Super users can access the consolidated dashboard (ID 1) to see all projects
+      setLocation(`/dashboard/1`);
+    } catch (error) {
+      console.error('Error accessing project:', error);
+    }
+  };
+
   const getInitials = (name: string) => {
     return name.split(' ').map(n => n[0]).join('').toUpperCase();
   };
@@ -484,10 +493,17 @@ export default function AdminDashboard() {
                       </div>
                     </div>
                     <div className="flex gap-2 mt-4">
-                      <Button size="sm" variant="outline">
-                        <Eye className="w-4 h-4 mr-1" />
-                        Ver
-                      </Button>
+                      {user?.isSuperUser && (
+                        <Button 
+                          size="sm" 
+                          variant="default"
+                          onClick={() => handleProjectAccess(project.id)}
+                          className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white"
+                        >
+                          <Eye className="w-4 h-4 mr-1" />
+                          Acessar
+                        </Button>
+                      )}
                       <Button size="sm" variant="outline">
                         <Edit className="w-4 h-4 mr-1" />
                         Editar
