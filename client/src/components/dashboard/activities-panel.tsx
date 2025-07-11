@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import HierarchicalActivities from './hierarchical-activities';
 import SimpleActivityTable from './simple-activity-table';
+import HierarchicalTaskTable from './hierarchical-task-table';
 import DependencyManager from './dependency-manager';
 import { Activity } from '@/../shared/schema';
 
@@ -180,32 +181,22 @@ const ActivitiesPanel: React.FC<ActivitiesPanelProps> = ({
           />
         </div>
 
-        {/* View Tabs */}
-        <Tabs value={viewMode} onValueChange={(value) => setViewMode(value as 'hierarchical' | 'table')}>
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="hierarchical">Visualização Hierárquica</TabsTrigger>
-            <TabsTrigger value="table">Visualização em Tabela</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="hierarchical" className="space-y-4">
-            <HierarchicalActivities
-              activities={filteredActivities}
-              onUpdateActivity={onUpdateActivity}
-              onDeleteActivity={onDeleteActivity}
-              onCreateSubActivity={onCreateSubActivity}
-              onEditActivity={onEditActivity}
-            />
-          </TabsContent>
-          
-          <TabsContent value="table" className="space-y-4">
-            <SimpleActivityTable
-              activities={filteredActivities}
-              onUpdateActivity={onUpdateActivity}
-              onDeleteActivity={onDeleteActivity}
-              onEditActivity={onEditActivity}
-            />
-          </TabsContent>
-        </Tabs>
+        {/* Enhanced Hierarchical View */}
+        <HierarchicalTaskTable
+          activities={filteredActivities}
+          onUpdateActivity={onUpdateActivity}
+          onDeleteActivity={onDeleteActivity}
+          onCreateSubActivity={() => {
+            // Refresh activities after creating subtask
+            window.location.reload();
+          }}
+          onEditActivity={onEditActivity}
+          showDependencies={showDependencies}
+          onManageDependencies={(activityId) => {
+            // Handle dependency management for specific activity
+            console.log('Managing dependencies for activity:', activityId);
+          }}
+        />
       </CardContent>
     </Card>
   );

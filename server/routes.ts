@@ -698,6 +698,62 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Create sub-activity endpoint
+  app.post("/api/activities/:parentId/sub-activity", async (req, res) => {
+    try {
+      const parentId = parseInt(req.params.parentId);
+      
+      // Get parent activity to inherit properties
+      const parentActivity = await storage.getActivity(parentId);
+      if (!parentActivity) {
+        return res.status(404).json({ message: "Parent activity not found" });
+      }
+      
+      // Create sub-activity with inherited properties
+      const subActivityData = {
+        ...req.body,
+        parentActivityId: parentId,
+        level: (parentActivity.level || 0) + 1,
+        dashboardId: parentActivity.dashboardId,
+        projectId: parentActivity.projectId,
+        discipline: req.body.discipline || parentActivity.discipline,
+        // Convert dates
+        plannedStartDate: req.body.plannedStartDate ? new Date(req.body.plannedStartDate) : null,
+        plannedEndDate: req.body.plannedEndDate ? new Date(req.body.plannedEndDate) : null,
+        actualStartDate: req.body.actualStartDate ? new Date(req.body.actualStartDate) : null,
+        actualEndDate: req.body.actualEndDate ? new Date(req.body.actualEndDate) : null,
+        baselineStartDate: req.body.baselineStartDate ? new Date(req.body.baselineStartDate) : null,
+        baselineEndDate: req.body.baselineEndDate ? new Date(req.body.baselineEndDate) : null,
+        // Convert numeric fields to strings
+        plannedValue: req.body.plannedValue !== undefined ? String(req.body.plannedValue) : "0",
+        actualCost: req.body.actualCost !== undefined ? String(req.body.actualCost) : "0",
+        earnedValue: req.body.earnedValue !== undefined ? String(req.body.earnedValue) : "0",
+        completionPercentage: req.body.completionPercentage !== undefined ? String(req.body.completionPercentage) : "0",
+      };
+      
+      const validatedData = insertActivitySchema.parse(subActivityData);
+      const subActivity = await storage.createActivity(validatedData);
+      
+      // Log the sub-activity creation
+      await storage.createActivityLog({
+        dashboardId: validatedData.dashboardId!,
+        userId: 1, // TODO: Get from authenticated user
+        action: "create",
+        entityType: "activity",
+        entityId: subActivity.id,
+        details: { name: subActivity.name, parentId: parentId, type: "sub-activity" }
+      });
+
+      res.status(201).json(subActivity);
+    } catch (error) {
+      console.error("Error creating sub-activity:", error);
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid input", errors: error.errors });
+      }
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   app.post("/api/activities/import", async (req, res) => {
     try {
       const { dashboardId, activities } = req.body;
