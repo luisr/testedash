@@ -458,6 +458,72 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // PDF Reports endpoints
+  app.get("/api/reports/projects/pdf", async (req, res) => {
+    try {
+      const { PDFGenerator } = await import('./pdf-generator');
+      const projects = await storage.getProjectsByDashboardId(1);
+      const generator = new PDFGenerator();
+      const pdfBuffer = await generator.generateProjectsReport(projects);
+      
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', 'attachment; filename="relatorio-projetos.pdf"');
+      res.send(pdfBuffer);
+    } catch (error) {
+      console.error("Error generating projects PDF:", error);
+      res.status(500).json({ message: "Error generating PDF report" });
+    }
+  });
+
+  app.get("/api/reports/users/pdf", async (req, res) => {
+    try {
+      const { PDFGenerator } = await import('./pdf-generator');
+      const users = await storage.getUsers();
+      const generator = new PDFGenerator();
+      const pdfBuffer = await generator.generateUsersReport(users);
+      
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', 'attachment; filename="relatorio-usuarios.pdf"');
+      res.send(pdfBuffer);
+    } catch (error) {
+      console.error("Error generating users PDF:", error);
+      res.status(500).json({ message: "Error generating PDF report" });
+    }
+  });
+
+  app.get("/api/reports/financial/pdf", async (req, res) => {
+    try {
+      const { PDFGenerator } = await import('./pdf-generator');
+      const projects = await storage.getProjectsByDashboardId(1);
+      const generator = new PDFGenerator();
+      const pdfBuffer = await generator.generateFinancialReport(projects);
+      
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', 'attachment; filename="relatorio-financeiro.pdf"');
+      res.send(pdfBuffer);
+    } catch (error) {
+      console.error("Error generating financial PDF:", error);
+      res.status(500).json({ message: "Error generating PDF report" });
+    }
+  });
+
+  app.get("/api/reports/general/pdf", async (req, res) => {
+    try {
+      const { PDFGenerator } = await import('./pdf-generator');
+      const users = await storage.getUsers();
+      const projects = await storage.getProjectsByDashboardId(1);
+      const generator = new PDFGenerator();
+      const pdfBuffer = await generator.generateGeneralReport(users, projects);
+      
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', 'attachment; filename="relatorio-geral.pdf"');
+      res.send(pdfBuffer);
+    } catch (error) {
+      console.error("Error generating general PDF:", error);
+      res.status(500).json({ message: "Error generating PDF report" });
+    }
+  });
+
   // Activities
   app.get("/api/activities/dashboard/:dashboardId", async (req, res) => {
     try {
