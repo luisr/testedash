@@ -9,6 +9,7 @@ import ChartsSection from "@/components/dashboard/charts-section";
 import ActivityTable from "@/components/dashboard/activity-table";
 import ShareModal from "@/components/dashboard/share-modal";
 import ActivityLogPanel from "@/components/dashboard/activity-log-panel";
+import ExportModal from "@/components/dashboard/export-modal";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 
@@ -18,6 +19,7 @@ export default function Dashboard() {
   
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [shareModalOpen, setShareModalOpen] = useState(false);
+  const [exportModalOpen, setExportModalOpen] = useState(false);
   const [activityLogOpen, setActivityLogOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
@@ -48,6 +50,91 @@ export default function Dashboard() {
     startDate,
     endDate
   );
+
+  // Define available columns for export
+  const availableColumns = [
+    { key: 'name', label: 'Nome' },
+    { key: 'description', label: 'Descrição' },
+    { key: 'discipline', label: 'Disciplina' },
+    { key: 'responsible', label: 'Responsável' },
+    { key: 'status', label: 'Status' },
+    { key: 'priority', label: 'Prioridade' },
+    { key: 'plannedStartDate', label: 'Data Início Planejada' },
+    { key: 'plannedEndDate', label: 'Data Fim Planejada' },
+    { key: 'actualStartDate', label: 'Data Início Real' },
+    { key: 'actualEndDate', label: 'Data Fim Real' },
+    { key: 'plannedValue', label: 'Valor Planejado' },
+    { key: 'actualCost', label: 'Custo Real' },
+    { key: 'earnedValue', label: 'Valor Agregado' },
+    { key: 'completionPercentage', label: 'Percentual Conclusão' },
+    { key: 'associatedRisk', label: 'Risco Associado' },
+  ];
+
+  // Export handler
+  const handleExport = async (options: any) => {
+    try {
+      // Filter activities based on date range if specified
+      let exportData = metrics.filteredActivities;
+      
+      if (options.dateRange) {
+        const { start, end } = options.dateRange;
+        exportData = exportData.filter(activity => {
+          const startDate = new Date(activity.plannedStartDate || activity.actualStartDate || '');
+          return startDate >= start && startDate <= end;
+        });
+      }
+
+      // Filter columns based on selection
+      const filteredData = exportData.map(activity => {
+        const filtered: any = {};
+        options.columns.forEach((col: string) => {
+          if (col in activity) {
+            filtered[col] = activity[col as keyof typeof activity];
+          }
+        });
+        return filtered;
+      });
+
+      // Create export request
+      const exportRequest = {
+        data: filteredData,
+        format: options.format,
+        dashboardName: dashboard?.name || "Dashboard Principal",
+        includeCharts: options.includeCharts,
+        includeFilters: options.includeFilters,
+        columns: options.columns,
+        metrics: metrics
+      };
+
+      // Send to backend for processing
+      const response = await fetch(`/api/export/dashboard/${dashboardId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(exportRequest),
+      });
+
+      if (!response.ok) {
+        throw new Error('Erro ao exportar dados');
+      }
+
+      // Download the file
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `dashboard-${dashboard?.name || 'export'}-${new Date().toISOString().split('T')[0]}.${options.format}`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+
+    } catch (error) {
+      console.error('Erro ao exportar:', error);
+      // You can add toast notification here
+    }
+  };
 
   if (isLoading) {
     return (
@@ -81,9 +168,7 @@ export default function Dashboard() {
           dashboardName={dashboard?.name || "Dashboard Principal"}
           onMenuClick={() => setSidebarOpen(true)}
           onShareClick={() => setShareModalOpen(true)}
-          onExportClick={() => {
-            // TODO: Implement export functionality
-          }}
+          onExportClick={() => setExportModalOpen(true)}
         />
         
         <main className="p-6 space-y-6">
@@ -137,6 +222,13 @@ export default function Dashboard() {
         isOpen={shareModalOpen}
         onClose={() => setShareModalOpen(false)}
         onShare={shareDashboard}
+      />
+
+      <ExportModal 
+        isOpen={exportModalOpen}
+        onClose={() => setExportModalOpen(false)}
+        onExport={handleExport}
+        availableColumns={availableColumns}
       />
 
       <ActivityLogPanel 

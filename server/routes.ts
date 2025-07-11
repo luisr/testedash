@@ -344,6 +344,140 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Dashboard export
+  app.post("/api/export/dashboard/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { data, format, dashboardName, includeCharts, includeFilters, columns, metrics } = req.body;
+      
+      // Log the export action
+      await storage.createActivityLog({
+        dashboardId: parseInt(id),
+        userId: 1, // TODO: Get from session
+        action: 'export',
+        entityType: 'dashboard',
+        entityId: parseInt(id),
+        details: { format, columns: columns.length, includeCharts, includeFilters }
+      });
+
+      if (format === 'csv') {
+        // Generate CSV
+        const csvHeaders = columns.map((col: string) => {
+          const availableColumns = [
+            { key: 'name', label: 'Nome' },
+            { key: 'description', label: 'Descrição' },
+            { key: 'discipline', label: 'Disciplina' },
+            { key: 'responsible', label: 'Responsável' },
+            { key: 'status', label: 'Status' },
+            { key: 'priority', label: 'Prioridade' },
+            { key: 'plannedStartDate', label: 'Data Início Planejada' },
+            { key: 'plannedEndDate', label: 'Data Fim Planejada' },
+            { key: 'actualStartDate', label: 'Data Início Real' },
+            { key: 'actualEndDate', label: 'Data Fim Real' },
+            { key: 'plannedValue', label: 'Valor Planejado' },
+            { key: 'actualCost', label: 'Custo Real' },
+            { key: 'earnedValue', label: 'Valor Agregado' },
+            { key: 'completionPercentage', label: 'Percentual Conclusão' },
+            { key: 'associatedRisk', label: 'Risco Associado' },
+          ];
+          const column = availableColumns.find((c: any) => c.key === col);
+          return column?.label || col;
+        }).join(',');
+        
+        const csvRows = data.map((row: any) => {
+          return columns.map((col: string) => {
+            const value = row[col];
+            if (value === null || value === undefined) return '';
+            if (typeof value === 'string' && value.includes(',')) {
+              return `"${value.replace(/"/g, '""')}"`;
+            }
+            return value;
+          }).join(',');
+        });
+        
+        const csvContent = [csvHeaders, ...csvRows].join('\n');
+        
+        res.setHeader('Content-Type', 'text/csv');
+        res.setHeader('Content-Disposition', `attachment; filename="${dashboardName}-export.csv"`);
+        res.send(csvContent);
+      } else if (format === 'xlsx') {
+        // For Excel export, return CSV with Excel headers (would need xlsx library for true Excel)
+        const csvHeaders = columns.map((col: string) => {
+          const availableColumns = [
+            { key: 'name', label: 'Nome' },
+            { key: 'description', label: 'Descrição' },
+            { key: 'discipline', label: 'Disciplina' },
+            { key: 'responsible', label: 'Responsável' },
+            { key: 'status', label: 'Status' },
+            { key: 'priority', label: 'Prioridade' },
+            { key: 'plannedStartDate', label: 'Data Início Planejada' },
+            { key: 'plannedEndDate', label: 'Data Fim Planejada' },
+            { key: 'actualStartDate', label: 'Data Início Real' },
+            { key: 'actualEndDate', label: 'Data Fim Real' },
+            { key: 'plannedValue', label: 'Valor Planejado' },
+            { key: 'actualCost', label: 'Custo Real' },
+            { key: 'earnedValue', label: 'Valor Agregado' },
+            { key: 'completionPercentage', label: 'Percentual Conclusão' },
+            { key: 'associatedRisk', label: 'Risco Associado' },
+          ];
+          const column = availableColumns.find((c: any) => c.key === col);
+          return column?.label || col;
+        }).join(',');
+        
+        const csvRows = data.map((row: any) => {
+          return columns.map((col: string) => {
+            const value = row[col];
+            if (value === null || value === undefined) return '';
+            if (typeof value === 'string' && value.includes(',')) {
+              return `"${value.replace(/"/g, '""')}"`;
+            }
+            return value;
+          }).join(',');
+        });
+        
+        const csvContent = [csvHeaders, ...csvRows].join('\n');
+        
+        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        res.setHeader('Content-Disposition', `attachment; filename="${dashboardName}-export.xlsx"`);
+        res.send(csvContent);
+      } else if (format === 'pdf') {
+        // Generate PDF-like text content
+        let pdfContent = `Dashboard: ${dashboardName}\n`;
+        pdfContent += `Exported on: ${new Date().toLocaleString()}\n\n`;
+        
+        if (includeFilters && metrics) {
+          pdfContent += `Métricas do Dashboard:\n`;
+          pdfContent += `- Total de Atividades: ${metrics.totalActivities}\n`;
+          pdfContent += `- Atividades Concluídas: ${metrics.completedActivities}\n`;
+          pdfContent += `- Taxa de Conclusão: ${metrics.overallCompletionPercentage}%\n`;
+          pdfContent += `- SPI Médio: ${metrics.averageSPI}\n`;
+          pdfContent += `- CPI Médio: ${metrics.averageCPI}\n\n`;
+        }
+        
+        pdfContent += `Atividades:\n`;
+        pdfContent += `${'='.repeat(50)}\n`;
+        
+        data.forEach((activity: any, index: number) => {
+          pdfContent += `${index + 1}. ${activity.name || 'Sem título'}\n`;
+          if (activity.description) pdfContent += `   Descrição: ${activity.description}\n`;
+          if (activity.responsible) pdfContent += `   Responsável: ${activity.responsible}\n`;
+          if (activity.status) pdfContent += `   Status: ${activity.status}\n`;
+          if (activity.completionPercentage) pdfContent += `   Progresso: ${activity.completionPercentage}%\n`;
+          pdfContent += `\n`;
+        });
+        
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', `attachment; filename="${dashboardName}-export.pdf"`);
+        res.send(pdfContent);
+      } else {
+        res.status(400).json({ message: "Unsupported format" });
+      }
+    } catch (error) {
+      console.error('Dashboard export error:', error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

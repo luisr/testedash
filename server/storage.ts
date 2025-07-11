@@ -133,6 +133,8 @@ export class DatabaseStorage implements IStorage {
     const newUser: User = {
       id: mockUsers.length + 1,
       ...user,
+      avatar: user.avatar || null,
+      role: user.role || 'user',
       createdAt: new Date(),
       updatedAt: new Date()
     };
@@ -180,6 +182,11 @@ export class DatabaseStorage implements IStorage {
     const newDashboard: Dashboard = {
       id: mockDashboards.length + 1,
       ...dashboard,
+      description: dashboard.description || null,
+      ownerId: dashboard.ownerId || null,
+      isPublic: dashboard.isPublic || null,
+      theme: dashboard.theme || null,
+      settings: dashboard.settings || {},
       createdAt: new Date(),
       updatedAt: new Date()
     };
@@ -237,6 +244,13 @@ export class DatabaseStorage implements IStorage {
     const newProject: Project = {
       id: mockProjects.length + 1,
       ...project,
+      description: project.description || null,
+      status: project.status || null,
+      dashboardId: project.dashboardId || null,
+      budget: project.budget || null,
+      actualCost: project.actualCost || null,
+      startDate: project.startDate || null,
+      endDate: project.endDate || null,
       createdAt: new Date(),
       updatedAt: new Date()
     };
@@ -301,6 +315,25 @@ export class DatabaseStorage implements IStorage {
     const newActivity: Activity = {
       id: mockActivities.length + 1,
       ...activity,
+      description: activity.description || null,
+      status: activity.status || null,
+      dashboardId: activity.dashboardId || null,
+      actualCost: activity.actualCost || null,
+      actualStartDate: activity.actualStartDate || null,
+      actualEndDate: activity.actualEndDate || null,
+      associatedRisk: activity.associatedRisk || null,
+      completionPercentage: activity.completionPercentage || null,
+      documentLink: activity.documentLink || null,
+      earnedValue: activity.earnedValue || null,
+      plannedValue: activity.plannedValue || null,
+      priority: activity.priority || null,
+      projectId: activity.projectId || null,
+      plannedStartDate: activity.plannedStartDate || null,
+      plannedEndDate: activity.plannedEndDate || null,
+      baselineStartDate: activity.baselineStartDate || null,
+      baselineEndDate: activity.baselineEndDate || null,
+      requiredResources: activity.requiredResources || null,
+      dependencies: activity.dependencies || null,
       createdAt: new Date(),
       updatedAt: new Date()
     };
@@ -350,6 +383,10 @@ export class DatabaseStorage implements IStorage {
     const newShare: DashboardShare = {
       id: mockDashboardShares.length + 1,
       ...share,
+      dashboardId: share.dashboardId || null,
+      userId: share.userId || null,
+      sharedById: share.sharedById || null,
+      permission: share.permission || null,
       createdAt: new Date()
     };
     mockDashboardShares.push(newShare);
@@ -391,6 +428,10 @@ export class DatabaseStorage implements IStorage {
     const newLog: ActivityLog = {
       id: mockActivityLogs.length + 1,
       ...log,
+      dashboardId: log.dashboardId || null,
+      userId: log.userId || null,
+      entityId: log.entityId || null,
+      details: log.details || {},
       timestamp: new Date()
     };
     mockActivityLogs.push(newLog);
@@ -413,6 +454,11 @@ export class DatabaseStorage implements IStorage {
     const newColumn: CustomColumn = {
       id: mockCustomColumns.length + 1,
       ...column,
+      options: column.options || null,
+      dashboardId: column.dashboardId || null,
+      formula: column.formula || null,
+      isVisible: column.isVisible || null,
+      sortOrder: column.sortOrder || null,
       createdAt: new Date()
     };
     mockCustomColumns.push(newColumn);
@@ -461,6 +507,9 @@ export class DatabaseStorage implements IStorage {
     const newChart: CustomChart = {
       id: mockCustomCharts.length + 1,
       ...chart,
+      dashboardId: chart.dashboardId || null,
+      isVisible: chart.isVisible || null,
+      sortOrder: chart.sortOrder || null,
       createdAt: new Date()
     };
     mockCustomCharts.push(newChart);
