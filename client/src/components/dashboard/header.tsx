@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Menu, Share2, Download, Sun, Moon } from "lucide-react";
 import { useTheme } from "@/components/dashboard/theme-provider";
+import beachParkLogo from "@assets/pngegg_1752264509099.png";
 
 interface HeaderProps {
   dashboardName: string;
@@ -31,13 +32,18 @@ export default function Header({
           >
             <Menu className="w-5 h-5" />
           </Button>
-          <div>
-            <h1 className="text-2xl font-bold text-gradient bg-gradient-to-r from-primary to-primary/80 bg-clip-text">
-              {dashboardName}
-            </h1>
-            <p className="text-sm text-muted-foreground mt-1 font-medium">
-              Visão geral dos projetos e atividades
-            </p>
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-white p-1">
+              <img src={beachParkLogo} alt="BeachPark Logo" className="w-10 h-10 object-contain" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold text-gradient bg-gradient-to-r from-primary to-primary/80 bg-clip-text">
+                {dashboardName}
+              </h1>
+              <p className="text-sm text-muted-foreground mt-1 font-medium">
+                Visão geral dos projetos e atividades
+              </p>
+            </div>
           </div>
         </div>
         

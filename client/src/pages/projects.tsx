@@ -180,8 +180,8 @@ export default function Projects() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-white p-1">
-                <img src={beachParkLogo} alt="BeachPark Logo" className="w-8 h-8 object-contain" />
+              <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-white p-1">
+                <img src={beachParkLogo} alt="BeachPark Logo" className="w-10 h-10 object-contain" />
               </div>
               <div>
                 <h1 className="text-2xl font-bold text-foreground">Tô Sabendo</h1>

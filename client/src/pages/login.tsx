@@ -52,8 +52,8 @@ export default function Login() {
         {/* Logo/Header */}
         <div className="text-center space-y-2">
           <div className="flex justify-center">
-            <div className="w-16 h-16 rounded-2xl flex items-center justify-center bg-white p-2">
-              <img src={beachParkLogo} alt="BeachPark Logo" className="w-12 h-12 object-contain" />
+            <div className="w-20 h-20 rounded-2xl flex items-center justify-center bg-white p-2">
+              <img src={beachParkLogo} alt="BeachPark Logo" className="w-16 h-16 object-contain" />
             </div>
           </div>
           <h1 className="text-3xl font-bold text-foreground">Tô Sabendo</h1>
