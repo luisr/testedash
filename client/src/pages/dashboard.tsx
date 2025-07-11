@@ -30,6 +30,8 @@ import { NewUserModal } from "@/components/dashboard/new-user-modal";
 import { NewProjectModal } from "@/components/dashboard/new-project-modal";
 import { UsersListModal } from "@/components/dashboard/users-list-modal";
 import { ProjectsListModal } from "@/components/dashboard/projects-list-modal";
+import ProjectsModal from "@/components/dashboard/projects-modal";
+import UsersModal from "@/components/dashboard/users-modal";
 
 export default function Dashboard() {
   const { id } = useParams<{ id?: string }>();
@@ -207,6 +209,127 @@ export default function Dashboard() {
     }
   };
 
+  // Project management functions
+  const createProject = async (projectData: any) => {
+    try {
+      const response = await fetch('/api/projects', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...projectData,
+          dashboardId,
+          startDate: projectData.startDate ? new Date(projectData.startDate).toISOString() : null,
+          endDate: projectData.endDate ? new Date(projectData.endDate).toISOString() : null
+        })
+      });
+      
+      if (response.ok) {
+        window.location.reload();
+      } else {
+        const error = await response.json();
+        console.error('Error creating project:', error);
+      }
+    } catch (error) {
+      console.error('Error creating project:', error);
+    }
+  };
+
+  const updateProject = async (projectId: number, projectData: any) => {
+    try {
+      const response = await fetch(`/api/projects/${projectId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...projectData,
+          startDate: projectData.startDate ? new Date(projectData.startDate).toISOString() : null,
+          endDate: projectData.endDate ? new Date(projectData.endDate).toISOString() : null
+        })
+      });
+      
+      if (response.ok) {
+        window.location.reload();
+      } else {
+        const error = await response.json();
+        console.error('Error updating project:', error);
+      }
+    } catch (error) {
+      console.error('Error updating project:', error);
+    }
+  };
+
+  const deleteProject = async (projectId: number) => {
+    try {
+      const response = await fetch(`/api/projects/${projectId}`, {
+        method: 'DELETE'
+      });
+      
+      if (response.ok) {
+        window.location.reload();
+      } else {
+        const error = await response.json();
+        console.error('Error deleting project:', error);
+      }
+    } catch (error) {
+      console.error('Error deleting project:', error);
+    }
+  };
+
+  // User management functions
+  const createUser = async (userData: any) => {
+    try {
+      const response = await fetch('/api/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(userData)
+      });
+      
+      if (response.ok) {
+        window.location.reload();
+      } else {
+        const error = await response.json();
+        console.error('Error creating user:', error);
+      }
+    } catch (error) {
+      console.error('Error creating user:', error);
+    }
+  };
+
+  const updateUser = async (userId: number, userData: any) => {
+    try {
+      const response = await fetch(`/api/users/${userId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(userData)
+      });
+      
+      if (response.ok) {
+        window.location.reload();
+      } else {
+        const error = await response.json();
+        console.error('Error updating user:', error);
+      }
+    } catch (error) {
+      console.error('Error updating user:', error);
+    }
+  };
+
+  const deleteUser = async (userId: number) => {
+    try {
+      const response = await fetch(`/api/users/${userId}`, {
+        method: 'DELETE'
+      });
+      
+      if (response.ok) {
+        window.location.reload();
+      } else {
+        const error = await response.json();
+        console.error('Error deleting user:', error);
+      }
+    } catch (error) {
+      console.error('Error deleting user:', error);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -236,6 +359,7 @@ export default function Dashboard() {
         onProjectsClick={() => setProjectsListModalOpen(true)}
         onReportsClick={() => setModalType('reports')}
         onSettingsClick={() => setModalType('import')}
+        onScheduleClick={() => setModalType('schedule')}
       />
       
       <div className="flex-1 lg:ml-0">
@@ -475,6 +599,25 @@ export default function Dashboard() {
         activities={activities}
         users={[]} // Will be loaded from API
         dashboardId={dashboardId}
+      />
+      
+      <ProjectsModal
+        isOpen={projectsListModalOpen}
+        onClose={() => setProjectsListModalOpen(false)}
+        projects={projects}
+        activities={activities}
+        onCreateProject={createProject}
+        onUpdateProject={updateProject}
+        onDeleteProject={deleteProject}
+      />
+
+      <UsersModal
+        isOpen={usersListModalOpen}
+        onClose={() => setUsersListModalOpen(false)}
+        users={[]} // Will be loaded from API
+        onCreateUser={createUser}
+        onUpdateUser={updateUser}
+        onDeleteUser={deleteUser}
       />
     </div>
   );

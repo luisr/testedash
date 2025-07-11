@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { FolderOpen, Users, FileText, BarChart3, Target, CheckCircle, Upload } from "lucide-react";
+import { FolderOpen, Users, FileText, BarChart3, Target, CheckCircle, Upload, Calendar, Clock, TrendingUp } from "lucide-react";
 import { Project, Activity, User } from "@shared/schema";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { apiRequest } from "@/lib/queryClient";
@@ -12,7 +12,7 @@ import { apiRequest } from "@/lib/queryClient";
 interface SimpleModalProps {
   isOpen: boolean;
   onClose: () => void;
-  type: 'projects' | 'users' | 'reports' | 'import';
+  type: 'projects' | 'users' | 'reports' | 'import' | 'schedule';
   projects?: Project[];
   activities?: Activity[];
   users?: User[];
@@ -103,6 +103,7 @@ export default function SimpleModal({
       case 'users': return 'Gerenciamento de Usuários';
       case 'reports': return 'Relatórios e Análises';
       case 'import': return 'Importar Atividades';
+      case 'schedule': return 'Cronograma';
       default: return 'Modal';
     }
   };
@@ -113,6 +114,7 @@ export default function SimpleModal({
       case 'users': return <Users className="h-5 w-5 text-primary" />;
       case 'reports': return <FileText className="h-5 w-5 text-primary" />;
       case 'import': return <Upload className="h-5 w-5 text-primary" />;
+      case 'schedule': return <Calendar className="h-5 w-5 text-primary" />;
       default: return null;
     }
   };
@@ -437,12 +439,124 @@ export default function SimpleModal({
     </div>
   );
 
+  const renderScheduleContent = () => {
+    const activitiesWithDates = activities.filter(a => a.plannedStartDate && a.plannedEndDate);
+    
+    return (
+      <div className="space-y-4">
+        <div className="text-center py-4">
+          <Calendar className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+          <h3 className="text-lg font-semibold mb-2">Cronograma de Atividades</h3>
+          <p className="text-sm text-muted-foreground mb-4">
+            Visualização temporal das atividades planejadas
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                <TrendingUp className="h-4 w-4" />
+                Atividades Agendadas
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{activitiesWithDates.length}</div>
+              <div className="text-xs text-muted-foreground">
+                De {activities.length} total
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                <Clock className="h-4 w-4" />
+                Prazo Médio
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                {activitiesWithDates.length > 0 ? 
+                  Math.round(activitiesWithDates.reduce((acc, a) => {
+                    const start = new Date(a.plannedStartDate!);
+                    const end = new Date(a.plannedEndDate!);
+                    return acc + (end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24);
+                  }, 0) / activitiesWithDates.length) : 0
+                } dias
+              </div>
+              <div className="text-xs text-muted-foreground">
+                Duração média
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                <Target className="h-4 w-4" />
+                No Prazo
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-green-600">
+                {activitiesWithDates.filter(a => a.status !== 'delayed').length}
+              </div>
+              <div className="text-xs text-muted-foreground">
+                Atividades
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Próximas Atividades</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {activitiesWithDates
+                .sort((a, b) => new Date(a.plannedStartDate!).getTime() - new Date(b.plannedStartDate!).getTime())
+                .slice(0, 5)
+                .map(activity => (
+                  <div key={activity.id} className="flex items-center justify-between p-3 border rounded-lg">
+                    <div className="flex-1">
+                      <div className="font-medium">{activity.name}</div>
+                      <div className="text-sm text-muted-foreground">
+                        {activity.responsible} • {activity.discipline}
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-sm font-medium">
+                        {formatDate(activity.plannedStartDate!)}
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        Início previsto
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              {activitiesWithDates.length === 0 && (
+                <div className="text-center py-8 text-muted-foreground">
+                  <Calendar className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                  <p>Nenhuma atividade com datas planejadas</p>
+                  <p className="text-sm">Configure datas nas atividades para ver o cronograma</p>
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  };
+
   const renderContent = () => {
     switch (type) {
       case 'projects': return renderProjectsContent();
       case 'users': return renderUsersContent();
       case 'reports': return renderReportsContent();
       case 'import': return renderImportContent();
+      case 'schedule': return renderScheduleContent();
       default: return <div>Conteúdo não encontrado</div>;
     }
   };

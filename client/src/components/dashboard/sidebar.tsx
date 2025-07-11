@@ -25,13 +25,14 @@ interface SidebarProps {
   onProjectsClick?: () => void;
   onReportsClick?: () => void;
   onSettingsClick?: () => void;
+  onScheduleClick?: () => void;
 }
 
-export default function Sidebar({ isOpen, onClose, onActivityLogToggle, onUsersClick, onProjectsClick, onReportsClick, onSettingsClick }: SidebarProps) {
+export default function Sidebar({ isOpen, onClose, onActivityLogToggle, onUsersClick, onProjectsClick, onReportsClick, onSettingsClick, onScheduleClick }: SidebarProps) {
   const navigation = [
     { name: "Dashboard", href: "/", icon: LayoutDashboard, current: true },
     { name: "Projetos", href: "#", icon: Folder, current: false, onClick: onProjectsClick },
-    { name: "Cronograma", href: "/schedule", icon: Calendar, current: false },
+    { name: "Cronograma", href: "#", icon: Calendar, current: false, onClick: onScheduleClick },
     { name: "Relatórios", href: "#", icon: BarChart3, current: false, onClick: onReportsClick },
   ];
 
