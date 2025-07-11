@@ -1,0 +1,94 @@
+/* FORÇAR TEMA MODERNO - PRIORIDADE ABSOLUTA */
+
+/* Zerar todos os backgrounds existentes */
+html, body, #root, main, div, section, article, aside, header, footer, nav {
+  background-color: transparent !important;
+  background-image: none !important;
+  background: none !important;
+}
+
+/* Aplicar gradiente moderno APENAS aos containers principais */
+html {
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%) !important;
+  min-height: 100vh !important;
+}
+
+body {
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%) !important;
+  min-height: 100vh !important;
+}
+
+#root {
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%) !important;
+  min-height: 100vh !important;
+}
+
+/* Tema escuro */
+.dark html {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;
+}
+
+.dark body {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;
+}
+
+.dark #root {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;
+}
+
+/* Remover cores indesejadas */
+.bg-yellow-50, .bg-yellow-100, .bg-yellow-200, .bg-yellow-300, .bg-yellow-400, .bg-yellow-500,
+.bg-amber-50, .bg-amber-100, .bg-amber-200, .bg-amber-300, .bg-amber-400, .bg-amber-500,
+.bg-orange-50, .bg-orange-100, .bg-orange-200, .bg-orange-300, .bg-orange-400, .bg-orange-500,
+[class*="yellow"], [class*="amber"], [class*="orange"] {
+  background-color: transparent !important;
+  background-image: none !important;
+  background: none !important;
+}
+
+/* Cards com glassmorphism */
+.card, [class*="card"] {
+  background: rgba(255, 255, 255, 0.9) !important;
+  backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  border-radius: 16px !important;
+}
+
+.dark .card, .dark [class*="card"] {
+  background: rgba(15, 23, 42, 0.9) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Sidebar */
+.sidebar-container {
+  background: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(20px) !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+.dark .sidebar-container {
+  background: rgba(15, 23, 42, 0.95) !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Botões com gradiente */
+button[data-variant="default"], .bg-primary {
+  background: linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%) !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 12px !important;
+}
+
+/* Remoção total de estilos indesejados */
+* {
+  background-color: unset !important;
+}
+
+/* Aplicar apenas nos containers principais */
+.min-h-screen, .h-screen {
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%) !important;
+}
+
+.dark .min-h-screen, .dark .h-screen {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;
+}

@@ -215,6 +215,31 @@ body.loading *,
   background: unset !important;
 }
 
+/* FORÇA COMPLETA DO NOVO TEMA */
+body,
+body *,
+html,
+html *,
+#root,
+#root * {
+  background-color: transparent !important;
+  background-image: none !important;
+}
+
+/* Aplicar gradiente em containers principais */
+body,
+html,
+#root {
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%) !important;
+  min-height: 100vh !important;
+}
+
+.dark body,
+.dark html,
+.dark #root {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;
+}
+
 /* Modern Glass-morphism Cards */
 .card,
 [class*="card"],
