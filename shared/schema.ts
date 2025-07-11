@@ -11,6 +11,7 @@ export const users = pgTable("users", {
   passwordHash: text("password_hash"), // For simple authentication
   isActive: boolean("is_active").default(true),
   isSuperUser: boolean("is_super_user").default(false), // Super user can access consolidated dashboard
+  mustChangePassword: boolean("must_change_password").default(true), // Forces password change on first login
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

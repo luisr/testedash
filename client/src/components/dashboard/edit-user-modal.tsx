@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,19 +6,31 @@ import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { UserPlus, AlertCircle } from "lucide-react";
+import { User, AlertCircle, UserCheck } from "lucide-react";
 
-interface NewUserModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onUserCreated: () => void;
+interface User {
+  id: number;
+  name: string;
+  email: string;
+  role: string;
+  avatar?: string;
+  isActive: boolean;
+  isSuperUser: boolean;
 }
 
-export default function NewUserModal({ 
+interface EditUserModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  user: User;
+  onUserUpdated: () => void;
+}
+
+export default function EditUserModal({ 
   isOpen, 
   onClose, 
-  onUserCreated 
-}: NewUserModalProps) {
+  user, 
+  onUserUpdated 
+}: EditUserModalProps) {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -29,31 +41,39 @@ export default function NewUserModal({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
+  useEffect(() => {
+    if (user) {
+      setFormData({
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        isActive: user.isActive,
+        isSuperUser: user.isSuperUser || false
+      });
+    }
+  }, [user]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setIsLoading(true);
 
     try {
-      const response = await fetch('/api/users', {
-        method: 'POST',
+      const response = await fetch(`/api/users/${user.id}`, {
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          ...formData,
-          // Default password will be set on backend
-          password: 'BeachPark@123'
-        }),
+        body: JSON.stringify(formData),
       });
 
       if (response.ok) {
-        onUserCreated();
+        onUserUpdated();
         onClose();
         resetForm();
       } else {
         const errorData = await response.json();
-        setError(errorData.message || 'Erro ao criar usuário');
+        setError(errorData.message || 'Erro ao atualizar usuário');
       }
     } catch (error) {
       setError('Erro de conexão. Tente novamente.');
@@ -101,8 +121,8 @@ export default function NewUserModal({
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <UserPlus className="h-5 w-5" />
-            Novo Usuário
+            <UserCheck className="h-5 w-5" />
+            Editar Usuário
           </DialogTitle>
         </DialogHeader>
         
@@ -189,21 +209,12 @@ export default function NewUserModal({
             </p>
           </div>
 
-          <div className="bg-yellow-50 dark:bg-yellow-900/20 p-4 rounded-lg">
-            <h4 className="font-medium text-yellow-900 dark:text-yellow-100 mb-2">
-              Senha Padrão:
-            </h4>
-            <p className="text-sm text-yellow-800 dark:text-yellow-200">
-              A senha padrão "BeachPark@123" será definida. O usuário deverá alterá-la no primeiro login.
-            </p>
-          </div>
-
           <div className="flex justify-end gap-2 pt-4">
             <Button type="button" variant="outline" onClick={handleClose}>
               Cancelar
             </Button>
             <Button type="submit" disabled={isLoading}>
-              {isLoading ? "Criando..." : "Criar Usuário"}
+              {isLoading ? "Salvando..." : "Salvar Alterações"}
             </Button>
           </div>
         </form>

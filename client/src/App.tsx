@@ -8,6 +8,7 @@ import { ThemeOverride } from "@/components/theme-override";
 import Dashboard from "@/pages/dashboard";
 import Login from "@/pages/login";
 import Projects from "@/pages/projects";
+import AdminDashboard from "@/pages/admin-dashboard";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -16,6 +17,7 @@ function Router() {
       <Route path="/login" component={Login} />
       <Route path="/projects" component={Projects} />
       <Route path="/dashboard" component={Dashboard} />
+      <Route path="/admin-dashboard" component={AdminDashboard} />
       <Route path="/" component={Login} />
       <Route component={NotFound} />
     </Switch>

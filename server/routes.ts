@@ -48,10 +48,50 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ 
         success: true, 
         user: userWithoutPassword,
+        mustChangePassword: user.mustChangePassword || false,
         message: "Login realizado com sucesso"
       });
     } catch (error) {
       console.error("Login error:", error);
+      res.status(500).json({ message: "Erro interno do servidor" });
+    }
+  });
+
+  // Change password endpoint
+  app.post("/api/auth/change-password", async (req, res) => {
+    try {
+      const { userId, currentPassword, newPassword } = req.body;
+      
+      if (!userId || !currentPassword || !newPassword) {
+        return res.status(400).json({ message: "Todos os campos são obrigatórios" });
+      }
+      
+      if (newPassword.length < 8) {
+        return res.status(400).json({ message: "A nova senha deve ter pelo menos 8 caracteres" });
+      }
+      
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ message: "Usuário não encontrado" });
+      }
+      
+      const bcrypt = await import('bcrypt');
+      const isValidPassword = await bcrypt.compare(currentPassword, user.passwordHash || '');
+      
+      if (!isValidPassword) {
+        return res.status(401).json({ message: "Senha atual incorreta" });
+      }
+      
+      const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+      
+      await storage.updateUser(userId, { 
+        passwordHash: hashedNewPassword,
+        mustChangePassword: false 
+      });
+      
+      res.json({ message: "Senha alterada com sucesso" });
+    } catch (error) {
+      console.error("Change password error:", error);
       res.status(500).json({ message: "Erro interno do servidor" });
     }
   });
@@ -130,7 +170,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(409).json({ message: "User with this email already exists" });
       }
       
-      const user = await storage.createUser(userData);
+      // Set default password for new users
+      const bcrypt = await import('bcrypt');
+      const defaultPassword = 'BeachPark@123';
+      const hashedPassword = await bcrypt.hash(defaultPassword, 10);
+      
+      const userWithDefaults = {
+        ...userData,
+        passwordHash: hashedPassword,
+        mustChangePassword: true
+      };
+      
+      const user = await storage.createUser(userWithDefaults);
       res.status(201).json(user);
     } catch (error) {
       console.error("Error creating user:", error);

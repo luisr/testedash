@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Eye, EyeOff, LogIn, Shield } from "lucide-react";
 import beachParkLogo from "@assets/pngegg_1752264509099.png";
+import ChangePasswordModal from "@/components/auth/change-password-modal";
 
 export default function Login() {
   const [, setLocation] = useLocation();
@@ -15,6 +16,8 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
+  const [loggedInUser, setLoggedInUser] = useState<any>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,7 +36,14 @@ export default function Login() {
       if (response.ok) {
         const data = await response.json();
         localStorage.setItem("authUser", JSON.stringify(data.user));
-        setLocation("/projects");
+        
+        // Check if user must change password
+        if (data.mustChangePassword) {
+          setLoggedInUser(data.user);
+          setShowChangePasswordModal(true);
+        } else {
+          setLocation("/admin-dashboard");
+        }
       } else {
         const errorData = await response.json();
         setError(errorData.message || "Credenciais inválidas");
@@ -44,6 +54,11 @@ export default function Login() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handlePasswordChanged = () => {
+    setShowChangePasswordModal(false);
+    setLocation("/admin-dashboard");
   };
 
   return (
@@ -154,6 +169,16 @@ export default function Login() {
           Sistema de autenticação por colaborador
         </p>
       </div>
+      
+      {/* Change Password Modal */}
+      {showChangePasswordModal && loggedInUser && (
+        <ChangePasswordModal
+          isOpen={showChangePasswordModal}
+          onClose={() => setShowChangePasswordModal(false)}
+          userId={loggedInUser.id}
+          onPasswordChanged={handlePasswordChanged}
+        />
+      )}
     </div>
   );
 }
