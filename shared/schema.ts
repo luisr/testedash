@@ -72,7 +72,24 @@ export const dashboardShares = pgTable("dashboard_shares", {
   userId: integer("user_id").references(() => users.id),
   sharedById: integer("shared_by_id").references(() => users.id),
   permission: text("permission").default("view"), // view, edit, admin
+  // Granular permissions
+  canView: boolean("can_view").default(true),
+  canEdit: boolean("can_edit").default(false),
+  canDelete: boolean("can_delete").default(false),
+  canShare: boolean("can_share").default(false),
+  canExport: boolean("can_export").default(false),
+  canCreateActivities: boolean("can_create_activities").default(false),
+  canEditActivities: boolean("can_edit_activities").default(false),
+  canDeleteActivities: boolean("can_delete_activities").default(false),
+  canViewReports: boolean("can_view_reports").default(true),
+  canManageCustomColumns: boolean("can_manage_custom_columns").default(false),
+  canManageCustomCharts: boolean("can_manage_custom_charts").default(false),
+  // Optional expiration and restrictions
+  expiresAt: timestamp("expires_at"),
+  isActive: boolean("is_active").default(true),
+  notes: text("notes"),
   createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
 });
 
 export const activityLogs = pgTable("activity_logs", {
@@ -140,7 +157,7 @@ export const insertUserSchema = createInsertSchema(users).omit({ id: true, creat
 export const insertDashboardSchema = createInsertSchema(dashboards).omit({ id: true, createdAt: true, updatedAt: true });
 export const insertProjectSchema = createInsertSchema(projects).omit({ id: true, createdAt: true, updatedAt: true });
 export const insertActivitySchema = createInsertSchema(activities).omit({ id: true, createdAt: true, updatedAt: true });
-export const insertDashboardShareSchema = createInsertSchema(dashboardShares).omit({ id: true, createdAt: true });
+export const insertDashboardShareSchema = createInsertSchema(dashboardShares).omit({ id: true, createdAt: true, updatedAt: true });
 export const insertActivityLogSchema = createInsertSchema(activityLogs).omit({ id: true, timestamp: true });
 export const insertCustomColumnSchema = createInsertSchema(customColumns).omit({ id: true, createdAt: true });
 export const insertCustomChartSchema = createInsertSchema(customCharts).omit({ id: true, createdAt: true });

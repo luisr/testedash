@@ -8,7 +8,7 @@ import Header from "@/components/dashboard/header";
 import KPICards from "@/components/dashboard/kpi-cards";
 import ChartsSection from "@/components/dashboard/charts-section";
 import ActivityTable from "@/components/dashboard/activity-table";
-import ShareModal from "@/components/dashboard/share-modal";
+import ShareModalEnhanced from "@/components/dashboard/share-modal-enhanced";
 import ActivityLogPanel from "@/components/dashboard/activity-log-panel";
 import ExportModal from "@/components/dashboard/export-modal";
 import NewActivityModal from "@/components/dashboard/new-activity-modal";
@@ -307,10 +307,11 @@ export default function Dashboard() {
         </main>
       </div>
 
-      <ShareModal 
+      <ShareModalEnhanced 
         isOpen={shareModalOpen}
         onClose={() => setShareModalOpen(false)}
         onShare={shareDashboard}
+        dashboardId={dashboardId}
       />
 
       <ExportModal 

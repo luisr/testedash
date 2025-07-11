@@ -347,17 +347,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/dashboard-shares", async (req, res) => {
     try {
-      const shareData = insertDashboardShareSchema.parse(req.body);
-      const share = await storage.createDashboardShare(shareData);
+      const { email, ...shareData } = req.body;
+      
+      // First, find or create user by email
+      let user = await storage.getUserByEmail(email);
+      if (!user) {
+        // Create a new user if they don't exist
+        user = await storage.createUser({
+          name: email.split('@')[0],
+          email: email,
+          role: 'user'
+        });
+      }
+
+      const parsedShareData = insertDashboardShareSchema.parse({
+        ...shareData,
+        userId: user.id,
+        sharedById: 1 // TODO: Get from authenticated user
+      });
+
+      const share = await storage.createDashboardShare(parsedShareData);
       
       // Log the dashboard share
       await storage.createActivityLog({
-        dashboardId: shareData.dashboardId,
-        userId: shareData.sharedById,
+        dashboardId: parsedShareData.dashboardId,
+        userId: parsedShareData.sharedById,
         action: "share",
         entityType: "dashboard",
-        entityId: shareData.dashboardId,
-        details: { userId: shareData.userId, permission: shareData.permission }
+        entityId: parsedShareData.dashboardId,
+        details: { 
+          userEmail: email,
+          userId: user.id, 
+          permission: parsedShareData.permission,
+          granularPermissions: {
+            canView: parsedShareData.canView,
+            canEdit: parsedShareData.canEdit,
+            canExport: parsedShareData.canExport,
+            canCreateActivities: parsedShareData.canCreateActivities,
+            canShare: parsedShareData.canShare
+          }
+        }
       });
 
       res.status(201).json(share);
@@ -365,6 +394,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (error instanceof z.ZodError) {
         return res.status(400).json({ message: "Invalid input", errors: error.errors });
       }
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.delete("/api/dashboard-shares/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const deleted = await storage.deleteDashboardShare(id);
+      
+      if (deleted) {
+        // Log the share deletion
+        await storage.createActivityLog({
+          dashboardId: 1, // TODO: Get from share context
+          userId: 1, // TODO: Get from authenticated user
+          action: "unshare",
+          entityType: "dashboard",
+          entityId: 1,
+          details: { shareId: id }
+        });
+      }
+      
+      res.json({ message: "Share deleted successfully" });
+    } catch (error) {
       res.status(500).json({ message: "Internal server error" });
     }
   });

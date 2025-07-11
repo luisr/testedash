@@ -410,12 +410,26 @@ export class DatabaseStorage implements IStorage {
     }
     const newShare: DashboardShare = {
       id: mockDashboardShares.length + 1,
-      ...share,
       dashboardId: share.dashboardId || null,
       userId: share.userId || null,
       sharedById: share.sharedById || null,
       permission: share.permission || null,
-      createdAt: new Date()
+      canView: share.canView ?? true,
+      canEdit: share.canEdit ?? false,
+      canDelete: share.canDelete ?? false,
+      canShare: share.canShare ?? false,
+      canExport: share.canExport ?? false,
+      canCreateActivities: share.canCreateActivities ?? false,
+      canEditActivities: share.canEditActivities ?? false,
+      canDeleteActivities: share.canDeleteActivities ?? false,
+      canViewReports: share.canViewReports ?? true,
+      canManageCustomColumns: share.canManageCustomColumns ?? false,
+      canManageCustomCharts: share.canManageCustomCharts ?? false,
+      expiresAt: share.expiresAt ?? null,
+      isActive: share.isActive ?? true,
+      notes: share.notes ?? null,
+      createdAt: new Date(),
+      updatedAt: new Date()
     };
     mockDashboardShares.push(newShare);
     return newShare;
