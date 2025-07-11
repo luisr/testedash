@@ -460,8 +460,8 @@ export default function ActivityTable({
                                       activity={activity}
                                       userId={5} // Luis Ribeiro user ID
                                       onSuccess={() => {
-                                        // Refresh data after successful update
-                                        window.location.reload();
+                                        // Não recarregar a página, apenas invalidar queries específicas
+                                        // O ActivityDateEditor já faz isso internamente
                                       }}
                                     />
                                     <Button

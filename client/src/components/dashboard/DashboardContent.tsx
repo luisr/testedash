@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { useDashboardData } from '@/hooks/use-dashboard-data';
 import { useConsolidatedDashboard } from '@/hooks/use-consolidated-dashboard';
 import { useActivityMetrics } from '@/hooks/use-activity-metrics';
@@ -22,6 +23,7 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({
   isConsolidatedDashboard 
 }) => {
   const { user } = useAuth();
+  const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
   const [filterResponsible, setFilterResponsible] = useState("");
@@ -124,7 +126,10 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({
         dashboardId={dashboardId}
         activities={activities}
         projects={projects}
-        onKPIUpdate={() => window.location.reload()}
+        onKPIUpdate={() => {
+          // Invalidar apenas as queries relacionadas aos KPIs
+          queryClient.invalidateQueries({ queryKey: ['/api/custom-kpis', dashboardId] });
+        }}
       />
 
       {/* Activity Summary */}
@@ -136,7 +141,10 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({
         projects={projects}
         customCharts={customCharts}
         dashboardId={dashboardId}
-        onChartsUpdate={() => window.location.reload()}
+        onChartsUpdate={() => {
+          // Invalidar apenas as queries relacionadas aos gráficos
+          queryClient.invalidateQueries({ queryKey: ['/api/custom-charts', dashboardId] });
+        }}
       />
 
       {/* Activities Panel with Multiple Views */}
@@ -164,7 +172,10 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({
       {!isConsolidatedDashboard && (
         <BackupManagement 
           dashboardId={dashboardId}
-          onBackupComplete={() => window.location.reload()}
+          onBackupComplete={() => {
+            // Invalidar apenas as queries relacionadas aos backups
+            queryClient.invalidateQueries({ queryKey: ['/api/backups', dashboardId] });
+          }}
         />
       )}
     </div>

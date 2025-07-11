@@ -70,15 +70,15 @@ export function useUpdateActivityWithAudit() {
       });
     },
     onSuccess: (updatedActivity, params) => {
-      // Invalidate related queries
+      // Invalidate apenas as queries específicas relacionadas ao dashboard
       queryClient.invalidateQueries({ 
-        queryKey: ['/api/activities'] 
+        queryKey: ['/api/activities/dashboard', updatedActivity.dashboardId] 
       });
       queryClient.invalidateQueries({ 
-        queryKey: ['/api/date-changes-audit'] 
+        queryKey: ['/api/date-changes-audit', updatedActivity.dashboardId] 
       });
       queryClient.invalidateQueries({ 
-        queryKey: ['/api/activity-logs'] 
+        queryKey: ['/api/activity-logs', updatedActivity.dashboardId] 
       });
     },
   });

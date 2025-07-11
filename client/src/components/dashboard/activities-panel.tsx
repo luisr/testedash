@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { Plus, Settings, Network, Filter, Search, Download, Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -45,6 +46,7 @@ const ActivitiesPanel: React.FC<ActivitiesPanelProps> = ({
   onBulkImport,
   customColumns = []
 }) => {
+  const queryClient = useQueryClient();
   const [viewMode, setViewMode] = useState<'hierarchical' | 'table'>('hierarchical');
   const [showDependencies, setShowDependencies] = useState(false);
 
@@ -209,8 +211,8 @@ const ActivitiesPanel: React.FC<ActivitiesPanelProps> = ({
           onUpdateActivity={onUpdateActivity}
           onDeleteActivity={onDeleteActivity}
           onCreateSubActivity={() => {
-            // Refresh activities after creating subtask
-            window.location.reload();
+            // Invalidar apenas as queries relacionadas a atividades
+            queryClient.invalidateQueries({ queryKey: ['/api/activities/dashboard', dashboardId] });
           }}
           onEditActivity={onEditActivity}
           showDependencies={showDependencies}

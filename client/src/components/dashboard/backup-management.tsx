@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -74,6 +75,7 @@ interface DashboardVersion {
 }
 
 export default function BackupManagement({ dashboardId, userId }: BackupManagementProps) {
+  const queryClient = useQueryClient();
   const [schedules, setSchedules] = useState<BackupSchedule[]>([]);
   const [backups, setBackups] = useState<DashboardBackup[]>([]);
   const [versions, setVersions] = useState<DashboardVersion[]>([]);
@@ -303,8 +305,9 @@ export default function BackupManagement({ dashboardId, userId }: BackupManageme
           title: "Sucesso",
           description: "Dashboard restaurado com sucesso"
         });
-        // Reload page to reflect changes
-        window.location.reload();
+        // Invalidar queries relacionadas aos backups
+        queryClient.invalidateQueries({ queryKey: ['/api/backups', dashboardId] });
+        queryClient.invalidateQueries({ queryKey: ['/api/activities/dashboard', dashboardId] });
       }
     } catch (error) {
       console.error('Error restoring backup:', error);
