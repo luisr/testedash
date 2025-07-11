@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress";
+import { Checkbox } from "@/components/ui/checkbox";
 import { 
   Table, 
   TableBody, 
@@ -24,13 +25,19 @@ import {
   ChevronRight,
   ChevronDown,
   Plus,
-  GitBranch
+  GitBranch,
+  Move,
+  X
 } from "lucide-react";
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { Activity } from "@shared/schema";
 import TableConfigModal from "./table-config-modal";
 import EditActivityModal from "./edit-activity-modal";
 import { ActivityDateEditor } from "./activity-date-editor";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 
 interface ActivityTableProps {
   activities: Activity[];
@@ -89,7 +96,14 @@ export default function ActivityTable({
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null);
   const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set());
+  const [selectedActivities, setSelectedActivities] = useState<Set<number>>(new Set());
+  const [showBulkActions, setShowBulkActions] = useState(false);
+  const [showMoveModal, setShowMoveModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [targetParentId, setTargetParentId] = useState<number | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
   const itemsPerPage = 10;
+  const { toast } = useToast();
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -118,6 +132,123 @@ export default function ActivityTable({
     const earnedValue = parseFloat(activity.earnedValue || "0");
     const actualCost = parseFloat(activity.actualCost || "0");
     return actualCost > 0 ? (earnedValue / actualCost).toFixed(2) : "0.00";
+  };
+
+  // Funções para manipular seleções
+  const handleSelectActivity = (activityId: number, checked: boolean) => {
+    const newSelected = new Set(selectedActivities);
+    if (checked) {
+      newSelected.add(activityId);
+    } else {
+      newSelected.delete(activityId);
+    }
+    setSelectedActivities(newSelected);
+    setShowBulkActions(newSelected.size > 0);
+  };
+
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      const allIds = new Set(flatActivities.map(activity => activity.id));
+      setSelectedActivities(allIds);
+      setShowBulkActions(true);
+    } else {
+      setSelectedActivities(new Set());
+      setShowBulkActions(false);
+    }
+  };
+
+  const handleMoveToSubtask = () => {
+    if (selectedActivities.size === 0) return;
+    setShowMoveModal(true);
+  };
+
+  const handleBulkDelete = () => {
+    if (selectedActivities.size === 0) return;
+    setShowDeleteModal(true);
+  };
+
+  const confirmMoveToSubtask = async () => {
+    if (!targetParentId || selectedActivities.size === 0) return;
+    
+    setIsProcessing(true);
+    
+    try {
+      // Processar cada atividade selecionada
+      for (const activityId of selectedActivities) {
+        await apiRequest('PUT', `/api/activities/${activityId}`, {
+          parentActivityId: targetParentId
+        });
+      }
+      
+      toast({
+        title: "Atividades movidas com sucesso",
+        description: `${selectedActivities.size} atividade(s) foram movidas para subtarefas.`,
+        variant: "default"
+      });
+      
+      // Limpar seleções e fechar modal
+      setSelectedActivities(new Set());
+      setShowBulkActions(false);
+      setShowMoveModal(false);
+      setTargetParentId(null);
+      
+      // Atualizar dados na interface
+      if (onCustomColumnsUpdate) {
+        onCustomColumnsUpdate();
+      }
+    } catch (error: any) {
+      console.error('Erro ao mover atividades:', error);
+      toast({
+        title: "Erro ao mover atividades",
+        description: error.message || "Houve um problema ao mover as atividades selecionadas.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const confirmBulkDelete = async () => {
+    if (selectedActivities.size === 0) return;
+    
+    setIsProcessing(true);
+    
+    try {
+      // Processar cada atividade selecionada
+      for (const activityId of selectedActivities) {
+        await apiRequest('DELETE', `/api/activities/${activityId}`);
+      }
+      
+      toast({
+        title: "Atividades excluídas com sucesso",
+        description: `${selectedActivities.size} atividade(s) foram excluídas.`,
+        variant: "default"
+      });
+      
+      // Limpar seleções e fechar modal
+      setSelectedActivities(new Set());
+      setShowBulkActions(false);
+      setShowDeleteModal(false);
+      
+      // Atualizar dados na interface
+      if (onCustomColumnsUpdate) {
+        onCustomColumnsUpdate();
+      }
+    } catch (error: any) {
+      console.error('Erro ao deletar atividades:', error);
+      toast({
+        title: "Erro ao excluir atividades",
+        description: error.message || "Houve um problema ao excluir as atividades selecionadas.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const clearSelection = () => {
+    setSelectedActivities(new Set());
+    setShowBulkActions(false);
   };
 
   // Função para criar estrutura hierárquica
@@ -282,6 +413,48 @@ export default function ActivityTable({
         </div>
       </CardHeader>
       
+      {/* Barra de ações em lote */}
+      {showBulkActions && (
+        <div className="px-6 py-4 bg-gradient-to-r from-blue-50 to-cyan-50 border-b border-border/50">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <span className="text-sm font-medium text-blue-800">
+                {selectedActivities.size} atividade(s) selecionada(s)
+              </span>
+              <Button 
+                variant="ghost" 
+                size="sm"
+                onClick={clearSelection}
+                className="text-blue-600 hover:text-blue-800"
+              >
+                <X className="w-4 h-4 mr-1" />
+                Limpar seleção
+              </Button>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={handleMoveToSubtask}
+                className="bg-white border-blue-200 text-blue-700 hover:bg-blue-50"
+              >
+                <Move className="w-4 h-4 mr-2" />
+                Mover para subtarefas
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={handleBulkDelete}
+                className="bg-white border-red-200 text-red-700 hover:bg-red-50"
+              >
+                <Trash2 className="w-4 h-4 mr-2" />
+                Excluir selecionadas
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+      
       <CardContent className="p-0">
         <DragDropContext onDragEnd={handleDragEnd}>
           <div className="overflow-x-auto">
@@ -290,6 +463,13 @@ export default function ActivityTable({
                 <TableRow className="bg-muted/50">
                   <TableHead className="font-medium text-muted-foreground w-8">
                     {/* Drag handle column */}
+                  </TableHead>
+                  <TableHead className="font-medium text-muted-foreground w-12">
+                    <Checkbox
+                      checked={selectedActivities.size === flatActivities.length && flatActivities.length > 0}
+                      onCheckedChange={(checked) => handleSelectAll(checked as boolean)}
+                      className="ml-2"
+                    />
                   </TableHead>
                   <TableHead className="font-medium text-muted-foreground">
                     Atividade
@@ -340,6 +520,13 @@ export default function ActivityTable({
                                   <GripVertical className="w-4 h-4 text-muted-foreground cursor-grab" />
                                 </div>
                               </div>
+                            </TableCell>
+                            <TableCell>
+                              <Checkbox
+                                checked={selectedActivities.has(activity.id)}
+                                onCheckedChange={(checked) => handleSelectActivity(activity.id, checked as boolean)}
+                                className="ml-2"
+                              />
                             </TableCell>
                             <TableCell>
                               <div className="flex items-center">
@@ -560,6 +747,79 @@ export default function ActivityTable({
         activity={selectedActivity}
         onSave={onActivityUpdate}
       />
+      
+      {/* Modal para mover para subtarefas */}
+      <Dialog open={showMoveModal} onOpenChange={setShowMoveModal}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Mover para Subtarefas</DialogTitle>
+            <DialogDescription>
+              Selecione a atividade pai para as {selectedActivities.size} atividades selecionadas.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Atividade Pai</label>
+              <Select value={targetParentId?.toString()} onValueChange={(value) => setTargetParentId(parseInt(value))}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecione uma atividade pai" />
+                </SelectTrigger>
+                <SelectContent>
+                  {activities
+                    .filter(activity => !selectedActivities.has(activity.id))
+                    .map((activity) => (
+                      <SelectItem key={activity.id} value={activity.id.toString()}>
+                        {activity.name}
+                      </SelectItem>
+                    ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex justify-end space-x-2">
+              <Button variant="outline" onClick={() => setShowMoveModal(false)}>
+                Cancelar
+              </Button>
+              <Button onClick={confirmMoveToSubtask} disabled={!targetParentId || isProcessing}>
+                {isProcessing ? "Processando..." : "Confirmar Movimento"}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Modal para confirmar exclusão em lote */}
+      <Dialog open={showDeleteModal} onOpenChange={setShowDeleteModal}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Confirmar Exclusão</DialogTitle>
+            <DialogDescription>
+              Tem certeza que deseja excluir as {selectedActivities.size} atividades selecionadas?
+              Esta ação não pode ser desfeita.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="bg-red-50 p-4 rounded-lg">
+              <h4 className="font-medium text-red-800 mb-2">Atividades que serão excluídas:</h4>
+              <ul className="text-sm text-red-700 space-y-1">
+                {Array.from(selectedActivities).map(activityId => {
+                  const activity = activities.find(a => a.id === activityId);
+                  return activity ? (
+                    <li key={activityId}>• {activity.name}</li>
+                  ) : null;
+                })}
+              </ul>
+            </div>
+            <div className="flex justify-end space-x-2">
+              <Button variant="outline" onClick={() => setShowDeleteModal(false)}>
+                Cancelar
+              </Button>
+              <Button variant="destructive" onClick={confirmBulkDelete} disabled={isProcessing}>
+                {isProcessing ? "Processando..." : "Confirmar Exclusão"}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 }
