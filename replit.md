@@ -249,3 +249,13 @@ The application is designed for seamless deployment on platforms like Replit, Ve
 - **Color Scheme Consistency**: Implemented consistent blue-to-cyan gradient theme across all components
 - **Accessibility Improvements**: Added proper focus states and reduced motion preferences
 - **Responsive Design**: Ensured all components work properly on mobile and desktop devices
+
+### January 11, 2025 - Optimized API System and Selective Data Invalidation
+- **API Request Fixes**: Corrected all API calls in Dependency Manager and Create Sub Activity Modal
+- **Selective Query Invalidation**: Implemented targeted cache invalidation to update only specific tables
+- **Performance Optimization**: Eliminated full dashboard reloads in favor of specific component updates
+- **Dependency Manager**: Fixed API calls and implemented selective table updates for dependencies
+- **Sub Activity Creation**: Fixed API calls and implemented selective table updates for activities
+- **Toast Notifications**: Enhanced user feedback with specific update confirmations
+- **Query Key Alignment**: Aligned all query keys with existing React Query patterns
+- **Accessibility Enhancement**: Added proper DialogDescription components to eliminate warnings

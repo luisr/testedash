@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Network, Plus, Trash2, ArrowRight, AlertCircle, GitBranch } from 'lucide-react';
 import { Activity } from '@/../shared/schema';
 import { useToast } from '@/hooks/use-toast';
-import { apiRequest } from '@/lib/queryClient';
+import { apiRequest, queryClient } from '@/lib/queryClient';
 
 interface DependencyManagerProps {
   dashboardId: number;
@@ -70,9 +70,15 @@ export default function DependencyManager({ dashboardId, activities, trigger }: 
 
       if (data) {
         setDependencies([...dependencies, data]);
+        
+        // Invalidar apenas as queries relacionadas a dependências (não recarrega o dashboard)
+        await queryClient.invalidateQueries({ 
+          queryKey: ['/api/dashboards', dashboardId, 'dependencies'] 
+        });
+        
         toast({
           title: "Dependência adicionada",
-          description: "A dependência foi criada com sucesso."
+          description: "A dependência foi criada com sucesso. Tabela atualizada!"
         });
       }
     } catch (error: any) {
@@ -90,9 +96,15 @@ export default function DependencyManager({ dashboardId, activities, trigger }: 
       await apiRequest('DELETE', `/api/activity-dependencies/${dependencyId}`);
 
       setDependencies(dependencies.filter(dep => dep.id !== dependencyId));
+      
+      // Invalidar apenas as queries relacionadas a dependências (não recarrega o dashboard)
+      await queryClient.invalidateQueries({ 
+        queryKey: ['/api/dashboards', dashboardId, 'dependencies'] 
+      });
+      
       toast({
         title: "Dependência removida",
-        description: "A dependência foi removida com sucesso."
+        description: "A dependência foi removida com sucesso. Tabela atualizada!"
       });
     } catch (error) {
       console.error('Error removing dependency:', error);

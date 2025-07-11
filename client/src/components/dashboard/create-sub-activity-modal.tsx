@@ -24,12 +24,12 @@ import { CalendarIcon, Plus } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Activity } from '@shared/schema';
-import { apiRequest } from '@/lib/queryClient';
+import { apiRequest, queryClient } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
 
 interface CreateSubActivityModalProps {
   parentActivity: Activity;
-  onSuccess: () => void;
+  onSuccess?: () => void;
 }
 
 export default function CreateSubActivityModal({ 
@@ -77,9 +77,14 @@ export default function CreateSubActivityModal({
 
       const response = await apiRequest('POST', `/api/activities/${parentActivity.id}/sub-activity`, subActivityData);
 
+      // Invalidar apenas as queries relacionadas a atividades (não recarrega o dashboard)
+      await queryClient.invalidateQueries({ 
+        queryKey: ['/api/activities/dashboard', parentActivity.dashboardId] 
+      });
+      
       toast({
         title: "Subtarefa criada com sucesso",
-        description: `A subtarefa "${formData.name}" foi adicionada à atividade "${parentActivity.name}".`
+        description: `A subtarefa "${formData.name}" foi adicionada. Tabela atualizada!`
       });
 
       // Reset form
@@ -96,7 +101,9 @@ export default function CreateSubActivityModal({
       });
 
       setOpen(false);
-      onSuccess();
+      if (onSuccess) {
+        onSuccess();
+      }
     } catch (error: any) {
       console.error('Error creating sub-activity:', error);
       toast({
