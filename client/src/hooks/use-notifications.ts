@@ -104,8 +104,8 @@ export function useNotifications(userId: number) {
   }, [unreadNotifications]);
 
   return {
-    notifications,
-    unreadNotifications,
+    notifications: notifications || [],
+    unreadNotifications: unreadNotifications || [],
     unreadCount,
     isLoading,
     createNotification: createNotificationMutation.mutate,

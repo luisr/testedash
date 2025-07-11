@@ -2,9 +2,8 @@ import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import Sidebar from './sidebar';
 import Header from './header';
-import { NotificationPopup } from '@/components/notifications/notification-popup';
-import { NotificationPreferencesDialog } from '@/components/notifications/notification-preferences-dialog';
-import { useNotifications, useWebSocketNotifications } from '@/hooks/use-notifications';
+import { Button } from '@/components/ui/button';
+import { Menu, Bell } from 'lucide-react';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -14,13 +13,6 @@ interface DashboardLayoutProps {
 export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, dashboardId }) => {
   const { user } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [notificationPreferencesOpen, setNotificationPreferencesOpen] = useState(false);
-  
-  // Notification management
-  const { notifications, markAsRead } = useNotifications(user?.id || 0);
-  useWebSocketNotifications(user?.id || 0);
-
-  const unreadNotifications = notifications.filter(n => !n.isRead);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 dashboard-container">
@@ -32,30 +24,36 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, dash
         />
         
         <div className="flex-1 flex flex-col overflow-hidden">
-          <Header 
-            onMenuClick={() => setSidebarOpen(true)}
-            onNotificationPreferencesClick={() => setNotificationPreferencesOpen(true)}
-            unreadCount={unreadNotifications.length}
-          />
+          {/* Simplified Header */}
+          <header className="bg-white/80 backdrop-blur-sm border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setSidebarOpen(true)}
+                className="lg:hidden"
+              >
+                <Menu className="h-4 w-4" />
+              </Button>
+              <h1 className="text-xl font-semibold text-gray-900">
+                Tô Sabendo - Dashboard
+              </h1>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button variant="ghost" size="sm">
+                <Bell className="h-4 w-4" />
+              </Button>
+              <div className="text-sm text-gray-600">
+                {user?.name || user?.email}
+              </div>
+            </div>
+          </header>
           
           <main className="flex-1 overflow-y-auto p-6">
             {children}
           </main>
         </div>
       </div>
-
-      {/* Notification Popup */}
-      <NotificationPopup 
-        notifications={unreadNotifications}
-        onMarkAsRead={markAsRead}
-      />
-
-      {/* Notification Preferences Dialog */}
-      <NotificationPreferencesDialog 
-        open={notificationPreferencesOpen}
-        onOpenChange={setNotificationPreferencesOpen}
-        userId={user?.id || 0}
-      />
     </div>
   );
 };
