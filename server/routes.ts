@@ -54,12 +54,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/users", async (req, res) => {
     try {
       const userData = insertUserSchema.parse(req.body);
+      
+      // Check if email already exists
+      const existingUser = await storage.getUserByEmail(userData.email);
+      if (existingUser) {
+        return res.status(409).json({ message: "User with this email already exists" });
+      }
+      
       const user = await storage.createUser(userData);
       res.status(201).json(user);
     } catch (error) {
       console.error("Error creating user:", error);
       if (error instanceof z.ZodError) {
         return res.status(400).json({ message: "Invalid input", errors: error.errors });
+      }
+      // Handle unique constraint violations
+      if (error && typeof error === 'object' && 'code' in error && error.code === '23505') {
+        return res.status(409).json({ message: "User with this email already exists" });
       }
       res.status(500).json({ message: "Internal server error", error: error instanceof Error ? error.message : 'Unknown error' });
     }

@@ -222,7 +222,7 @@ export default function ActivityTable({
 
   return (
     <Card className="table-container shadow-elegant animate-fade-in">
-      <CardHeader className="table-header p-6">
+      <CardHeader className="table-header p-6 border-b border-border/50">
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-semibold text-foreground">
             Atividades Recentes

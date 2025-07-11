@@ -60,10 +60,10 @@ export default function Sidebar({ isOpen, onClose, onActivityLogToggle, onUsersC
       )}>
         <div className="flex items-center justify-between h-16 px-6 border-b border-border/50">
           <div className="flex items-center space-x-3">
-            <div className="w-9 h-9 bg-primary rounded-xl flex items-center justify-center shadow-elegant">
+            <div className="w-10 h-10 bg-gradient-to-r from-primary to-accent rounded-xl flex items-center justify-center shadow-elegant hover-lift">
               <Activity className="w-5 h-5 text-primary-foreground" />
             </div>
-            <h1 className="text-xl font-bold text-foreground">ProjectHub</h1>
+            <h1 className="text-xl font-bold text-foreground bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">ProjectHub</h1>
           </div>
           <Button 
             variant="ghost" 
@@ -136,10 +136,10 @@ export default function Sidebar({ isOpen, onClose, onActivityLogToggle, onUsersC
         </nav>
         
         <div className="absolute bottom-0 w-full p-4 border-t border-border/50">
-          <div className="flex items-center space-x-3 p-3 rounded-lg hover:bg-accent/50 transition-colors">
-            <Avatar className="w-10 h-10 shadow-elegant">
+          <div className="flex items-center space-x-3 p-3 rounded-lg hover:bg-accent/50 transition-all duration-300 hover-lift">
+            <Avatar className="w-10 h-10 shadow-elegant ring-2 ring-primary/20">
               <AvatarImage src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&h=150" alt="Avatar" />
-              <AvatarFallback className="bg-primary text-primary-foreground font-semibold">JS</AvatarFallback>
+              <AvatarFallback className="bg-gradient-to-r from-primary to-accent text-primary-foreground font-semibold">JS</AvatarFallback>
             </Avatar>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-semibold text-foreground truncate">

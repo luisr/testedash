@@ -72,7 +72,7 @@ export default function KPICards({ metrics, dashboardId, activities, projects, o
         <h2 className="text-xl font-semibold text-foreground">KPIs do Dashboard</h2>
         <Dialog open={isKPIManagerOpen} onOpenChange={setIsKPIManagerOpen}>
           <DialogTrigger asChild>
-            <Button variant="outline" className="flex items-center gap-2">
+            <Button variant="outline" className="flex items-center gap-2 hover-lift">
               <Plus className="w-4 h-4" />
               Criar KPI
             </Button>
@@ -110,16 +110,16 @@ export default function KPICards({ metrics, dashboardId, activities, projects, o
                   {kpi.value}
                 </p>
               </div>
-              <div className={`w-14 h-14 ${kpi.bgColor} rounded-xl flex items-center justify-center group-hover:scale-105 transition-transform`}>
+              <div className={`w-14 h-14 bg-gradient-to-br from-primary/20 to-accent/20 rounded-xl flex items-center justify-center group-hover:scale-105 transition-transform shadow-elegant`}>
                 <kpi.icon className={`w-7 h-7 ${kpi.iconColor}`} />
               </div>
             </div>
             <div className="mt-6 pt-4 border-t border-border/50 flex items-center justify-between">
               <div className="flex items-center space-x-2">
-                <span className={`text-sm font-semibold px-2 py-1 rounded-full ${
+                <span className={`status-badge ${
                   kpi.trendUp 
-                    ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-400' 
-                    : 'bg-amber-100 text-amber-700 dark:bg-amber-900/20 dark:text-amber-400'
+                    ? 'status-completed' 
+                    : 'status-delayed'
                 }`}>
                   {kpi.trend}
                 </span>
