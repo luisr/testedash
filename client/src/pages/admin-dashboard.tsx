@@ -27,11 +27,7 @@ import {
   Filter
 } from "lucide-react";
 import beachParkLogo from "@assets/pngegg_1752264509099.png";
-// Temporarily removing imports to fix loading issues
-// import NewUserModal from "@/components/dashboard/new-user-modal";
-// import NewProjectModal from "@/components/dashboard/new-project-modal";
-// import EditUserModal from "@/components/dashboard/edit-user-modal";
-// import ChangePasswordModal from "@/components/auth/change-password-modal";
+// Components will be added back once loading issues are resolved
 
 interface User {
   id: number;
