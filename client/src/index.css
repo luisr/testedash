@@ -91,26 +91,34 @@ body {
   min-height: 100vh;
 }
 
-/* Force Apple colors to override any existing themes */
+/* Force modern theme colors to override any existing themes */
 html {
-  background-color: hsl(var(--background)) !important;
+  background: linear-gradient(135deg, hsl(var(--background)) 0%, hsl(var(--muted)) 100%) !important;
+  min-height: 100vh;
 }
 
 #root {
-  background-color: hsl(var(--background)) !important;
+  background: linear-gradient(135deg, hsl(var(--background)) 0%, hsl(var(--muted)) 100%) !important;
   color: hsl(var(--foreground)) !important;
+  min-height: 100vh;
 }
 
 /* Override any conflicting background colors */
 .bg-muted\/30,
 .bg-muted,
 .bg-background {
-  background-color: hsl(var(--background)) !important;
+  background: rgba(255, 255, 255, 0.5) !important;
+}
+
+.dark .bg-muted\/30,
+.dark .bg-muted,
+.dark .bg-background {
+  background: rgba(15, 23, 42, 0.5) !important;
 }
 
 /* Force removal of any yellow/amber backgrounds */
 body, html, #root, .min-h-screen, main {
-  background-color: hsl(var(--background)) !important;
+  background: linear-gradient(135deg, hsl(var(--background)) 0%, hsl(var(--muted)) 100%) !important;
 }
 
 /* Specific overrides for problem areas */
@@ -120,7 +128,7 @@ body, html, #root, .min-h-screen, main {
 .bg-amber-100,
 .bg-yellow-100,
 .bg-orange-100 {
-  background-color: hsl(var(--secondary)) !important;
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(245, 158, 11, 0.05) 100%) !important;
 }
 
 .dark .bg-amber-900,
@@ -129,12 +137,88 @@ body, html, #root, .min-h-screen, main {
 .dark .bg-amber-800,
 .dark .bg-yellow-800,
 .dark .bg-orange-800 {
-  background-color: hsl(var(--secondary)) !important;
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.2) 0%, rgba(245, 158, 11, 0.1) 100%) !important;
+}
+
+/* Force all elements to use the new design */
+* {
+  box-sizing: border-box !important;
+}
+
+/* Add modern gradient text effects */
+.gradient-text {
+  background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--accent)) 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+}
+
+/* Force override for all existing styles */
+.main-container,
+.dashboard-container,
+[class*="dashboard"],
+[class*="main"] {
+  background: linear-gradient(135deg, hsl(var(--background)) 0%, hsl(var(--muted)) 100%) !important;
+  min-height: 100vh !important;
+}
+
+/* Override Tailwind defaults */
+.bg-white {
+  background: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(20px) !important;
+}
+
+.dark .bg-white {
+  background: rgba(15, 23, 42, 0.95) !important;
+  backdrop-filter: blur(20px) !important;
+}
+
+.bg-gray-50,
+.bg-slate-50 {
+  background: rgba(248, 250, 252, 0.8) !important;
+  backdrop-filter: blur(10px) !important;
+}
+
+.dark .bg-gray-50,
+.dark .bg-slate-50 {
+  background: rgba(30, 41, 59, 0.8) !important;
+  backdrop-filter: blur(10px) !important;
+}
+
+/* Global background force override */
+body *,
+#root *,
+[data-theme] *,
+.min-h-screen,
+.h-screen {
+  background-color: unset !important;
+}
+
+/* Ensure main containers use gradient */
+.flex.h-screen,
+.min-h-screen,
+main,
+.main-container {
+  background: linear-gradient(135deg, hsl(var(--background)) 0%, hsl(var(--muted)) 100%) !important;
+}
+
+/* Force apply new theme immediately */
+body.loading,
+body.loading *,
+.loading * {
+  background: linear-gradient(135deg, hsl(var(--background)) 0%, hsl(var(--muted)) 100%) !important;
+}
+
+/* Important: Override all existing background colors */
+[style*="background"],
+[class*="bg-"] {
+  background: unset !important;
 }
 
 /* Modern Glass-morphism Cards */
 .card,
-[class*="card"] {
+[class*="card"],
+[data-radix-popper-content-wrapper] .card {
   background: rgba(255, 255, 255, 0.95) !important;
   backdrop-filter: blur(20px) !important;
   border: 1px solid rgba(255, 255, 255, 0.2) !important;
@@ -144,7 +228,8 @@ body, html, #root, .min-h-screen, main {
 }
 
 .dark .card,
-.dark [class*="card"] {
+.dark [class*="card"],
+.dark [data-radix-popper-content-wrapper] .card {
   background: rgba(15, 23, 42, 0.95) !important;
   backdrop-filter: blur(20px) !important;
   border: 1px solid rgba(255, 255, 255, 0.1) !important;
@@ -160,7 +245,8 @@ body, html, #root, .min-h-screen, main {
 /* Modern Gradient Buttons */
 .btn-primary,
 .bg-primary,
-button[class*="primary"] {
+button[class*="primary"],
+button[data-variant="default"] {
   background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--accent)) 100%) !important;
   color: hsl(var(--primary-foreground)) !important;
   border-radius: 12px !important;
@@ -172,7 +258,8 @@ button[class*="primary"] {
 
 .btn-primary:hover,
 .bg-primary:hover,
-button[class*="primary"]:hover {
+button[class*="primary"]:hover,
+button[data-variant="default"]:hover {
   transform: translateY(-1px) !important;
   box-shadow: 0 6px 20px rgba(59, 130, 246, 0.5) !important;
   background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--accent)) 100%) !important;
@@ -246,7 +333,8 @@ textarea {
 }
 
 /* Modern KPI Cards */
-.kpi-card {
+.kpi-card,
+[class*="kpi-card"] {
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 250, 252, 0.9) 100%) !important;
   backdrop-filter: blur(20px) !important;
   border: 1px solid rgba(255, 255, 255, 0.3) !important;
@@ -255,26 +343,31 @@ textarea {
   transition: all 0.3s ease !important;
 }
 
-.dark .kpi-card {
+.dark .kpi-card,
+.dark [class*="kpi-card"] {
   background: linear-gradient(135deg, rgba(15, 23, 42, 0.9) 0%, rgba(30, 41, 59, 0.9) 100%) !important;
   border: 1px solid rgba(255, 255, 255, 0.1) !important;
 }
 
-.kpi-card:hover {
+.kpi-card:hover,
+[class*="kpi-card"]:hover {
   transform: translateY(-4px) scale(1.02) !important;
   box-shadow: 0 16px 50px rgba(0, 0, 0, 0.2) !important;
 }
 
 /* Table Enhancements */
-.table-container {
+.table-container,
+[class*="table-container"] {
   background: rgba(255, 255, 255, 0.95) !important;
   backdrop-filter: blur(20px) !important;
   border-radius: 16px !important;
   overflow: hidden !important;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
 }
 
-.dark .table-container {
+.dark .table-container,
+.dark [class*="table-container"] {
   background: rgba(15, 23, 42, 0.95) !important;
   border: 1px solid rgba(255, 255, 255, 0.1) !important;
 }
