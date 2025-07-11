@@ -78,7 +78,13 @@ export default function CreateSubActivityModal({
       const response = await apiRequest('POST', `/api/activities/${parentActivity.id}/sub-activity`, subActivityData);
 
       // Invalidar apenas as queries relacionadas a atividades (não recarrega o dashboard)
+      console.log('Invalidating queries for dashboardId:', parentActivity.dashboardId);
       await queryClient.invalidateQueries({ 
+        queryKey: ['/api/activities/dashboard', parentActivity.dashboardId] 
+      });
+      
+      // Forçar refresh das queries para garantir que a tabela seja atualizada
+      await queryClient.refetchQueries({ 
         queryKey: ['/api/activities/dashboard', parentActivity.dashboardId] 
       });
       

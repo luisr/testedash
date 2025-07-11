@@ -71,9 +71,15 @@ export default function DependencyManager({ dashboardId, activities, trigger }: 
       if (data) {
         setDependencies([...dependencies, data]);
         
-        // Invalidar apenas as queries relacionadas a dependências (não recarrega o dashboard)
+        // Invalidar queries relacionadas a dependências E atividades
+        console.log('Invalidating dependency queries for dashboardId:', dashboardId);
         await queryClient.invalidateQueries({ 
           queryKey: ['/api/dashboards', dashboardId, 'dependencies'] 
+        });
+        
+        // Também invalidar atividades pois as dependências afetam a visualização
+        await queryClient.refetchQueries({ 
+          queryKey: ['/api/activities/dashboard', dashboardId] 
         });
         
         toast({
@@ -97,9 +103,15 @@ export default function DependencyManager({ dashboardId, activities, trigger }: 
 
       setDependencies(dependencies.filter(dep => dep.id !== dependencyId));
       
-      // Invalidar apenas as queries relacionadas a dependências (não recarrega o dashboard)
+      // Invalidar queries relacionadas a dependências E atividades
+      console.log('Invalidating dependency queries for dashboardId:', dashboardId);
       await queryClient.invalidateQueries({ 
         queryKey: ['/api/dashboards', dashboardId, 'dependencies'] 
+      });
+      
+      // Também invalidar atividades pois as dependências afetam a visualização
+      await queryClient.refetchQueries({ 
+        queryKey: ['/api/activities/dashboard', dashboardId] 
       });
       
       toast({
