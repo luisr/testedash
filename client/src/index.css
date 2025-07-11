@@ -329,3 +329,107 @@ body, html, #root, .min-h-screen, main, div {
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
+
+/* ===== FORCE APPLE THEME - OVERRIDE ALL EXISTING STYLES ===== */
+* {
+  --background: 255 255 255 !important;
+  --foreground: 28 28 30 !important;
+  --card: 255 255 255 !important;
+  --card-foreground: 28 28 30 !important;
+  --popover: 255 255 255 !important;
+  --popover-foreground: 28 28 30 !important;
+  --primary: 0 122 255 !important;
+  --primary-foreground: 255 255 255 !important;
+  --secondary: 246 246 246 !important;
+  --secondary-foreground: 28 28 30 !important;
+  --muted: 246 246 246 !important;
+  --muted-foreground: 142 142 147 !important;
+  --accent: 246 246 246 !important;
+  --accent-foreground: 28 28 30 !important;
+  --destructive: 255 59 48 !important;
+  --destructive-foreground: 255 255 255 !important;
+  --border: 229 229 234 !important;
+  --input: 242 242 247 !important;
+  --ring: 0 122 255 !important;
+}
+
+.dark * {
+  --background: 0 0 0 !important;
+  --foreground: 255 255 255 !important;
+  --card: 28 28 30 !important;
+  --card-foreground: 255 255 255 !important;
+  --popover: 28 28 30 !important;
+  --popover-foreground: 255 255 255 !important;
+  --primary: 10 132 255 !important;
+  --primary-foreground: 255 255 255 !important;
+  --secondary: 44 44 46 !important;
+  --secondary-foreground: 255 255 255 !important;
+  --muted: 44 44 46 !important;
+  --muted-foreground: 174 174 178 !important;
+  --accent: 44 44 46 !important;
+  --accent-foreground: 255 255 255 !important;
+  --destructive: 255 69 58 !important;
+  --destructive-foreground: 255 255 255 !important;
+  --border: 58 58 60 !important;
+  --input: 44 44 46 !important;
+  --ring: 10 132 255 !important;
+}
+
+/* Force body and root backgrounds */
+body, #root {
+  background-color: rgb(255, 255, 255) !important;
+  color: rgb(28, 28, 30) !important;
+}
+
+.dark body, .dark #root {
+  background-color: rgb(0, 0, 0) !important;
+  color: rgb(255, 255, 255) !important;
+}
+
+/* Force primary colors to Apple blue */
+.bg-primary {
+  background-color: rgb(0, 122, 255) !important;
+}
+
+.dark .bg-primary {
+  background-color: rgb(10, 132, 255) !important;
+}
+
+.text-primary {
+  color: rgb(0, 122, 255) !important;
+}
+
+.dark .text-primary {
+  color: rgb(10, 132, 255) !important;
+}
+
+.border-primary {
+  border-color: rgb(0, 122, 255) !important;
+}
+
+.dark .border-primary {
+  border-color: rgb(10, 132, 255) !important;
+}
+
+/* Force button styling */
+.btn-primary, button[class*="primary"] {
+  background-color: rgb(0, 122, 255) !important;
+  border-color: rgb(0, 122, 255) !important;
+  color: white !important;
+}
+
+.dark .btn-primary, .dark button[class*="primary"] {
+  background-color: rgb(10, 132, 255) !important;
+  border-color: rgb(10, 132, 255) !important;
+}
+
+/* Force card styling */
+.bg-card, [class*="card"] {
+  background-color: rgb(255, 255, 255) !important;
+  border-color: rgb(229, 229, 234) !important;
+}
+
+.dark .bg-card, .dark [class*="card"] {
+  background-color: rgb(28, 28, 30) !important;
+  border-color: rgb(58, 58, 60) !important;
+}
