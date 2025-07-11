@@ -12,7 +12,10 @@ import {
   type NotificationPreferences, type InsertNotificationPreferences,
   type DashboardBackup, type InsertDashboardBackup, type DashboardVersion, type InsertDashboardVersion,
   type BackupSchedule, type InsertBackupSchedule, type ActivityDependency, type InsertActivityDependency,
-  type ActivityConstraint, type InsertActivityConstraint
+  type ActivityConstraint, type InsertActivityConstraint,
+  customStatuses, customKPIs,
+  type CustomStatus, type CustomKPI,
+  type InsertCustomStatus, type InsertCustomKPI
 } from "@shared/schema";
 
 // Check if DATABASE_URL is properly configured or build from individual components
@@ -793,6 +796,68 @@ export class DatabaseStorage implements IStorage {
     } catch (error) {
       console.error('Error getting dashboard users:', error);
       return [];
+    }
+  }
+
+  // Custom Status methods
+  async getCustomStatuses(dashboardId: number): Promise<CustomStatus[]> {
+    if (!db) return [];
+    try {
+      return await db.select().from(customStatuses).where(eq(customStatuses.dashboardId, dashboardId));
+    } catch (error) {
+      console.error('Error getting custom statuses:', error);
+      return [];
+    }
+  }
+
+  async createCustomStatus(data: InsertCustomStatus): Promise<CustomStatus> {
+    if (!db) throw new Error('Database not available');
+    try {
+      const result = await db.insert(customStatuses).values(data).returning();
+      return result[0];
+    } catch (error) {
+      console.error('Error creating custom status:', error);
+      throw error;
+    }
+  }
+
+  async deleteCustomStatuses(dashboardId: number): Promise<void> {
+    if (!db) return;
+    try {
+      await db.delete(customStatuses).where(eq(customStatuses.dashboardId, dashboardId));
+    } catch (error) {
+      console.error('Error deleting custom statuses:', error);
+    }
+  }
+
+  // Custom KPI methods
+  async getCustomKPIs(dashboardId: number): Promise<CustomKPI[]> {
+    if (!db) return [];
+    try {
+      return await db.select().from(customKPIs).where(eq(customKPIs.dashboardId, dashboardId));
+    } catch (error) {
+      console.error('Error getting custom KPIs:', error);
+      return [];
+    }
+  }
+
+  async createCustomKPI(data: InsertCustomKPI): Promise<CustomKPI> {
+    if (!db) throw new Error('Database not available');
+    try {
+      const result = await db.insert(customKPIs).values(data).returning();
+      return result[0];
+    } catch (error) {
+      console.error('Error creating custom KPI:', error);
+      throw error;
+    }
+  }
+
+  async deleteCustomKPI(id: number): Promise<void> {
+    if (!db) return;
+    try {
+      await db.delete(customKPIs).where(eq(customKPIs.id, id));
+    } catch (error) {
+      console.error('Error deleting custom KPI:', error);
     }
   }
 

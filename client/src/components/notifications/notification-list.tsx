@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { useNotifications } from "@/hooks/use-notifications";
 import { formatDate } from "@/lib/utils";
-import { Check, CheckCheck, Trash2, X } from "lucide-react";
+import { Check, CheckCheck, Trash2, X, Bell } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { Notification } from "@shared/schema";
 

@@ -1098,6 +1098,82 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Migration endpoint for custom features
+  app.post("/api/migrate-custom-features", async (req, res) => {
+    try {
+      console.log('🔄 Starting custom features migration...');
+      
+      // Get database connection
+      let connectionString = process.env.DATABASE_URL;
+      if (!connectionString || !connectionString.startsWith('postgresql://')) {
+        const { PGUSER, PGPASSWORD, PGHOST, PGPORT, PGDATABASE } = process.env;
+        if (PGUSER && PGPASSWORD && PGHOST && PGPORT && PGDATABASE) {
+          connectionString = `postgresql://${PGUSER}:${PGPASSWORD}@${PGHOST}:${PGPORT}/${PGDATABASE}?sslmode=require`;
+        }
+      }
+      
+      if (!connectionString) {
+        throw new Error('Database connection not configured');
+      }
+      
+      const client = postgres(connectionString);
+      const db = drizzle(client);
+      
+      // Create custom_statuses table
+      await db.execute(sql`
+        CREATE TABLE IF NOT EXISTS custom_statuses (
+          id SERIAL PRIMARY KEY,
+          dashboard_id INTEGER NOT NULL REFERENCES dashboards(id),
+          name TEXT NOT NULL,
+          label TEXT NOT NULL,
+          color TEXT NOT NULL,
+          background_color TEXT NOT NULL,
+          border_color TEXT NOT NULL,
+          is_default BOOLEAN DEFAULT false NOT NULL,
+          is_active BOOLEAN DEFAULT true NOT NULL,
+          "order" INTEGER DEFAULT 1 NOT NULL,
+          description TEXT,
+          created_at TIMESTAMP DEFAULT NOW() NOT NULL
+        );
+      `);
+      
+      // Create custom_kpis table
+      await db.execute(sql`
+        CREATE TABLE IF NOT EXISTS custom_kpis (
+          id SERIAL PRIMARY KEY,
+          dashboard_id INTEGER NOT NULL REFERENCES dashboards(id),
+          name TEXT NOT NULL,
+          description TEXT,
+          data_source TEXT NOT NULL,
+          field TEXT NOT NULL,
+          aggregation TEXT NOT NULL,
+          filters JSONB DEFAULT '[]' NOT NULL,
+          icon TEXT NOT NULL,
+          color TEXT NOT NULL,
+          format TEXT NOT NULL,
+          target DECIMAL,
+          target_comparison TEXT DEFAULT 'gt' NOT NULL,
+          is_active BOOLEAN DEFAULT true NOT NULL,
+          "order" INTEGER DEFAULT 1 NOT NULL,
+          size TEXT DEFAULT 'medium' NOT NULL,
+          created_at TIMESTAMP DEFAULT NOW() NOT NULL
+        );
+      `);
+      
+      // Create indexes for better performance
+      await db.execute(sql`CREATE INDEX IF NOT EXISTS idx_custom_statuses_dashboard ON custom_statuses(dashboard_id);`);
+      await db.execute(sql`CREATE INDEX IF NOT EXISTS idx_custom_kpis_dashboard ON custom_kpis(dashboard_id);`);
+      
+      await client.end();
+      console.log('✅ Custom features migration completed successfully!');
+      res.json({ success: true, message: 'Custom features migration completed successfully' });
+      
+    } catch (error) {
+      console.error('❌ Error during custom features migration:', error);
+      res.status(500).json({ error: 'Migration failed', details: (error as Error).message });
+    }
+  });
+
   // Temporary migration endpoint
   app.post("/api/migrate-dependencies", async (req, res) => {
     try {
@@ -1189,6 +1265,72 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('❌ Error during migration:', error);
       res.status(500).json({ error: 'Migration failed', details: (error as Error).message });
+    }
+  });
+
+  // Custom Status routes
+  app.get("/api/custom-statuses/:dashboardId", async (req, res) => {
+    try {
+      const dashboardId = parseInt(req.params.dashboardId);
+      const customStatuses = await storage.getCustomStatuses(dashboardId);
+      res.json(customStatuses);
+    } catch (error) {
+      console.error("Error fetching custom statuses:", error);
+      res.status(500).json({ error: "Failed to fetch custom statuses" });
+    }
+  });
+
+  app.post("/api/custom-statuses/:dashboardId", async (req, res) => {
+    try {
+      const dashboardId = parseInt(req.params.dashboardId);
+      const statuses = req.body;
+      
+      // Delete existing custom statuses for this dashboard
+      await storage.deleteCustomStatuses(dashboardId);
+      
+      // Insert new custom statuses
+      for (const status of statuses) {
+        await storage.createCustomStatus({ ...status, dashboardId });
+      }
+      
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error saving custom statuses:", error);
+      res.status(500).json({ error: "Failed to save custom statuses" });
+    }
+  });
+
+  // Custom KPI routes
+  app.get("/api/custom-kpis/:dashboardId", async (req, res) => {
+    try {
+      const dashboardId = parseInt(req.params.dashboardId);
+      const customKPIs = await storage.getCustomKPIs(dashboardId);
+      res.json(customKPIs);
+    } catch (error) {
+      console.error("Error fetching custom KPIs:", error);
+      res.status(500).json({ error: "Failed to fetch custom KPIs" });
+    }
+  });
+
+  app.post("/api/custom-kpis", async (req, res) => {
+    try {
+      const kpiData = req.body;
+      const kpi = await storage.createCustomKPI(kpiData);
+      res.json(kpi);
+    } catch (error) {
+      console.error("Error creating custom KPI:", error);
+      res.status(500).json({ error: "Failed to create custom KPI" });
+    }
+  });
+
+  app.delete("/api/custom-kpis/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      await storage.deleteCustomKPI(id);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting custom KPI:", error);
+      res.status(500).json({ error: "Failed to delete custom KPI" });
     }
   });
 

@@ -239,6 +239,43 @@ export const activityConstraints = pgTable("activity_constraints", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// Custom Status Configuration
+export const customStatuses = pgTable("custom_statuses", {
+  id: serial("id").primaryKey(),
+  dashboardId: integer("dashboard_id").references(() => dashboards.id).notNull(),
+  name: text("name").notNull(),
+  label: text("label").notNull(),
+  color: text("color").notNull(),
+  backgroundColor: text("background_color").notNull(),
+  borderColor: text("border_color").notNull(),
+  isDefault: boolean("is_default").default(false).notNull(),
+  isActive: boolean("is_active").default(true).notNull(),
+  order: integer("order").default(1).notNull(),
+  description: text("description"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// Custom KPIs
+export const customKPIs = pgTable("custom_kpis", {
+  id: serial("id").primaryKey(),
+  dashboardId: integer("dashboard_id").references(() => dashboards.id).notNull(),
+  name: text("name").notNull(),
+  description: text("description"),
+  dataSource: text("data_source").notNull(), // activities, projects, custom
+  field: text("field").notNull(),
+  aggregation: text("aggregation").notNull(), // count, sum, avg, min, max, percentage
+  filters: jsonb("filters").default('[]').notNull(),
+  icon: text("icon").notNull(),
+  color: text("color").notNull(),
+  format: text("format").notNull(), // number, currency, percentage, days
+  target: decimal("target"),
+  targetComparison: text("target_comparison").default('gt').notNull(),
+  isActive: boolean("is_active").default(true).notNull(),
+  order: integer("order").default(1).notNull(),
+  size: text("size").default('medium').notNull(), // small, medium, large
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).omit({ id: true, createdAt: true, updatedAt: true });
 export const insertDashboardSchema = createInsertSchema(dashboards).omit({ id: true, createdAt: true, updatedAt: true });
@@ -255,6 +292,8 @@ export const insertDashboardVersionSchema = createInsertSchema(dashboardVersions
 export const insertBackupScheduleSchema = createInsertSchema(backupSchedules).omit({ id: true, createdAt: true, updatedAt: true, lastRun: true, nextRun: true });
 export const insertActivityDependencySchema = createInsertSchema(activityDependencies).omit({ id: true, createdAt: true, updatedAt: true });
 export const insertActivityConstraintSchema = createInsertSchema(activityConstraints).omit({ id: true, createdAt: true, updatedAt: true });
+export const insertCustomStatusSchema = createInsertSchema(customStatuses).omit({ id: true, createdAt: true });
+export const insertCustomKPISchema = createInsertSchema(customKPIs).omit({ id: true, createdAt: true });
 
 // Types
 export type User = typeof users.$inferSelect;
@@ -287,3 +326,7 @@ export type ActivityDependency = typeof activityDependencies.$inferSelect;
 export type InsertActivityDependency = z.infer<typeof insertActivityDependencySchema>;
 export type ActivityConstraint = typeof activityConstraints.$inferSelect;
 export type InsertActivityConstraint = z.infer<typeof insertActivityConstraintSchema>;
+export type CustomStatus = typeof customStatuses.$inferSelect;
+export type InsertCustomStatus = z.infer<typeof insertCustomStatusSchema>;
+export type CustomKPI = typeof customKPIs.$inferSelect;
+export type InsertCustomKPI = z.infer<typeof insertCustomKPISchema>;
