@@ -1,6 +1,7 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+import { setupBackupTables } from "./setup-backup-tables";
 
 const app = express();
 app.use(express.json());
@@ -37,6 +38,13 @@ app.use((req, res, next) => {
 });
 
 (async () => {
+  // Setup backup tables first
+  try {
+    await setupBackupTables();
+  } catch (error) {
+    console.error('Failed to setup backup tables:', error);
+  }
+  
   const server = await registerRoutes(app);
 
   // Initialize WebSocket notification service
