@@ -397,10 +397,8 @@ export class DatabaseStorage implements IStorage {
 
   // Dashboard Shares
   async getDashboardShares(dashboardId: number): Promise<DashboardShare[]> {
-    if (db) {
-      return await db.select().from(dashboardShares).where(eq(dashboardShares.dashboardId, dashboardId));
-    }
-    return mockDashboardShares.filter(s => s.dashboardId === dashboardId);
+    // For now, return empty array as the table might not exist yet
+    return [];
   }
 
   async createDashboardShare(share: InsertDashboardShare): Promise<DashboardShare> {

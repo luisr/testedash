@@ -468,6 +468,53 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.post("/api/custom-columns", async (req, res) => {
+    try {
+      const columnData = insertCustomColumnSchema.parse(req.body);
+      const column = await storage.createCustomColumn(columnData);
+      res.status(201).json(column);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid input", errors: error.errors });
+      }
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.put("/api/custom-columns/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const columnData = insertCustomColumnSchema.partial().parse(req.body);
+      const column = await storage.updateCustomColumn(id, columnData);
+      
+      if (!column) {
+        return res.status(404).json({ message: "Column not found" });
+      }
+      
+      res.json(column);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid input", errors: error.errors });
+      }
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.delete("/api/custom-columns/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const deleted = await storage.deleteCustomColumn(id);
+      
+      if (!deleted) {
+        return res.status(404).json({ message: "Column not found" });
+      }
+      
+      res.json({ message: "Column deleted successfully" });
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   app.post("/api/custom-charts", async (req, res) => {
     try {
       const chartData = insertCustomChartSchema.parse(req.body);

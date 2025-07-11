@@ -170,6 +170,25 @@ export default function Dashboard() {
     }
   };
 
+  // Bulk import handler
+  const handleBulkImport = async (activities: any[]) => {
+    try {
+      const importPromises = activities.map(activityData => 
+        createActivity(activityData)
+      );
+      
+      await Promise.all(importPromises);
+      
+      // Refresh the data
+      window.location.reload();
+      
+      return { success: true, count: activities.length };
+    } catch (error) {
+      console.error('Error importing activities:', error);
+      throw error;
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -270,14 +289,6 @@ export default function Dashboard() {
                 <Plus className="h-4 w-4" />
                 Nova Atividade
               </Button>
-              <Button
-                onClick={() => setModalType('import')}
-                variant="outline"
-                className="flex items-center gap-2"
-              >
-                <Upload className="h-4 w-4" />
-                Importar
-              </Button>
             </div>
           </div>
 
@@ -303,6 +314,10 @@ export default function Dashboard() {
             onEndDateChange={setEndDate}
             onActivityUpdate={updateActivity}
             onActivityDelete={deleteActivity}
+            onActivitiesImport={handleBulkImport}
+            onCustomColumnsUpdate={() => window.location.reload()}
+            onExport={handleExport}
+            dashboardId={dashboardId}
           />
         </main>
       </div>

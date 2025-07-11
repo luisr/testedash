@@ -22,6 +22,8 @@ import {
   Trash2 
 } from "lucide-react";
 import { Activity } from "@shared/schema";
+import TableConfigModal from "./table-config-modal";
+import EditActivityModal from "./edit-activity-modal";
 
 interface ActivityTableProps {
   activities: Activity[];
@@ -38,6 +40,10 @@ interface ActivityTableProps {
   onEndDateChange: (value: string) => void;
   onActivityUpdate: (id: number, data: Partial<Activity>) => void;
   onActivityDelete: (id: number) => void;
+  onActivitiesImport: (activities: any[]) => void;
+  onCustomColumnsUpdate: () => void;
+  onExport: (options: any) => void;
+  dashboardId: number;
 }
 
 export default function ActivityTable({ 
@@ -54,9 +60,16 @@ export default function ActivityTable({
   endDate,
   onEndDateChange,
   onActivityUpdate,
-  onActivityDelete
+  onActivityDelete,
+  onActivitiesImport,
+  onCustomColumnsUpdate,
+  onExport,
+  dashboardId
 }: ActivityTableProps) {
   const [currentPage, setCurrentPage] = useState(1);
+  const [configModalOpen, setConfigModalOpen] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null);
   const itemsPerPage = 10;
   
   const totalPages = Math.ceil(activities.length / itemsPerPage);
@@ -112,7 +125,12 @@ export default function ActivityTable({
             <Button variant="ghost" size="icon" className="hover-lift focus-ring">
               <Filter className="w-5 h-5" />
             </Button>
-            <Button variant="ghost" size="icon" className="hover-lift focus-ring">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="hover-lift focus-ring"
+              onClick={() => setConfigModalOpen(true)}
+            >
               <Settings className="w-5 h-5" />
             </Button>
           </div>
@@ -207,6 +225,10 @@ export default function ActivityTable({
                         variant="ghost"
                         size="icon"
                         className="text-primary hover:text-primary/80 hover-lift focus-ring h-8 w-8"
+                        onClick={() => {
+                          setSelectedActivity(activity);
+                          setEditModalOpen(true);
+                        }}
                       >
                         <Edit2 className="w-4 h-4" />
                       </Button>
@@ -286,6 +308,25 @@ export default function ActivityTable({
           </nav>
         </div>
       </CardContent>
+      
+      {/* Modals */}
+      <TableConfigModal
+        isOpen={configModalOpen}
+        onClose={() => setConfigModalOpen(false)}
+        dashboardId={dashboardId}
+        customColumns={customColumns}
+        activities={activities}
+        onCustomColumnsUpdate={onCustomColumnsUpdate}
+        onActivitiesImport={onActivitiesImport}
+        onExport={onExport}
+      />
+      
+      <EditActivityModal
+        isOpen={editModalOpen}
+        onClose={() => setEditModalOpen(false)}
+        activity={selectedActivity}
+        onSave={onActivityUpdate}
+      />
     </Card>
   );
 }
