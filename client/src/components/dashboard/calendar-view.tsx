@@ -64,9 +64,9 @@ export default function CalendarView({ activities, onUpdateActivity }: CalendarV
 
   const getActivitiesForDate = (date: Date) => {
     const dateStr = date.toISOString().split('T')[0];
-    return activities.filter(activity => {
-      const startDate = activity.plannedStartDate ? new Date(activity.plannedStartDate).toISOString().split('T')[0] : null;
-      const endDate = activity.plannedEndDate ? new Date(activity.plannedEndDate).toISOString().split('T')[0] : null;
+    return (activities || []).filter(activity => {
+      const startDate = activity?.plannedStartDate ? new Date(activity.plannedStartDate).toISOString().split('T')[0] : null;
+      const endDate = activity?.plannedEndDate ? new Date(activity.plannedEndDate).toISOString().split('T')[0] : null;
       
       return startDate === dateStr || endDate === dateStr;
     });

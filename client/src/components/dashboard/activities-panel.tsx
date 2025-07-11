@@ -13,7 +13,7 @@ import {
   DropdownMenuSeparator
 } from '@/components/ui/dropdown-menu';
 import HierarchicalActivities from './hierarchical-activities';
-import ActivityTable from './activity-table';
+import SimpleActivityTable from './simple-activity-table';
 import DependencyManager from './dependency-manager';
 import { Activity } from '@/../shared/schema';
 
@@ -198,11 +198,11 @@ const ActivitiesPanel: React.FC<ActivitiesPanelProps> = ({
           </TabsContent>
           
           <TabsContent value="table" className="space-y-4">
-            <ActivityTable
+            <SimpleActivityTable
               activities={filteredActivities}
-              customColumns={customColumns}
-              searchTerm={searchTerm}
-              onSearchChange={onSearchChange}
+              onUpdateActivity={onUpdateActivity}
+              onDeleteActivity={onDeleteActivity}
+              onEditActivity={onEditActivity}
             />
           </TabsContent>
         </Tabs>

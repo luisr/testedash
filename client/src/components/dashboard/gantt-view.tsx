@@ -43,11 +43,11 @@ export default function GanttView({ activities, onUpdateActivity }: GanttViewPro
     let minDate = new Date();
     let maxDate = new Date();
     
-    activities.forEach(activity => {
-      const startDate = activity.plannedStartDate ? new Date(activity.plannedStartDate) : new Date();
-      const endDate = activity.plannedEndDate ? new Date(activity.plannedEndDate) : new Date();
-      const baselineStart = activity.baselineStartDate ? new Date(activity.baselineStartDate) : undefined;
-      const baselineEnd = activity.baselineEndDate ? new Date(activity.baselineEndDate) : undefined;
+    (activities || []).forEach(activity => {
+      const startDate = activity?.plannedStartDate ? new Date(activity.plannedStartDate) : new Date();
+      const endDate = activity?.plannedEndDate ? new Date(activity.plannedEndDate) : new Date();
+      const baselineStart = activity?.baselineStartDate ? new Date(activity.baselineStartDate) : undefined;
+      const baselineEnd = activity?.baselineEndDate ? new Date(activity.baselineEndDate) : undefined;
       
       if (startDate < minDate) minDate = startDate;
       if (endDate > maxDate) maxDate = endDate;

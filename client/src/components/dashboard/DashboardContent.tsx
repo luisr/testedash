@@ -139,43 +139,26 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({
         onChartsUpdate={() => window.location.reload()}
       />
 
-      {/* Activity Table */}
-      <ActivityTable 
+      {/* Activities Panel with Multiple Views */}
+      <ActivitiesPanel 
         activities={activities}
-        customColumns={customColumns}
+        dashboardId={dashboardId}
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
-        filterStatus={filterStatus}
-        onFilterStatusChange={setFilterStatus}
-        filterResponsible={filterResponsible}
-        onFilterResponsibleChange={setFilterResponsible}
-        startDate={startDate}
-        onStartDateChange={setStartDate}
-        endDate={endDate}
-        onEndDateChange={setEndDate}
-        onActivityUpdate={updateActivity}
-        onActivityDelete={deleteActivity}
-        onActivitiesImport={() => {}}
-        onCustomColumnsUpdate={() => window.location.reload()}
-        onExport={() => {}}
-        dashboardId={dashboardId}
-        isReadOnly={isConsolidatedDashboard}
+        onNewActivity={createActivity}
+        onUpdateActivity={updateActivity}
+        onDeleteActivity={deleteActivity}
+        onEditActivity={() => {}}
+        onCreateSubActivity={() => {}}
+        onBulkImport={() => {}}
+        customColumns={customColumns}
       />
 
-      {/* Additional Panels */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <ActivitiesPanel 
-          activities={activities}
-          onActivityUpdate={updateActivity}
-          readOnly={isConsolidatedDashboard}
-        />
-        
-        <ProjectViews 
-          projects={projects}
-          dashboardId={dashboardId}
-          readOnly={isConsolidatedDashboard}
-        />
-      </div>
+      {/* Project Views */}
+      <ProjectViews 
+        activities={activities}
+        onUpdateActivity={updateActivity}
+      />
 
       {/* Backup Management - Only for regular dashboards */}
       {!isConsolidatedDashboard && (
