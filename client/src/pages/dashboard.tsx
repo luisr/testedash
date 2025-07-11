@@ -3,6 +3,7 @@ import { useParams } from "wouter";
 import { useDashboardData } from "@/hooks/use-dashboard-data";
 import { useActivityMetrics } from "@/hooks/use-activity-metrics";
 import { useNotifications, useWebSocketNotifications } from "@/hooks/use-notifications";
+import { useConsolidatedDashboard } from "@/hooks/use-consolidated-dashboard";
 import Sidebar from "@/components/dashboard/sidebar";
 import Header from "@/components/dashboard/header";
 import KPICards from "@/components/dashboard/kpi-cards";
@@ -36,7 +37,8 @@ import UsersModal from "@/components/dashboard/users-modal";
 export default function Dashboard() {
   const { id } = useParams<{ id?: string }>();
   const dashboardId = id ? parseInt(id) : 1; // Default to dashboard 1
-  const userId = 1; // TODO: Get from authentication
+  const userId = 5; // Luis Ribeiro user ID
+  const isConsolidatedDashboard = dashboardId === 1; // Dashboard 1 is consolidated read-only
   
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [shareModalOpen, setShareModalOpen] = useState(false);
@@ -81,6 +83,10 @@ export default function Dashboard() {
     }
   };
 
+  // Use consolidated dashboard for dashboard ID 1, regular dashboard for others
+  const regularDashboard = useDashboardData(dashboardId);
+  const consolidatedDashboard = useConsolidatedDashboard();
+  
   const {
     dashboard,
     activities,
@@ -94,16 +100,31 @@ export default function Dashboard() {
     updateActivity,
     deleteActivity,
     shareDashboard
-  } = useDashboardData(dashboardId);
+  } = isConsolidatedDashboard ? {
+    dashboard: { id: 1, name: "Dashboard Principal", description: "Visão consolidada de todos os projetos" },
+    activities: consolidatedDashboard.consolidatedData.activities,
+    projects: consolidatedDashboard.consolidatedData.projects,
+    customColumns: [],
+    customCharts: [],
+    activityLogs: [],
+    isLoading: consolidatedDashboard.isLoading,
+    error: consolidatedDashboard.error,
+    createActivity: () => Promise.resolve({} as any),
+    updateActivity: () => Promise.resolve({} as any),
+    deleteActivity: () => Promise.resolve(false),
+    shareDashboard: () => Promise.resolve({} as any)
+  } : regularDashboard;
 
-  const metrics = useActivityMetrics(
-    activities,
-    searchTerm,
-    filterStatus,
-    filterResponsible,
-    startDate,
-    endDate
-  );
+  const metrics = isConsolidatedDashboard 
+    ? consolidatedDashboard.metrics 
+    : useActivityMetrics(
+        activities,
+        searchTerm,
+        filterStatus,
+        filterResponsible,
+        startDate,
+        endDate
+      );
 
   // Define available columns for export
   const availableColumns = [
@@ -537,6 +558,7 @@ export default function Dashboard() {
             dashboardId={dashboardId}
             onNewActivity={() => setNewActivityModalOpen(true)}
             onManageDependencies={() => setDependencyModalOpen(true)}
+            isReadOnly={isConsolidatedDashboard}
           />
           
           <ProjectViews 

@@ -244,6 +244,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Consolidated dashboard data (read-only for dashboard ID 1)
+  app.get("/api/dashboard/consolidated", async (req, res) => {
+    try {
+      const consolidatedData = await storage.getConsolidatedDashboardData();
+      res.json(consolidatedData);
+    } catch (error) {
+      console.error("Error fetching consolidated dashboard data:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // Projects
   app.get("/api/projects/dashboard/:dashboardId", async (req, res) => {
     try {

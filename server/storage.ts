@@ -338,6 +338,88 @@ export class DatabaseStorage implements IStorage {
     return mockProjects.find(p => p.id === id);
   }
 
+  // Get consolidated dashboard data (all projects for default dashboard)
+  async getConsolidatedDashboardData(): Promise<{
+    projects: Project[];
+    activities: Activity[];
+    totalBudget: number;
+    totalActualCost: number;
+    totalActivities: number;
+    completedActivities: number;
+    projectsStats: any[];
+  }> {
+    if (!db) {
+      return {
+        projects: mockProjects,
+        activities: mockActivities,
+        totalBudget: 0,
+        totalActualCost: 0,
+        totalActivities: mockActivities.length,
+        completedActivities: mockActivities.filter(a => a.status === 'completed').length,
+        projectsStats: []
+      };
+    }
+
+    try {
+      // Get all projects
+      const allProjects = await db.select().from(projects);
+      
+      // Get all activities from all projects
+      const allActivities = await db.select().from(activities);
+      
+      // Calculate totals
+      const totalBudget = allProjects.reduce((sum, p) => sum + parseFloat(p.budget || '0'), 0);
+      const totalActualCost = allProjects.reduce((sum, p) => sum + parseFloat(p.actualCost || '0'), 0);
+      const totalActivities = allActivities.length;
+      const completedActivities = allActivities.filter(a => a.status === 'completed').length;
+      
+      // Get project stats
+      const projectsStats = await Promise.all(
+        allProjects.map(async (project) => {
+          const projectActivities = allActivities.filter(a => 
+            a.discipline === project.name || a.responsible === project.name
+          );
+          const completedCount = projectActivities.filter(a => a.status === 'completed').length;
+          const totalCount = projectActivities.length;
+          
+          return {
+            id: project.id,
+            name: project.name,
+            budget: parseFloat(project.budget || '0'),
+            actualCost: parseFloat(project.actualCost || '0'),
+            status: project.status,
+            totalActivities: totalCount,
+            completedActivities: completedCount,
+            progress: totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0,
+            startDate: project.startDate,
+            endDate: project.endDate
+          };
+        })
+      );
+      
+      return {
+        projects: allProjects,
+        activities: allActivities,
+        totalBudget,
+        totalActualCost,
+        totalActivities,
+        completedActivities,
+        projectsStats
+      };
+    } catch (error) {
+      console.error('Error getting consolidated dashboard data:', error);
+      return {
+        projects: [],
+        activities: [],
+        totalBudget: 0,
+        totalActualCost: 0,
+        totalActivities: 0,
+        completedActivities: 0,
+        projectsStats: []
+      };
+    }
+  }
+
   async getProjectsByDashboardId(dashboardId: number): Promise<Project[]> {
     if (db) {
       return await db.select().from(projects).where(eq(projects.dashboardId, dashboardId));

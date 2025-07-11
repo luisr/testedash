@@ -53,6 +53,7 @@ interface ActivityTableProps {
   dashboardId: number;
   onNewActivity?: () => void;
   onManageDependencies?: () => void;
+  isReadOnly?: boolean;
 }
 
 interface ActivityWithChildren extends Activity {
@@ -80,7 +81,8 @@ export default function ActivityTable({
   onExport,
   dashboardId,
   onNewActivity,
-  onManageDependencies
+  onManageDependencies,
+  isReadOnly = false
 }: ActivityTableProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [configModalOpen, setConfigModalOpen] = useState(false);
@@ -237,24 +239,28 @@ export default function ActivityTable({
                 className="pl-10 w-64 focus-ring"
               />
             </div>
-            <Button 
-              variant="default" 
-              size="sm"
-              className="hover-lift focus-ring"
-              onClick={onNewActivity}
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              Nova Atividade
-            </Button>
-            <Button 
-              variant="outline" 
-              size="sm"
-              className="hover-lift focus-ring"
-              onClick={onManageDependencies}
-            >
-              <GitBranch className="w-4 h-4 mr-2" />
-              Dependências
-            </Button>
+            {!isReadOnly && (
+              <Button 
+                variant="default" 
+                size="sm"
+                className="hover-lift focus-ring"
+                onClick={onNewActivity}
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Nova Atividade
+              </Button>
+            )}
+            {!isReadOnly && (
+              <Button 
+                variant="outline" 
+                size="sm"
+                className="hover-lift focus-ring"
+                onClick={onManageDependencies}
+              >
+                <GitBranch className="w-4 h-4 mr-2" />
+                Dependências
+              </Button>
+            )}
             <Button variant="ghost" size="icon" className="hover-lift focus-ring">
               <Filter className="w-5 h-5" />
             </Button>
@@ -405,37 +411,41 @@ export default function ActivityTable({
                                 <Button
                                   variant="ghost"
                                   size="icon"
-                                  className="text-primary hover:text-primary/80 hover-lift focus-ring h-8 w-8"
-                                  onClick={() => {
-                                    setSelectedActivity(activity);
-                                    setEditModalOpen(true);
-                                  }}
-                                >
-                                  <Edit2 className="w-4 h-4" />
-                                </Button>
-                                <ActivityDateEditor
-                                  activity={activity}
-                                  userId={1} // TODO: Get from auth context
-                                  onSuccess={() => {
-                                    // Refresh data after successful update
-                                    window.location.reload();
-                                  }}
-                                />
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
                                   className="text-muted-foreground hover:text-foreground hover-lift focus-ring h-8 w-8"
                                 >
                                   <Eye className="w-4 h-4" />
                                 </Button>
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  className="text-destructive hover:text-destructive/80 hover-lift focus-ring h-8 w-8"
-                                  onClick={() => onActivityDelete(activity.id)}
-                                >
-                                  <Trash2 className="w-4 h-4" />
-                                </Button>
+                                {!isReadOnly && (
+                                  <>
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      className="text-primary hover:text-primary/80 hover-lift focus-ring h-8 w-8"
+                                      onClick={() => {
+                                        setSelectedActivity(activity);
+                                        setEditModalOpen(true);
+                                      }}
+                                    >
+                                      <Edit2 className="w-4 h-4" />
+                                    </Button>
+                                    <ActivityDateEditor
+                                      activity={activity}
+                                      userId={5} // Luis Ribeiro user ID
+                                      onSuccess={() => {
+                                        // Refresh data after successful update
+                                        window.location.reload();
+                                      }}
+                                    />
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      className="text-destructive hover:text-destructive/80 hover-lift focus-ring h-8 w-8"
+                                      onClick={() => onActivityDelete(activity.id)}
+                                    >
+                                      <Trash2 className="w-4 h-4" />
+                                    </Button>
+                                  </>
+                                )}
                               </div>
                             </TableCell>
                           </TableRow>
