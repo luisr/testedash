@@ -1,4 +1,4 @@
-import { eq, desc, and, or, like, sql } from "drizzle-orm";
+import { eq, desc, and, or, like, sql, ne } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 import {
@@ -258,10 +258,16 @@ export class DatabaseStorage implements IStorage {
   async deleteUser(id: number): Promise<boolean> {
     if (db) {
       try {
-        // First, update any dashboards owned by this user to assign them to an admin
-        const adminUser = await db.select().from(users).where(eq(users.role, 'admin')).limit(1);
-        if (adminUser.length > 0) {
-          await db.update(dashboards).set({ ownerId: adminUser[0].id }).where(eq(dashboards.ownerId, id));
+        // First, find a suitable admin user to transfer ownership
+        const adminUsers = await db.select().from(users).where(and(eq(users.role, 'admin'), ne(users.id, id))).limit(1);
+        
+        if (adminUsers.length > 0) {
+          // Transfer dashboard ownership to another admin
+          await db.update(dashboards).set({ ownerId: adminUsers[0].id }).where(eq(dashboards.ownerId, id));
+        } else {
+          // If no other admin exists, we need to handle this case
+          // For now, we'll set ownerId to null or create a system user
+          await db.update(dashboards).set({ ownerId: null }).where(eq(dashboards.ownerId, id));
         }
         
         // Delete the user

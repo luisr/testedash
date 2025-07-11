@@ -399,6 +399,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Projects
+  app.get("/api/projects", async (req, res) => {
+    try {
+      const projects = await storage.getProjectsByDashboardId(1); // Get all projects
+      res.json(projects);
+    } catch (error) {
+      console.error("Error getting projects:", error);
+      res.status(500).json({ message: "Internal server error", error: error instanceof Error ? error.message : 'Unknown error' });
+    }
+  });
+
   app.get("/api/projects/dashboard/:dashboardId", async (req, res) => {
     try {
       const dashboardId = parseInt(req.params.dashboardId);
