@@ -117,7 +117,34 @@ const ActivitiesPanel: React.FC<ActivitiesPanelProps> = ({
               </Badge>
             </div>
 
-            {/* Configuration Buttons */}
+            {/* Action Buttons */}
+            <Button
+              onClick={onNewActivity}
+              size="sm"
+              className="flex items-center gap-2"
+            >
+              <Plus className="h-4 w-4" />
+              Nova Atividade
+            </Button>
+          </div>
+        </div>
+      </CardHeader>
+
+      <CardContent className="space-y-4">
+        {/* Search and Action Bar */}
+        <div className="flex items-center gap-4">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Pesquisar atividades..."
+              value={searchTerm}
+              onChange={(e) => onSearchChange(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+          
+          {/* Action Buttons */}
+          <div className="flex items-center gap-2">
             <DependencyManager
               dashboardId={dashboardId}
               activities={activities}
@@ -128,15 +155,6 @@ const ActivitiesPanel: React.FC<ActivitiesPanelProps> = ({
                 </Button>
               }
             />
-            
-            <Button
-              onClick={onNewActivity}
-              size="sm"
-              className="flex items-center gap-2"
-            >
-              <Plus className="h-4 w-4" />
-              Nova Atividade
-            </Button>
             
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -150,13 +168,30 @@ const ActivitiesPanel: React.FC<ActivitiesPanelProps> = ({
                   {viewMode === 'hierarchical' ? 'Visualização em Tabela' : 'Visualização Hierárquica'}
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>
-                  <Download className="h-4 w-4 mr-2" />
-                  Exportar Atividades
-                </DropdownMenuItem>
-                <DropdownMenuItem>
+                <DropdownMenuItem onClick={() => onBulkImport([])}>
                   <Upload className="h-4 w-4 mr-2" />
                   Importar Atividades
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => {
+                  // Export functionality
+                  const csvData = activities.map(activity => ({
+                    Nome: activity.name,
+                    Descrição: activity.description,
+                    Responsável: activity.responsible,
+                    Status: activity.status,
+                    Progresso: activity.completionPercentage
+                  }));
+                  const csvContent = "data:text/csv;charset=utf-8," + 
+                    Object.keys(csvData[0] || {}).join(",") + "\n" +
+                    csvData.map(row => Object.values(row).join(",")).join("\n");
+                  
+                  const link = document.createElement("a");
+                  link.setAttribute("href", encodeURI(csvContent));
+                  link.setAttribute("download", "atividades.csv");
+                  link.click();
+                }}>
+                  <Download className="h-4 w-4 mr-2" />
+                  Exportar CSV
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>
@@ -166,19 +201,6 @@ const ActivitiesPanel: React.FC<ActivitiesPanelProps> = ({
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
-        </div>
-      </CardHeader>
-
-      <CardContent className="space-y-4">
-        {/* Search Bar */}
-        <div className="relative">
-          <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Pesquisar atividades..."
-            value={searchTerm}
-            onChange={(e) => onSearchChange(e.target.value)}
-            className="pl-10"
-          />
         </div>
 
         {/* Enhanced Hierarchical View */}
