@@ -231,10 +231,10 @@ export default function ActivityTable({
   const currentActivities = flatActivities.slice(startIndex, startIndex + itemsPerPage);
 
   return (
-    <Card className="table-container shadow-elegant animate-fade-in">
-      <CardHeader className="table-header p-6 border-b border-border/50">
+    <Card className="table-enhanced animate-fade-in">
+      <CardHeader className="p-6 border-b border-border/50">
         <div className="flex items-center justify-between">
-          <h3 className="text-lg font-semibold text-foreground">
+          <h3 className="text-lg font-semibold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
             Atividades Recentes
           </h3>
           <div className="flex items-center space-x-3">
@@ -244,14 +244,13 @@ export default function ActivityTable({
                 placeholder="Buscar atividades..."
                 value={searchTerm}
                 onChange={(e) => onSearchChange(e.target.value)}
-                className="pl-10 w-64 focus-ring"
+                className="pl-10 w-64 input-enhanced"
               />
             </div>
             {!isReadOnly && (
               <Button 
                 variant="default" 
                 size="sm"
-                className="hover-lift focus-ring"
                 onClick={onNewActivity}
               >
                 <Plus className="w-4 h-4 mr-2" />
@@ -262,14 +261,13 @@ export default function ActivityTable({
               <Button 
                 variant="outline" 
                 size="sm"
-                className="hover-lift focus-ring"
                 onClick={onManageDependencies}
               >
                 <GitBranch className="w-4 h-4 mr-2" />
                 Dependências
               </Button>
             )}
-            <Button variant="ghost" size="icon" className="hover-lift focus-ring">
+            <Button variant="ghost" size="icon">
               <Filter className="w-5 h-5" />
             </Button>
             <Button 

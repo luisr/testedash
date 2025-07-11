@@ -148,13 +148,13 @@ export default function DependencyManager({ dashboardId, activities, trigger }: 
     };
 
     return (
-      <Card className="p-4 bg-gradient-to-br from-blue-50 to-cyan-50 border-blue-200">
+      <Card className="card-enhanced p-6">
         <div className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="text-sm font-medium mb-2 block text-blue-900">Atividade</label>
+              <label className="text-sm font-medium mb-2 block text-foreground">Atividade</label>
               <Select value={selectedActivity} onValueChange={setSelectedActivity}>
-                <SelectTrigger className="border-blue-200 focus:border-blue-400">
+                <SelectTrigger className="input-enhanced">
                   <SelectValue placeholder="Selecione uma atividade" />
                 </SelectTrigger>
                 <SelectContent>
@@ -168,9 +168,9 @@ export default function DependencyManager({ dashboardId, activities, trigger }: 
             </div>
 
             <div>
-              <label className="text-sm font-medium mb-2 block text-blue-900">Depende de</label>
+              <label className="text-sm font-medium mb-2 block text-foreground">Depende de</label>
               <Select value={selectedDependency} onValueChange={setSelectedDependency}>
-                <SelectTrigger className="border-blue-200 focus:border-blue-400">
+                <SelectTrigger className="input-enhanced">
                   <SelectValue placeholder="Selecione a dependência" />
                 </SelectTrigger>
                 <SelectContent>
@@ -185,9 +185,9 @@ export default function DependencyManager({ dashboardId, activities, trigger }: 
           </div>
 
           <div>
-            <label className="text-sm font-medium mb-2 block text-blue-900">Tipo de Dependência</label>
+            <label className="text-sm font-medium mb-2 block text-foreground">Tipo de Dependência</label>
             <Select value={selectedType} onValueChange={setSelectedType}>
-              <SelectTrigger className="border-blue-200 focus:border-blue-400">
+              <SelectTrigger className="input-enhanced">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -199,7 +199,7 @@ export default function DependencyManager({ dashboardId, activities, trigger }: 
             </Select>
           </div>
 
-          <Button onClick={handleSubmit} className="w-full bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700">
+          <Button onClick={handleSubmit} className="w-full">
             <Plus className="w-4 h-4 mr-2" />
             Adicionar Dependência
           </Button>
@@ -221,7 +221,7 @@ export default function DependencyManager({ dashboardId, activities, trigger }: 
       
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
+          <DialogTitle className="flex items-center gap-2 text-lg font-semibold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
             <GitBranch className="w-5 h-5 text-blue-600" />
             Gerenciador de Dependências
           </DialogTitle>
@@ -230,13 +230,13 @@ export default function DependencyManager({ dashboardId, activities, trigger }: 
         <div className="space-y-6">
           {/* Add Dependency Form */}
           <div>
-            <h3 className="text-lg font-semibold mb-4 text-blue-900">Adicionar Nova Dependência</h3>
+            <h3 className="text-lg font-semibold mb-4 text-foreground">Adicionar Nova Dependência</h3>
             <AddDependencyForm />
           </div>
 
           {/* Existing Dependencies */}
           <div>
-            <h3 className="text-lg font-semibold mb-4 text-blue-900">Dependências Existentes</h3>
+            <h3 className="text-lg font-semibold mb-4 text-foreground">Dependências Existentes</h3>
             {isLoading ? (
               <div className="text-center py-8">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>

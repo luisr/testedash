@@ -106,18 +106,18 @@ export default function KPICards({ metrics, dashboardId, activities, projects, o
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
       {kpis.map((kpi, index) => (
-        <Card key={index} className="kpi-card hover-lift shadow-elegant group">
+        <Card key={index} className="card-enhanced group cursor-pointer">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div className="flex-1">
                 <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
                   {kpi.title}
                 </p>
-                <p className="text-3xl font-bold text-foreground mt-2 group-hover:text-primary transition-colors">
+                <p className="text-3xl font-bold text-foreground mt-2 group-hover:bg-gradient-to-r group-hover:from-blue-600 group-hover:to-cyan-600 group-hover:bg-clip-text group-hover:text-transparent transition-all">
                   {kpi.value}
                 </p>
               </div>
-              <div className={`w-14 h-14 bg-gradient-to-br from-primary/20 to-accent/20 rounded-xl flex items-center justify-center group-hover:scale-105 transition-transform shadow-elegant`}>
+              <div className={`w-14 h-14 bg-gradient-to-br from-primary/20 to-accent/20 rounded-xl flex items-center justify-center group-hover:scale-105 transition-transform shadow-lg`}>
                 <kpi.icon className={`w-7 h-7 ${kpi.iconColor}`} />
               </div>
             </div>

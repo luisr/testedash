@@ -129,31 +129,33 @@ export default function CreateSubActivityModal({
       
       <DialogContent className="max-w-2xl">
         <DialogHeader>
-          <DialogTitle>
+          <DialogTitle className="text-lg font-semibold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
             Criar Subtarefa para: {parentActivity.name}
           </DialogTitle>
         </DialogHeader>
         
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="name">Nome da Subtarefa *</Label>
+              <Label htmlFor="name" className="text-sm font-medium">Nome da Subtarefa *</Label>
               <Input
                 id="name"
                 value={formData.name}
                 onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
                 placeholder="Digite o nome da subtarefa"
+                className="input-enhanced"
                 required
               />
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="responsible">Responsável</Label>
+              <Label htmlFor="responsible" className="text-sm font-medium">Responsável</Label>
               <Input
                 id="responsible"
                 value={formData.responsible}
                 onChange={(e) => setFormData(prev => ({ ...prev, responsible: e.target.value }))}
                 placeholder="Nome do responsável"
+                className="input-enhanced"
               />
             </div>
           </div>
