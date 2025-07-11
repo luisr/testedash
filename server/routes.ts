@@ -461,7 +461,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Reports endpoints
   app.get("/api/reports/projects/pdf", async (req, res) => {
     try {
-      const { PDFGenerator } = await import('./pdf-generator');
+      const { PDFGenerator } = await import('./pdf-generator-simple');
       const projects = await storage.getProjectsByDashboardId(1);
       const generator = new PDFGenerator();
       const reportContent = await generator.generateProjectsReport(projects);
@@ -477,7 +477,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/reports/users/pdf", async (req, res) => {
     try {
-      const { PDFGenerator } = await import('./pdf-generator');
+      const { PDFGenerator } = await import('./pdf-generator-simple');
       const users = await storage.getUsers();
       const generator = new PDFGenerator();
       const reportContent = await generator.generateUsersReport(users);
@@ -493,7 +493,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/reports/financial/pdf", async (req, res) => {
     try {
-      const { PDFGenerator } = await import('./pdf-generator');
+      const { PDFGenerator } = await import('./pdf-generator-simple');
       const projects = await storage.getProjectsByDashboardId(1);
       const generator = new PDFGenerator();
       const reportContent = await generator.generateFinancialReport(projects);
@@ -509,7 +509,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/reports/general/pdf", async (req, res) => {
     try {
-      const { PDFGenerator } = await import('./pdf-generator');
+      const { PDFGenerator } = await import('./pdf-generator-simple');
       const users = await storage.getUsers();
       const projects = await storage.getProjectsByDashboardId(1);
       const generator = new PDFGenerator();
