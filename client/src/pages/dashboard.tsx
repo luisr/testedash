@@ -11,10 +11,14 @@ import ActivityTable from "@/components/dashboard/activity-table";
 import ShareModal from "@/components/dashboard/share-modal";
 import ActivityLogPanel from "@/components/dashboard/activity-log-panel";
 import ExportModal from "@/components/dashboard/export-modal";
+import NewActivityModal from "@/components/dashboard/new-activity-modal";
+import ProjectsModal from "@/components/dashboard/projects-modal";
+import UsersModal from "@/components/dashboard/users-modal";
+import ReportsModal from "@/components/dashboard/reports-modal";
 import { NotificationPopup } from "@/components/notifications/notification-popup";
 import { NotificationPreferencesDialog } from "@/components/notifications/notification-preferences-dialog";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { Plus, FolderOpen, Users, FileText } from "lucide-react";
 
 export default function Dashboard() {
   const { id } = useParams<{ id?: string }>();
@@ -25,6 +29,10 @@ export default function Dashboard() {
   const [shareModalOpen, setShareModalOpen] = useState(false);
   const [exportModalOpen, setExportModalOpen] = useState(false);
   const [activityLogOpen, setActivityLogOpen] = useState(false);
+  const [newActivityModalOpen, setNewActivityModalOpen] = useState(false);
+  const [projectsModalOpen, setProjectsModalOpen] = useState(false);
+  const [usersModalOpen, setUsersModalOpen] = useState(false);
+  const [reportsModalOpen, setReportsModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
   const [filterResponsible, setFilterResponsible] = useState("all");
@@ -217,7 +225,31 @@ export default function Dashboard() {
                 Visão geral dos projetos e atividades
               </p>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
+              <Button
+                onClick={() => setProjectsModalOpen(true)}
+                variant="outline"
+                className="flex items-center gap-2"
+              >
+                <FolderOpen className="h-4 w-4" />
+                Projetos
+              </Button>
+              <Button
+                onClick={() => setUsersModalOpen(true)}
+                variant="outline"
+                className="flex items-center gap-2"
+              >
+                <Users className="h-4 w-4" />
+                Usuários
+              </Button>
+              <Button
+                onClick={() => setReportsModalOpen(true)}
+                variant="outline"
+                className="flex items-center gap-2"
+              >
+                <FileText className="h-4 w-4" />
+                Relatórios
+              </Button>
               <Button
                 onClick={() => {
                   // Create a test notification
@@ -236,9 +268,7 @@ export default function Dashboard() {
                 Testar Notificação
               </Button>
               <Button 
-                onClick={() => {
-                  // TODO: Open create activity modal
-                }}
+                onClick={() => setNewActivityModalOpen(true)}
                 className="flex items-center gap-2"
               >
                 <Plus className="h-4 w-4" />
@@ -290,6 +320,61 @@ export default function Dashboard() {
         isOpen={activityLogOpen}
         onClose={() => setActivityLogOpen(false)}
         logs={activityLogs}
+      />
+      
+      <NewActivityModal
+        isOpen={newActivityModalOpen}
+        onClose={() => setNewActivityModalOpen(false)}
+        onSubmit={(activityData) => {
+          createActivity(activityData);
+          handleActivityUpdate(activityData, 'create');
+        }}
+        projects={projects}
+      />
+      
+      <ProjectsModal
+        isOpen={projectsModalOpen}
+        onClose={() => setProjectsModalOpen(false)}
+        projects={projects}
+        activities={activities}
+        onCreateProject={(projectData) => {
+          // TODO: Implement project creation
+          console.log('Creating project:', projectData);
+        }}
+        onUpdateProject={(id, projectData) => {
+          // TODO: Implement project update
+          console.log('Updating project:', id, projectData);
+        }}
+        onDeleteProject={(id) => {
+          // TODO: Implement project deletion
+          console.log('Deleting project:', id);
+        }}
+      />
+      
+      <UsersModal
+        isOpen={usersModalOpen}
+        onClose={() => setUsersModalOpen(false)}
+        users={[]} // TODO: Get users from API
+        onCreateUser={(userData) => {
+          // TODO: Implement user creation
+          console.log('Creating user:', userData);
+        }}
+        onUpdateUser={(id, userData) => {
+          // TODO: Implement user update
+          console.log('Updating user:', id, userData);
+        }}
+        onDeleteUser={(id) => {
+          // TODO: Implement user deletion
+          console.log('Deleting user:', id);
+        }}
+      />
+      
+      <ReportsModal
+        isOpen={reportsModalOpen}
+        onClose={() => setReportsModalOpen(false)}
+        projects={projects}
+        activities={activities}
+        users={[]} // TODO: Get users from API
       />
     </div>
   );
