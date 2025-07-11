@@ -40,13 +40,13 @@ export default function NewActivityModal({ isOpen, onClose, onSubmit, projects, 
     const activityData = {
       ...formData,
       projectId: formData.projectId ? parseInt(formData.projectId) : null,
-      parentActivityId: formData.parentActivityId ? parseInt(formData.parentActivityId) : null,
+      parentActivityId: formData.parentActivityId && formData.parentActivityId !== 'none' ? parseInt(formData.parentActivityId) : null,
       plannedValue: formData.plannedValue || '0',
       actualCost: '0',
       earnedValue: '0',
       completionPercentage: '0',
       requiredResources: formData.requiredResources ? formData.requiredResources.split(',').map(r => r.trim()) : [],
-      dependencies: formData.dependencies ? formData.dependencies.split(',').map(d => d.trim()) : [],
+      dependencies: formData.dependencies && formData.dependencies !== 'none' ? [formData.dependencies] : [],
       plannedStartDate: formData.plannedStartDate ? new Date(formData.plannedStartDate) : null,
       plannedEndDate: formData.plannedEndDate ? new Date(formData.plannedEndDate) : null
     };
@@ -158,7 +158,7 @@ export default function NewActivityModal({ isOpen, onClose, onSubmit, projects, 
                   <SelectValue placeholder="Selecione para criar subatividade" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Nenhuma (Atividade Principal)</SelectItem>
+                  <SelectItem value="none">Nenhuma (Atividade Principal)</SelectItem>
                   {activities.filter(activity => !activity.parentActivityId).map(activity => (
                     <SelectItem key={activity.id} value={activity.id.toString()}>
                       {activity.name}
@@ -290,13 +290,20 @@ export default function NewActivityModal({ isOpen, onClose, onSubmit, projects, 
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="dependencies">Dependências</Label>
-            <Input
-              id="dependencies"
-              value={formData.dependencies}
-              onChange={(e) => handleInputChange('dependencies', e.target.value)}
-              placeholder="Separe as dependências por vírgula"
-            />
+            <Label htmlFor="dependencies">Dependências (Opcional)</Label>
+            <Select value={formData.dependencies} onValueChange={(value) => handleInputChange('dependencies', value)}>
+              <SelectTrigger>
+                <SelectValue placeholder="Selecione atividades que devem ser concluídas primeiro" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">Nenhuma dependência</SelectItem>
+                {activities.filter(activity => !activity.parentActivityId).map(activity => (
+                  <SelectItem key={activity.id} value={activity.name}>
+                    {activity.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <DialogFooter>
