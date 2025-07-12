@@ -1,8 +1,474 @@
-/* Import our new theme system */
-@import './styles/themes.css';
-@import './styles/components.css';
-
-/* Keep Tailwind for utility classes */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import './styles/theme.css';
+@import './components/button-harmony.css';
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 255 255 255;
+    --foreground: 26 26 26;
+    --card: 255 255 255;
+    --card-foreground: 26 26 26;
+    --popover: 255 255 255;
+    --popover-foreground: 26 26 26;
+    --primary: 14 165 233;
+    --primary-foreground: 255 255 255;
+    --secondary: 241 245 249;
+    --secondary-foreground: 51 65 85;
+    --muted: 248 250 252;
+    --muted-foreground: 100 116 139;
+    --accent: 6 182 212;
+    --accent-foreground: 255 255 255;
+    --destructive: 239 68 68;
+    --destructive-foreground: 255 255 255;
+    --border: 226 232 240;
+    --input: 241 245 249;
+    --ring: 14 165 233;
+    --chart-1: 14 165 233;
+    --chart-2: 6 182 212;
+    --chart-3: 2 132 199;
+    --chart-4: 16 185 129;
+    --chart-5: 245 158 11;
+    --radius: 0.5rem;
+    
+    /* BeachPark Brand Colors */
+    --brand-primary: 14 165 233;
+    --brand-secondary: 6 182 212;
+    --brand-accent: 2 132 199;
+    --brand-gradient: linear-gradient(135deg, rgb(14, 165, 233), rgb(6, 182, 212));
+    
+    /* Status Colors */
+    --status-completed: 34 197 94;
+    --status-in-progress: 59 130 246;
+    --status-not-started: 148 163 184;
+    --status-delayed: 245 158 11;
+    --status-cancelled: 239 68 68;
+    
+    /* Priority Colors */
+    --priority-low: 148 163 184;
+    --priority-medium: 245 158 11;
+    --priority-high: 249 115 22;
+    --priority-critical: 239 68 68;
+  }
+
+  .dark {
+    --background: 15 23 42;
+    --foreground: 248 250 252;
+    --card: 30 41 59;
+    --card-foreground: 248 250 252;
+    --popover: 30 41 59;
+    --popover-foreground: 248 250 252;
+    --primary: 14 165 233;
+    --primary-foreground: 255 255 255;
+    --secondary: 51 65 85;
+    --secondary-foreground: 203 213 225;
+    --muted: 30 41 59;
+    --muted-foreground: 148 163 184;
+    --accent: 6 182 212;
+    --accent-foreground: 255 255 255;
+    --destructive: 239 68 68;
+    --destructive-foreground: 255 255 255;
+    --border: 51 65 85;
+    --input: 30 41 59;
+    --ring: 14 165 233;
+    --chart-1: 14 165 233;
+    --chart-2: 6 182 212;
+    --chart-3: 2 132 199;
+    --chart-4: 16 185 129;
+    --chart-5: 245 158 11;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+    box-sizing: border-box;
+  }
+  
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+@layer components {
+  /* BeachPark Glass Card Component */
+  .beachpark-card {
+    @apply backdrop-blur-md border rounded-xl shadow-lg;
+    @apply transition-all duration-300 hover:shadow-xl hover:-translate-y-1;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(226, 232, 240, 0.3);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  }
+  
+  .dark .beachpark-card {
+    background: rgba(30, 41, 59, 0.95);
+    border: 1px solid rgba(51, 65, 85, 0.3);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  }
+  
+  /* BeachPark Primary Button */
+  .beachpark-btn-primary {
+    @apply inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-medium transition-all duration-200;
+    @apply text-white hover:shadow-lg hover:-translate-y-0.5;
+    @apply focus:outline-none focus:ring-2 focus:ring-offset-2;
+    background: linear-gradient(135deg, rgb(14, 165, 233), rgb(6, 182, 212));
+    border: none;
+    box-shadow: 0 4px 15px rgba(14, 165, 233, 0.3);
+  }
+  
+  .beachpark-btn-primary:hover {
+    background: linear-gradient(135deg, rgb(14, 165, 233), rgb(6, 182, 212));
+    filter: brightness(1.1);
+    box-shadow: 0 6px 20px rgba(14, 165, 233, 0.4);
+  }
+  
+  /* BeachPark Secondary Button */
+  .beachpark-btn-secondary {
+    @apply inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-medium transition-all duration-200;
+    @apply bg-secondary text-secondary-foreground hover:shadow-md;
+    @apply focus:outline-none focus:ring-2 focus:ring-offset-2;
+  }
+  
+  /* BeachPark Input Component */
+  .beachpark-input {
+    @apply flex h-10 w-full rounded-lg border border-input bg-input px-3 py-2 text-sm;
+    @apply transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2;
+    @apply placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  
+  /* BeachPark Status Badge */
+  .beachpark-status-badge {
+    @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium;
+    @apply transition-all duration-200;
+  }
+  
+  .beachpark-status-completed {
+    @apply beachpark-status-badge;
+    background: rgba(34, 197, 94, 0.1);
+    color: rgb(34, 197, 94);
+    border: 1px solid rgba(34, 197, 94, 0.2);
+  }
+  
+  .beachpark-status-in-progress {
+    @apply beachpark-status-badge;
+    background: rgba(59, 130, 246, 0.1);
+    color: rgb(59, 130, 246);
+    border: 1px solid rgba(59, 130, 246, 0.2);
+  }
+  
+  .beachpark-status-not-started {
+    @apply beachpark-status-badge;
+    background: rgba(148, 163, 184, 0.1);
+    color: rgb(148, 163, 184);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+  }
+  
+  .beachpark-status-delayed {
+    @apply beachpark-status-badge;
+    background: rgba(245, 158, 11, 0.1);
+    color: rgb(245, 158, 11);
+    border: 1px solid rgba(245, 158, 11, 0.2);
+  }
+  
+  .beachpark-status-cancelled {
+    @apply beachpark-status-badge;
+    background: rgba(239, 68, 68, 0.1);
+    color: rgb(239, 68, 68);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+  }
+  
+  /* BeachPark Priority Badge */
+  .beachpark-priority-low {
+    @apply beachpark-status-badge;
+    background: rgba(148, 163, 184, 0.1);
+    color: rgb(148, 163, 184);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+  }
+  
+  .beachpark-priority-medium {
+    @apply beachpark-status-badge;
+    background: rgba(245, 158, 11, 0.1);
+    color: rgb(245, 158, 11);
+    border: 1px solid rgba(245, 158, 11, 0.2);
+  }
+  
+  .beachpark-priority-high {
+    @apply beachpark-status-badge;
+    background: rgba(249, 115, 22, 0.1);
+    color: rgb(249, 115, 22);
+    border: 1px solid rgba(249, 115, 22, 0.2);
+  }
+  
+  .beachpark-priority-critical {
+    @apply beachpark-status-badge;
+    background: rgba(239, 68, 68, 0.1);
+    color: rgb(239, 68, 68);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+  }
+  
+  /* BeachPark Sidebar */
+  .beachpark-sidebar {
+    @apply backdrop-blur-md border-r;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border-right: 1px solid rgba(226, 232, 240, 0.3);
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.05);
+  }
+  
+  .dark .beachpark-sidebar {
+    background: rgba(30, 41, 59, 0.95);
+    border-right: 1px solid rgba(51, 65, 85, 0.3);
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.2);
+  }
+  
+  /* BeachPark Navigation Item */
+  .beachpark-nav-item {
+    @apply flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200;
+    @apply hover:bg-accent hover:text-accent-foreground;
+  }
+  
+  .beachpark-nav-item.active {
+    @apply bg-primary text-primary-foreground;
+    background: linear-gradient(135deg, rgb(14, 165, 233), rgb(6, 182, 212));
+    color: white;
+    box-shadow: 0 4px 15px rgba(14, 165, 233, 0.3);
+  }
+  
+  /* BeachPark Table */
+  .beachpark-table {
+    @apply w-full border-collapse;
+  }
+  
+  .beachpark-table th {
+    @apply px-4 py-3 text-left text-sm font-medium text-muted-foreground;
+    @apply border-b border-border;
+  }
+  
+  .beachpark-table td {
+    @apply px-4 py-3 text-sm border-b border-border;
+    @apply transition-colors hover:bg-muted/50;
+  }
+  
+  .beachpark-table tr:hover {
+    @apply bg-muted/30;
+  }
+  
+  /* BeachPark Modal */
+  .beachpark-modal {
+    @apply fixed inset-0 z-50 flex items-center justify-center;
+    @apply bg-black/50 backdrop-blur-sm;
+  }
+  
+  .beachpark-modal-content {
+    @apply bg-card rounded-xl shadow-2xl border border-border;
+    @apply max-w-md w-full mx-4 p-6;
+    @apply animate-in fade-in-0 zoom-in-95 duration-200;
+  }
+  
+  /* BeachPark KPI Card */
+  .beachpark-kpi-card {
+    @apply beachpark-card p-6;
+    @apply hover:scale-105 transition-transform duration-300;
+  }
+  
+  .beachpark-kpi-card .kpi-value {
+    @apply text-2xl font-bold;
+    background: linear-gradient(135deg, rgb(14, 165, 233), rgb(6, 182, 212));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
+  /* BeachPark Gradient Background */
+  .beachpark-gradient-bg {
+    background: linear-gradient(135deg, rgb(248, 250, 252) 0%, rgb(241, 245, 249) 100%);
+  }
+  
+  .dark .beachpark-gradient-bg {
+    background: linear-gradient(135deg, rgb(15, 23, 42) 0%, rgb(30, 41, 59) 100%);
+  }
+  
+  /* BeachPark Scrollbar */
+  .beachpark-scrollbar::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  
+  .beachpark-scrollbar::-webkit-scrollbar-track {
+    @apply bg-muted rounded-lg;
+  }
+  
+  .beachpark-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-border rounded-lg;
+  }
+  
+  .beachpark-scrollbar::-webkit-scrollbar-thumb:hover {
+    @apply bg-muted-foreground;
+  }
+  
+  /* BeachPark Animations */
+  .beachpark-fade-in {
+    animation: beachpark-fade-in 0.3s ease-out;
+  }
+  
+  @keyframes beachpark-fade-in {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .beachpark-slide-up {
+    animation: beachpark-slide-up 0.4s ease-out;
+  }
+  
+  @keyframes beachpark-slide-up {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .beachpark-scale-in {
+    animation: beachpark-scale-in 0.2s ease-out;
+  }
+  
+  @keyframes beachpark-scale-in {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+  
+  /* BeachPark Loading Spinner */
+  .beachpark-spinner {
+    @apply inline-block w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin;
+  }
+  
+  /* BeachPark Toast Notifications */
+  .beachpark-toast {
+    @apply fixed bottom-4 right-4 z-50;
+    @apply bg-card border border-border rounded-lg shadow-lg;
+    @apply px-4 py-3 max-w-sm;
+    @apply animate-in slide-in-from-right-full duration-300;
+  }
+  
+  .beachpark-toast.success {
+    @apply border-green-500/20 bg-green-50/10;
+  }
+  
+  .beachpark-toast.error {
+    @apply border-red-500/20 bg-red-50/10;
+  }
+  
+  .beachpark-toast.warning {
+    @apply border-yellow-500/20 bg-yellow-50/10;
+  }
+  
+  .beachpark-toast.info {
+    @apply border-blue-500/20 bg-blue-50/10;
+  }
+  
+  /* BeachPark Focus Ring */
+  .beachpark-focus-ring {
+    @apply focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2;
+  }
+  
+  /* BeachPark Hover Effects */
+  .beachpark-hover-lift {
+    @apply transition-transform duration-200 hover:-translate-y-1;
+  }
+  
+  .beachpark-hover-glow {
+    @apply transition-all duration-200 hover:shadow-lg;
+  }
+  
+  .beachpark-hover-scale {
+    @apply transition-transform duration-200 hover:scale-105;
+  }
+}
+
+@layer utilities {
+  /* BeachPark Utility Classes */
+  .beachpark-text-gradient {
+    background: linear-gradient(135deg, rgb(14, 165, 233), rgb(6, 182, 212));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
+  .beachpark-shadow-elegant {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  }
+  
+  .beachpark-shadow-elegant-lg {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  }
+  
+  .beachpark-backdrop-blur {
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+  }
+  
+  .beachpark-glass {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(226, 232, 240, 0.3);
+  }
+  
+  .dark .beachpark-glass {
+    background: rgba(30, 41, 59, 0.95);
+    border: 1px solid rgba(51, 65, 85, 0.3);
+  }
+}
+
+/* Selection Styles */
+::selection {
+  background: rgb(14, 165, 233);
+  color: white;
+}
+
+/* Focus Styles */
+:focus-visible {
+  outline: 2px solid rgb(14, 165, 233);
+  outline-offset: 2px;
+}
+
+/* Print Styles */
+@media print {
+  * {
+    @apply text-black bg-white;
+  }
+  
+  .beachpark-card,
+  .beachpark-glass {
+    @apply bg-white border-gray-300 shadow-none;
+  }
+  
+  .beachpark-gradient-bg {
+    @apply bg-white;
+  }
+}
