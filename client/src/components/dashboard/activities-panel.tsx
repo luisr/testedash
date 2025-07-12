@@ -219,8 +219,14 @@ const ActivitiesPanel: React.FC<ActivitiesPanelProps> = ({
         {/* Enhanced Hierarchical View */}
         <HierarchicalTaskTable
           activities={filteredActivities}
-          onUpdateActivity={onUpdateActivity}
-          onDeleteActivity={onDeleteActivity}
+          onUpdateActivity={(id, data) => {
+            console.log('HierarchicalTaskTable onUpdateActivity called:', id, data);
+            onUpdateActivity(id, data);
+          }}
+          onDeleteActivity={(id) => {
+            console.log('HierarchicalTaskTable onDeleteActivity called:', id);
+            onDeleteActivity(id);
+          }}
           onCreateSubActivity={() => {
             // Invalidar apenas as queries relacionadas a atividades
             queryClient.invalidateQueries({ queryKey: ['/api/activities/dashboard', dashboardId] });

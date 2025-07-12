@@ -196,6 +196,63 @@
   translate: -50% -50% !important;
 }
 
+/* Ultimate modal fix - disable all possible movements */
+[data-radix-dialog-overlay] {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  z-index: 50 !important;
+}
+
+[data-radix-dialog-content] {
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  z-index: 51 !important;
+  margin: 0 !important;
+  inset: unset !important;
+  translate: unset !important;
+  transition: none !important;
+  animation: none !important;
+  will-change: unset !important;
+}
+
+[data-radix-dialog-content]:hover,
+[data-radix-dialog-content]:focus,
+[data-radix-dialog-content]:active,
+[data-radix-dialog-content]:focus-within,
+[data-radix-dialog-content]:focus-visible {
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  z-index: 51 !important;
+  margin: 0 !important;
+  inset: unset !important;
+  translate: unset !important;
+  transition: none !important;
+  animation: none !important;
+  will-change: unset !important;
+}
+
+/* Force all children to not move */
+[data-radix-dialog-content] * {
+  transition: none !important;
+  animation: none !important;
+  will-change: unset !important;
+}
+
+[data-radix-dialog-content] *:hover,
+[data-radix-dialog-content] *:focus,
+[data-radix-dialog-content] *:active {
+  transition: none !important;
+  animation: none !important;
+  will-change: unset !important;
+}
+
 /* Prevent any hover effects on all dialog content */
 [data-radix-dialog-content]:hover,
 [data-radix-dialog-content]:focus,

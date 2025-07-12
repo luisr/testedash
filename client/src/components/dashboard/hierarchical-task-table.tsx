@@ -393,7 +393,10 @@ export default function HierarchicalTaskTable({
                           variant="ghost"
                           size="sm"
                           className="h-8 w-8 p-0"
-                          onClick={() => onEditActivity(activity)}
+                          onClick={() => {
+                            console.log('Hierarchical table edit button clicked for activity:', activity.id);
+                            onEditActivity(activity);
+                          }}
                         >
                           <Edit2 className="w-4 h-4" />
                         </Button>
@@ -421,7 +424,13 @@ export default function HierarchicalTaskTable({
                           variant="ghost"
                           size="sm"
                           className="h-8 w-8 p-0 text-destructive"
-                          onClick={() => onDeleteActivity(activity.id)}
+                          onClick={() => {
+                            console.log('Hierarchical table delete button clicked for activity:', activity.id);
+                            if (confirm('Tem certeza que deseja excluir esta atividade?')) {
+                              console.log('Confirmed deletion of activity:', activity.id);
+                              onDeleteActivity(activity.id);
+                            }
+                          }}
                         >
                           <Trash2 className="w-4 h-4" />
                         </Button>

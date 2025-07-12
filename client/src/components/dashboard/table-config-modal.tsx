@@ -353,7 +353,21 @@ export default function TableConfigModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="beachpark-card beachpark-modal sm:max-w-4xl max-h-[90vh] overflow-y-auto fixed-modal">
+      <DialogContent 
+        className="beachpark-card beachpark-modal sm:max-w-4xl max-h-[90vh] overflow-y-auto fixed-modal"
+        style={{
+          position: 'fixed !important',
+          top: '50% !important',
+          left: '50% !important',
+          transform: 'translate(-50%, -50%) !important',
+          zIndex: 9999,
+          margin: 0,
+          inset: 'unset !important',
+          transition: 'none !important',
+          animation: 'none !important',
+          willChange: 'unset !important'
+        }}
+      >
         <DialogHeader>
           <DialogTitle className="text-harmony-title flex items-center gap-2">
             <Settings className="w-5 h-5 text-primary" />

@@ -678,6 +678,7 @@ export default function ActivityTable({
                                         size="icon"
                                         className="text-primary hover:text-primary/80 beachpark-hover-lift h-8 w-8"
                                         onClick={() => {
+                                          console.log('Edit button clicked for activity:', activity.id);
                                           setSelectedActivity(activity);
                                           setEditModalOpen(true);
                                         }}
@@ -697,8 +698,11 @@ export default function ActivityTable({
                                         size="icon"
                                         className="text-destructive hover:text-destructive/80 beachpark-hover-lift h-8 w-8"
                                         onClick={() => {
-                                          console.log('Deleting activity:', activity.id);
-                                          onActivityDelete(activity.id);
+                                          console.log('Delete button clicked for activity:', activity.id);
+                                          if (confirm('Tem certeza que deseja excluir esta atividade?')) {
+                                            console.log('Confirmed deletion of activity:', activity.id);
+                                            onActivityDelete(activity.id);
+                                          }
                                         }}
                                       >
                                         <Trash2 className="w-4 h-4" />
@@ -790,7 +794,10 @@ export default function ActivityTable({
         isOpen={editModalOpen}
         onClose={() => setEditModalOpen(false)}
         activity={selectedActivity}
-        onSave={onActivityUpdate}
+        onSave={(id, data) => {
+          console.log('EditActivityModal onSave called:', id, data);
+          onActivityUpdate(id, data);
+        }}
       />
       
       {/* Modal para mover para subtarefas */}
