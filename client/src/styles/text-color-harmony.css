@@ -1,0 +1,290 @@
+/* BeachPark Text Color Harmony System */
+
+/* Primary text colors for maximum readability */
+.text-harmony-primary {
+  color: rgb(30, 41, 59);
+}
+
+.text-harmony-secondary {
+  color: rgb(51, 65, 85);
+}
+
+.text-harmony-muted {
+  color: rgb(100, 116, 139);
+}
+
+.text-harmony-accent {
+  color: rgb(14, 165, 233);
+}
+
+.text-harmony-success {
+  color: rgb(34, 197, 94);
+}
+
+.text-harmony-warning {
+  color: rgb(245, 158, 11);
+}
+
+.text-harmony-error {
+  color: rgb(239, 68, 68);
+}
+
+/* Dark mode text colors */
+.dark .text-harmony-primary {
+  color: rgb(248, 250, 252);
+}
+
+.dark .text-harmony-secondary {
+  color: rgb(203, 213, 225);
+}
+
+.dark .text-harmony-muted {
+  color: rgb(148, 163, 184);
+}
+
+.dark .text-harmony-accent {
+  color: rgb(56, 189, 248);
+}
+
+.dark .text-harmony-success {
+  color: rgb(52, 211, 153);
+}
+
+.dark .text-harmony-warning {
+  color: rgb(251, 191, 36);
+}
+
+.dark .text-harmony-error {
+  color: rgb(248, 113, 113);
+}
+
+/* Component-specific text harmonies */
+.beachpark-card .text-harmony-title {
+  color: rgb(30, 41, 59);
+  font-weight: 600;
+}
+
+.beachpark-card .text-harmony-subtitle {
+  color: rgb(51, 65, 85);
+  font-weight: 500;
+}
+
+.beachpark-card .text-harmony-content {
+  color: rgb(71, 85, 105);
+  font-weight: 400;
+}
+
+.beachpark-card .text-harmony-caption {
+  color: rgb(100, 116, 139);
+  font-weight: 400;
+}
+
+.dark .beachpark-card .text-harmony-title {
+  color: rgb(248, 250, 252);
+}
+
+.dark .beachpark-card .text-harmony-subtitle {
+  color: rgb(203, 213, 225);
+}
+
+.dark .beachpark-card .text-harmony-content {
+  color: rgb(186, 200, 214);
+}
+
+.dark .beachpark-card .text-harmony-caption {
+  color: rgb(148, 163, 184);
+}
+
+/* Table text harmonies */
+.beachpark-table .text-harmony-header {
+  color: rgb(30, 41, 59);
+  font-weight: 600;
+}
+
+.beachpark-table .text-harmony-cell {
+  color: rgb(51, 65, 85);
+  font-weight: 400;
+}
+
+.beachpark-table .text-harmony-cell-secondary {
+  color: rgb(100, 116, 139);
+  font-weight: 400;
+}
+
+.dark .beachpark-table .text-harmony-header {
+  color: rgb(248, 250, 252);
+}
+
+.dark .beachpark-table .text-harmony-cell {
+  color: rgb(203, 213, 225);
+}
+
+.dark .beachpark-table .text-harmony-cell-secondary {
+  color: rgb(148, 163, 184);
+}
+
+/* Button text harmonies */
+.beachpark-btn .text-harmony-primary {
+  color: rgb(255, 255, 255);
+  font-weight: 500;
+}
+
+.beachpark-btn-outline .text-harmony-primary {
+  color: rgb(59, 130, 246);
+  font-weight: 500;
+}
+
+.dark .beachpark-btn-outline .text-harmony-primary {
+  color: rgb(99, 102, 241);
+}
+
+/* Input text harmonies */
+.beachpark-input .text-harmony-value {
+  color: rgb(30, 41, 59);
+  font-weight: 400;
+}
+
+.beachpark-input .text-harmony-placeholder {
+  color: rgb(148, 163, 184);
+  font-weight: 400;
+}
+
+.dark .beachpark-input .text-harmony-value {
+  color: rgb(248, 250, 252);
+}
+
+.dark .beachpark-input .text-harmony-placeholder {
+  color: rgb(148, 163, 184);
+}
+
+/* Status badge text harmonies */
+.beachpark-badge-completed .text-harmony-status {
+  color: rgb(255, 255, 255);
+  font-weight: 600;
+}
+
+.beachpark-badge-in-progress .text-harmony-status {
+  color: rgb(255, 255, 255);
+  font-weight: 600;
+}
+
+.beachpark-badge-not-started .text-harmony-status {
+  color: rgb(255, 255, 255);
+  font-weight: 600;
+}
+
+.beachpark-badge-delayed .text-harmony-status {
+  color: rgb(255, 255, 255);
+  font-weight: 600;
+}
+
+.beachpark-badge-cancelled .text-harmony-status {
+  color: rgb(255, 255, 255);
+  font-weight: 600;
+}
+
+/* Modal text harmonies */
+.beachpark-modal .text-harmony-title {
+  color: rgb(30, 41, 59);
+  font-weight: 700;
+}
+
+.beachpark-modal .text-harmony-description {
+  color: rgb(71, 85, 105);
+  font-weight: 400;
+}
+
+.beachpark-modal .text-harmony-label {
+  color: rgb(51, 65, 85);
+  font-weight: 500;
+}
+
+.dark .beachpark-modal .text-harmony-title {
+  color: rgb(248, 250, 252);
+}
+
+.dark .beachpark-modal .text-harmony-description {
+  color: rgb(186, 200, 214);
+}
+
+.dark .beachpark-modal .text-harmony-label {
+  color: rgb(203, 213, 225);
+}
+
+/* Sidebar text harmonies */
+.beachpark-sidebar .text-harmony-brand {
+  color: rgb(59, 130, 246);
+  font-weight: 700;
+}
+
+.beachpark-sidebar .text-harmony-nav {
+  color: rgb(71, 85, 105);
+  font-weight: 500;
+}
+
+.beachpark-sidebar .text-harmony-nav-active {
+  color: rgb(59, 130, 246);
+  font-weight: 600;
+}
+
+.dark .beachpark-sidebar .text-harmony-brand {
+  color: rgb(99, 102, 241);
+}
+
+.dark .beachpark-sidebar .text-harmony-nav {
+  color: rgb(186, 200, 214);
+}
+
+.dark .beachpark-sidebar .text-harmony-nav-active {
+  color: rgb(99, 102, 241);
+}
+
+/* Force text color overrides for specific components */
+.force-text-primary {
+  color: rgb(30, 41, 59) !important;
+}
+
+.force-text-secondary {
+  color: rgb(51, 65, 85) !important;
+}
+
+.force-text-muted {
+  color: rgb(100, 116, 139) !important;
+}
+
+.dark .force-text-primary {
+  color: rgb(248, 250, 252) !important;
+}
+
+.dark .force-text-secondary {
+  color: rgb(203, 213, 225) !important;
+}
+
+.dark .force-text-muted {
+  color: rgb(148, 163, 184) !important;
+}
+
+/* Override any conflicting text colors */
+.beachpark-card h1, .beachpark-card h2, .beachpark-card h3, .beachpark-card h4, .beachpark-card h5, .beachpark-card h6 {
+  color: rgb(30, 41, 59);
+}
+
+.beachpark-card p, .beachpark-card span:not(.badge) {
+  color: rgb(51, 65, 85);
+}
+
+.beachpark-card small, .beachpark-card .text-xs {
+  color: rgb(100, 116, 139);
+}
+
+.dark .beachpark-card h1, .dark .beachpark-card h2, .dark .beachpark-card h3, .dark .beachpark-card h4, .dark .beachpark-card h5, .dark .beachpark-card h6 {
+  color: rgb(248, 250, 252);
+}
+
+.dark .beachpark-card p, .dark .beachpark-card span:not(.badge) {
+  color: rgb(203, 213, 225);
+}
+
+.dark .beachpark-card small, .dark .beachpark-card .text-xs {
+  color: rgb(148, 163, 184);
+}

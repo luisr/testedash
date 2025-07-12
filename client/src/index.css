@@ -1,12 +1,13 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 @import './styles/theme.css';
 @import './styles/typography-harmony.css';
+@import './styles/text-color-harmony.css';
 @import './components/button-harmony.css';
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Fix modal positioning issues */
+/* Fix modal positioning issues - Force stable positioning */
 .fixed-modal {
   position: fixed !important;
   top: 50% !important;
@@ -14,21 +15,27 @@
   transform: translate(-50%, -50%) !important;
   z-index: 9999 !important;
   pointer-events: auto !important;
+  will-change: unset !important;
 }
 
-/* Prevent modal from moving on hover */
-.fixed-modal:hover {
+/* Prevent modal from moving on hover/focus */
+.fixed-modal:hover, .fixed-modal:focus, .fixed-modal:active {
   transform: translate(-50%, -50%) !important;
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
 }
 
-/* Ensure modal overlay is properly positioned */
+/* Force stable dialog positioning */
 [data-radix-dialog-overlay] {
   position: fixed !important;
   inset: 0 !important;
   z-index: 9998 !important;
+  backdrop-filter: blur(8px) !important;
+  background-color: rgba(0, 0, 0, 0.5) !important;
 }
 
-/* Stable modal content positioning */
+/* Completely stable modal content positioning */
 [data-radix-dialog-content] {
   position: fixed !important;
   top: 50% !important;
@@ -37,6 +44,33 @@
   z-index: 9999 !important;
   max-height: 90vh !important;
   overflow-y: auto !important;
+  will-change: unset !important;
+  transition: none !important;
+  animation: none !important;
+  pointer-events: auto !important;
+}
+
+/* Force positioning for all dialog states */
+[data-radix-dialog-content]:hover,
+[data-radix-dialog-content]:focus,
+[data-radix-dialog-content]:active,
+[data-radix-dialog-content]:focus-within {
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+}
+
+/* Disable all animations and transitions on dialogs */
+[data-radix-dialog-content] * {
+  transition: none !important;
+  animation: none !important;
+}
+
+/* Prevent modal from being affected by scroll */
+[data-radix-dialog-content] {
+  margin: 0 !important;
+  inset: auto !important;
 }
 
 @layer base {
