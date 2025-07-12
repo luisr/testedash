@@ -1,9 +1,8 @@
-/* Monday.com Inspired Theme System */
-@import './styles/monday-theme.css';
-@import './styles/monday-components.css';
-@import './styles/monday-force.css';
+/* Import our new theme system */
+@import './styles/themes.css';
+@import './styles/components.css';
 
-/* Keep Tailwind for additional utility classes */
+/* Keep Tailwind for utility classes */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
