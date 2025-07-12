@@ -113,7 +113,7 @@ export default function EditActivityModal({ isOpen, onClose, activity, onSave }:
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!validateForm() || !activity) return;
@@ -141,13 +141,23 @@ export default function EditActivityModal({ isOpen, onClose, activity, onSave }:
       documentLink: formData.documentLink.trim()
     };
     
-    onSave(activity.id, updateData);
-    onClose();
-    
-    toast({
-      title: "Sucesso",
-      description: "Atividade atualizada com sucesso!",
-    });
+    console.log('EditActivityModal: Saving activity with data:', updateData);
+    try {
+      await onSave(activity.id, updateData);
+      onClose();
+      
+      toast({
+        title: "Sucesso",
+        description: "Atividade atualizada com sucesso!",
+      });
+    } catch (error) {
+      console.error('Error updating activity:', error);
+      toast({
+        title: "Erro",
+        description: "Erro ao atualizar atividade. Tente novamente.",
+        variant: "destructive",
+      });
+    }
   };
 
   const addResource = () => {

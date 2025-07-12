@@ -219,19 +219,22 @@ const ActivitiesPanel: React.FC<ActivitiesPanelProps> = ({
         {/* Enhanced Hierarchical View */}
         <HierarchicalTaskTable
           activities={filteredActivities}
-          onUpdateActivity={(id, data) => {
+          onUpdateActivity={async (id, data) => {
             console.log('HierarchicalTaskTable onUpdateActivity called:', id, data);
-            onUpdateActivity(id, data);
+            await onUpdateActivity(id, data);
           }}
-          onDeleteActivity={(id) => {
+          onDeleteActivity={async (id) => {
             console.log('HierarchicalTaskTable onDeleteActivity called:', id);
-            onDeleteActivity(id);
+            await onDeleteActivity(id);
           }}
-          onCreateSubActivity={() => {
-            // Invalidar apenas as queries relacionadas a atividades
-            queryClient.invalidateQueries({ queryKey: ['/api/activities/dashboard', dashboardId] });
+          onCreateSubActivity={(parentId) => {
+            console.log('HierarchicalTaskTable onCreateSubActivity called:', parentId);
+            onCreateSubActivity(parentId);
           }}
-          onEditActivity={onEditActivity}
+          onEditActivity={(activity) => {
+            console.log('HierarchicalTaskTable onEditActivity called:', activity);
+            onEditActivity(activity);
+          }}
           showDependencies={showDependencies}
           onManageDependencies={(activityId) => {
             // Handle dependency management for specific activity

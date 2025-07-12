@@ -14,6 +14,7 @@ import AdvancedReports from './advanced-reports';
 import BackupManagement from './backup-management';
 import CreateActivityModal from './create-activity-modal';
 import MilestoneManager from './milestone-manager';
+import EditActivityModal from './edit-activity-modal';
 import { Button } from '@/components/ui/button';
 import { Activity } from '@shared/schema';
 
@@ -35,6 +36,8 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({
   const [endDate, setEndDate] = useState("");
   const [showCreateActivityModal, setShowCreateActivityModal] = useState(false);
   const [showMilestoneManager, setShowMilestoneManager] = useState(false);
+  const [showEditActivityModal, setShowEditActivityModal] = useState(false);
+  const [editingActivity, setEditingActivity] = useState<Activity | null>(null);
   const [visibleFields, setVisibleFields] = useState<string[]>([
     // Campos padrão da tabela
     'name', 'status', 'priority', 'responsible', 'discipline', 'completionPercentage', 
@@ -219,9 +222,19 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({
         onNewActivity={() => setShowCreateActivityModal(true)}
         onUpdateActivity={updateActivity}
         onDeleteActivity={deleteActivity}
-        onEditActivity={() => {}}
-        onCreateSubActivity={() => {}}
-        onBulkImport={() => {}}
+        onEditActivity={(activity) => {
+          console.log('Edit activity called from DashboardContent:', activity);
+          setEditingActivity(activity);
+          setShowEditActivityModal(true);
+        }}
+        onCreateSubActivity={(parentId) => {
+          console.log('Create sub activity called from DashboardContent:', parentId);
+          // TODO: Implement create sub-activity functionality
+        }}
+        onBulkImport={(activities) => {
+          console.log('Bulk import called from DashboardContent:', activities);
+          // TODO: Implement bulk import functionality
+        }}
         customColumns={customColumns}
         visibleFields={visibleFields}
         onVisibleFieldsChange={setVisibleFields}
@@ -265,6 +278,20 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({
         onClose={() => setShowMilestoneManager(false)}
         activities={activities}
         dashboardId={dashboardId}
+      />
+
+      {/* Modal para editar atividade */}
+      <EditActivityModal
+        isOpen={showEditActivityModal}
+        onClose={() => {
+          setShowEditActivityModal(false);
+          setEditingActivity(null);
+        }}
+        activity={editingActivity}
+        onSave={async (id, data) => {
+          console.log('Edit activity modal save called:', id, data);
+          await updateActivity(id, data);
+        }}
       />
     </div>
   );

@@ -424,11 +424,16 @@ export default function HierarchicalTaskTable({
                           variant="ghost"
                           size="sm"
                           className="h-8 w-8 p-0 text-destructive"
-                          onClick={() => {
+                          onClick={async () => {
                             console.log('Hierarchical table delete button clicked for activity:', activity.id);
                             if (confirm('Tem certeza que deseja excluir esta atividade?')) {
                               console.log('Confirmed deletion of activity:', activity.id);
-                              onDeleteActivity(activity.id);
+                              try {
+                                await onDeleteActivity(activity.id);
+                                console.log('Activity deletion completed successfully');
+                              } catch (error) {
+                                console.error('Error deleting activity:', error);
+                              }
                             }
                           }}
                         >

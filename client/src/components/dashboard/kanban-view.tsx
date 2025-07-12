@@ -59,10 +59,13 @@ export default function KanbanView({ activities, onUpdateActivity }: KanbanViewP
 
     // Atualiza o status da atividade
     try {
+      console.log('Kanban: About to call onUpdateActivity with:', { activityId, newStatus });
       await onUpdateActivity(activityId, { status: newStatus });
       console.log('Kanban: Activity updated successfully');
     } catch (error) {
       console.error('Erro ao atualizar status da atividade:', error);
+      // Revert the UI change if API call fails
+      setDraggedItem(null);
     }
     
     setDraggedItem(null);
