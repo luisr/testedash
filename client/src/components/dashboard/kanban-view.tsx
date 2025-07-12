@@ -90,16 +90,16 @@ export default function KanbanView({ activities, onUpdateActivity }: KanbanViewP
   };
 
   return (
-    <div className="h-full overflow-hidden">
+    <div className="h-full overflow-hidden relative">
       <DragDropContext onDragEnd={handleDragEnd} onDragStart={handleDragStart}>
-        <div className="flex gap-6 h-full overflow-x-auto p-4">
+        <div className="flex gap-6 h-full overflow-x-auto p-4 relative">
           {statusColumns.map(column => {
             const columnActivities = (activities || []).filter(activity => activity?.status === column.id);
             const IconComponent = column.icon;
             
             return (
-              <div key={column.id} className="flex-shrink-0 w-80">
-                <Card className={`h-full ${column.color}`}>
+              <div key={column.id} className="flex-shrink-0 w-80 relative">
+                <Card className={`h-full ${column.color} relative`}>
                   <CardHeader className="pb-3">
                     <div className="flex items-center justify-between">
                       <CardTitle className="text-sm font-medium flex items-center gap-2">
@@ -118,9 +118,10 @@ export default function KanbanView({ activities, onUpdateActivity }: KanbanViewP
                         <div
                           {...provided.droppableProps}
                           ref={provided.innerRef}
-                          className={`space-y-3 min-h-[200px] transition-colors ${
+                          className={`space-y-3 min-h-[200px] transition-colors relative ${
                             snapshot.isDraggingOver ? 'bg-blue-50 rounded-lg' : ''
                           }`}
+                          style={{ position: 'relative', zIndex: 1 }}
                         >
                           {columnActivities.map((activity, index) => (
                             <Draggable
@@ -134,8 +135,12 @@ export default function KanbanView({ activities, onUpdateActivity }: KanbanViewP
                                   {...provided.draggableProps}
                                   {...provided.dragHandleProps}
                                   className={`cursor-move transition-all ${
-                                    snapshot.isDragging ? 'shadow-lg rotate-2' : 'shadow-sm hover:shadow-md'
+                                    snapshot.isDragging ? 'shadow-lg rotate-2 z-50' : 'shadow-sm hover:shadow-md'
                                   } ${draggedItem === activity.id.toString() ? 'opacity-50' : ''}`}
+                                  style={{
+                                    ...provided.draggableProps.style,
+                                    zIndex: snapshot.isDragging ? 9999 : 'auto'
+                                  }}
                                 >
                                   <CardContent className="p-4">
                                     <div className="space-y-3">

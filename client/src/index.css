@@ -910,3 +910,27 @@ table td {
     @apply bg-white border-gray-300 shadow-none;
   }
 }
+
+/* Drag and drop z-index fixes for Kanban */
+.react-beautiful-dnd-dragging {
+  z-index: 9999 !important;
+}
+
+.react-beautiful-dnd-drag-handle {
+  z-index: 1;
+}
+
+/* Ensure dragging items appear above everything */
+[data-rbd-drag-handle-dragging-id] {
+  z-index: 9999 !important;
+}
+
+[data-rbd-draggable-context-id] {
+  z-index: 1;
+}
+
+/* Portal for dragging elements */
+.react-beautiful-dnd-dragging {
+  transform: rotate(5deg) !important;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
+}

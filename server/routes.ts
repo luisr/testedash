@@ -1025,7 +1025,27 @@ Seja específico e prático nas recomendações.
   app.put("/api/activities/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
-      const activityData = insertActivitySchema.partial().parse(req.body);
+      const rawData = req.body;
+      
+      // Process the data to ensure proper types for database storage
+      const processedData = {
+        ...rawData,
+        // Convert Date objects to proper format
+        plannedStartDate: rawData.plannedStartDate ? new Date(rawData.plannedStartDate) : undefined,
+        plannedEndDate: rawData.plannedEndDate ? new Date(rawData.plannedEndDate) : undefined,
+        actualStartDate: rawData.actualStartDate ? new Date(rawData.actualStartDate) : undefined,
+        actualEndDate: rawData.actualEndDate ? new Date(rawData.actualEndDate) : undefined,
+        baselineStartDate: rawData.baselineStartDate ? new Date(rawData.baselineStartDate) : undefined,
+        baselineEndDate: rawData.baselineEndDate ? new Date(rawData.baselineEndDate) : undefined,
+        // Ensure numeric fields are strings for database
+        plannedValue: rawData.plannedValue !== undefined ? String(rawData.plannedValue) : undefined,
+        actualCost: rawData.actualCost !== undefined ? String(rawData.actualCost) : undefined,
+        earnedValue: rawData.earnedValue !== undefined ? String(rawData.earnedValue) : undefined,
+        completionPercentage: rawData.completionPercentage !== undefined ? String(rawData.completionPercentage) : undefined,
+        updatedAt: new Date()
+      };
+
+      const activityData = insertActivitySchema.partial().parse(processedData);
       const activity = await storage.updateActivity(id, activityData);
       
       if (!activity) {
@@ -1044,6 +1064,7 @@ Seja específico e prático nas recomendações.
 
       res.json(activity);
     } catch (error) {
+      console.error("Error updating activity:", error);
       if (error instanceof z.ZodError) {
         return res.status(400).json({ message: "Invalid input", errors: error.errors });
       }

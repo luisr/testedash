@@ -1,0 +1,43 @@
+edit-activity-modal.tsx:144 EditActivityModal: Saving activity with data: {name: 'kkkkkkkkkkkkkk', description: '', discipline: 'Geral', responsible: 'Desconhecido', priority: 'medium', …}
+DashboardContent.tsx:292 Edit activity modal save called: 15 {name: 'kkkkkkkkkkkkkk', description: '', discipline: 'Geral', responsible: 'Desconhecido', priority: 'medium', …}
+DashboardContent.tsx:105 Consolidated dashboard update activity: 15 {name: 'kkkkkkkkkkkkkk', description: '', discipline: 'Geral', responsible: 'Desconhecido', priority: 'medium', …}
+DashboardContent.tsx:107  PUT https://d0f958f6-4d37-47bb-86af-9baeea3cd0eb-00-twjnk6nj18ac.kirk.replit.dev/api/activities/15 400 (Bad Request)
+updateActivity @ DashboardContent.tsx:107
+onSave @ DashboardContent.tsx:293
+handleSubmit @ edit-activity-modal.tsx:146
+callCallback2 @ chunk-RPCDYKBN.js?v=9f755dbe:3674
+invokeGuardedCallbackDev @ chunk-RPCDYKBN.js?v=9f755dbe:3699
+invokeGuardedCallback @ chunk-RPCDYKBN.js?v=9f755dbe:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-RPCDYKBN.js?v=9f755dbe:3736
+executeDispatch @ chunk-RPCDYKBN.js?v=9f755dbe:7014
+processDispatchQueueItemsInOrder @ chunk-RPCDYKBN.js?v=9f755dbe:7034
+processDispatchQueue @ chunk-RPCDYKBN.js?v=9f755dbe:7043
+dispatchEventsForPlugins @ chunk-RPCDYKBN.js?v=9f755dbe:7051
+(anonymous) @ chunk-RPCDYKBN.js?v=9f755dbe:7174
+batchedUpdates$1 @ chunk-RPCDYKBN.js?v=9f755dbe:18913
+batchedUpdates @ chunk-RPCDYKBN.js?v=9f755dbe:3579
+dispatchEventForPluginEventSystem @ chunk-RPCDYKBN.js?v=9f755dbe:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-RPCDYKBN.js?v=9f755dbe:5478
+dispatchEvent @ chunk-RPCDYKBN.js?v=9f755dbe:5472
+dispatchDiscreteEvent @ chunk-RPCDYKBN.js?v=9f755dbe:5449
+edit-activity-modal.tsx:154 Error updating activity: Error: Failed to update activity
+    at updateActivity (DashboardContent.tsx:115:15)
+    at async onSave (DashboardContent.tsx:293:11)
+    at async handleSubmit (edit-activity-modal.tsx:146:7)
+handleSubmit @ edit-activity-modal.tsx:154
+await in handleSubmit
+callCallback2 @ chunk-RPCDYKBN.js?v=9f755dbe:3674
+invokeGuardedCallbackDev @ chunk-RPCDYKBN.js?v=9f755dbe:3699
+invokeGuardedCallback @ chunk-RPCDYKBN.js?v=9f755dbe:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-RPCDYKBN.js?v=9f755dbe:3736
+executeDispatch @ chunk-RPCDYKBN.js?v=9f755dbe:7014
+processDispatchQueueItemsInOrder @ chunk-RPCDYKBN.js?v=9f755dbe:7034
+processDispatchQueue @ chunk-RPCDYKBN.js?v=9f755dbe:7043
+dispatchEventsForPlugins @ chunk-RPCDYKBN.js?v=9f755dbe:7051
+(anonymous) @ chunk-RPCDYKBN.js?v=9f755dbe:7174
+batchedUpdates$1 @ chunk-RPCDYKBN.js?v=9f755dbe:18913
+batchedUpdates @ chunk-RPCDYKBN.js?v=9f755dbe:3579
+dispatchEventForPluginEventSystem @ chunk-RPCDYKBN.js?v=9f755dbe:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-RPCDYKBN.js?v=9f755dbe:5478
+dispatchEvent @ chunk-RPCDYKBN.js?v=9f755dbe:5472
+dispatchDiscreteEvent @ chunk-RPCDYKBN.js?v=9f755dbe:5449
