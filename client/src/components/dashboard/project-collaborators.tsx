@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Trash2, Edit2, Plus, Users, Shield, Eye, EyeOff, Check, X } from "lucide-react";
@@ -45,6 +45,15 @@ interface User {
   email: string;
   avatar?: string;
   role: string;
+}
+
+interface User {
+  id: number;
+  name: string;
+  email: string;
+  avatar?: string;
+  role: string;
+  isActive: boolean;
 }
 
 interface ProjectCollaboratorsProps {
@@ -125,7 +134,7 @@ export default function ProjectCollaborators({ projectId }: ProjectCollaborators
 
   // Buscar colaboradores do projeto
   const { data: collaborators = [], isLoading: isLoadingCollaborators } = useQuery<ProjectCollaborator[]>({
-    queryKey: ["/api/project-collaborators", projectId],
+    queryKey: [`/api/project-collaborators/${projectId}`],
     enabled: !!projectId,
   });
 
@@ -144,7 +153,7 @@ export default function ProjectCollaborators({ projectId }: ProjectCollaborators
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/project-collaborators", projectId] });
+      queryClient.invalidateQueries({ queryKey: [`/api/project-collaborators/${projectId}`] });
       setIsAddDialogOpen(false);
       setNewCollaborator({
         userId: "",
@@ -173,7 +182,7 @@ export default function ProjectCollaborators({ projectId }: ProjectCollaborators
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/project-collaborators", projectId] });
+      queryClient.invalidateQueries({ queryKey: [`/api/project-collaborators/${projectId}`] });
       setIsEditDialogOpen(false);
       setSelectedCollaborator(null);
       toast({
@@ -196,7 +205,7 @@ export default function ProjectCollaborators({ projectId }: ProjectCollaborators
       await apiRequest("DELETE", `/api/project-collaborators/${id}`);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/project-collaborators", projectId] });
+      queryClient.invalidateQueries({ queryKey: [`/api/project-collaborators/${projectId}`] });
       toast({
         title: "Colaborador removido",
         description: "O colaborador foi removido do projeto.",
@@ -321,6 +330,9 @@ export default function ProjectCollaborators({ projectId }: ProjectCollaborators
           <DialogContent className="beachpark-card max-w-2xl">
             <DialogHeader>
               <DialogTitle>Adicionar Novo Colaborador</DialogTitle>
+              <DialogDescription>
+                Selecione um usuário registrado no sistema para adicionar como colaborador deste projeto.
+              </DialogDescription>
             </DialogHeader>
             <div className="space-y-4">
               <div>
@@ -332,22 +344,34 @@ export default function ProjectCollaborators({ projectId }: ProjectCollaborators
                     <SelectValue placeholder="Selecione um usuário" />
                   </SelectTrigger>
                   <SelectContent>
-                    {availableUsers.map(user => (
-                      <SelectItem key={user.id} value={user.id.toString()}>
-                        <div className="flex items-center gap-2">
-                          <Avatar className="w-6 h-6">
-                            <AvatarImage src={user.avatar} />
-                            <AvatarFallback className="text-xs">
-                              {getInitials(user.name)}
-                            </AvatarFallback>
-                          </Avatar>
-                          <span>{user.name}</span>
-                          <span className="text-xs text-muted-foreground">({user.email})</span>
-                        </div>
-                      </SelectItem>
-                    ))}
+                    {availableUsers.length === 0 ? (
+                      <div className="p-3 text-center text-muted-foreground">
+                        <p className="text-sm">Nenhum usuário disponível</p>
+                        <p className="text-xs">Todos os usuários já são colaboradores ou não há usuários cadastrados</p>
+                      </div>
+                    ) : (
+                      availableUsers.map(user => (
+                        <SelectItem key={user.id} value={user.id.toString()}>
+                          <div className="flex items-center gap-2">
+                            <Avatar className="w-6 h-6">
+                              <AvatarImage src={user.avatar} />
+                              <AvatarFallback className="text-xs">
+                                {getInitials(user.name)}
+                              </AvatarFallback>
+                            </Avatar>
+                            <span>{user.name}</span>
+                            <span className="text-xs text-muted-foreground">({user.email})</span>
+                          </div>
+                        </SelectItem>
+                      ))
+                    )}
                   </SelectContent>
                 </Select>
+                {availableUsers.length === 0 && (
+                  <p className="text-xs text-muted-foreground mt-1">
+                    💡 Primeiro cadastre novos usuários no sistema através do menu "Usuários" para depois adicioná-los como colaboradores.
+                  </p>
+                )}
               </div>
 
               <div>
@@ -403,7 +427,7 @@ export default function ProjectCollaborators({ projectId }: ProjectCollaborators
                 </Button>
                 <Button 
                   onClick={handleAddCollaborator}
-                  disabled={addCollaboratorMutation.isPending}
+                  disabled={addCollaboratorMutation.isPending || availableUsers.length === 0}
                   className="beachpark-btn-primary"
                 >
                   {addCollaboratorMutation.isPending ? "Adicionando..." : "Adicionar Colaborador"}

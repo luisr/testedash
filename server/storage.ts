@@ -1057,26 +1057,7 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
-  // Project collaborators methods
-  async getProjectCollaborators(projectId: number): Promise<(ProjectCollaborator & { user: User })[]> {
-    if (!db) return [];
-    
-    try {
-      const result = await db
-        .select()
-        .from(projectCollaborators)
-        .leftJoin(users, eq(projectCollaborators.userId, users.id))
-        .where(eq(projectCollaborators.projectId, projectId));
-      
-      return result.map(row => ({
-        ...row.project_collaborators,
-        user: row.users || {} as User
-      })) as (ProjectCollaborator & { user: User })[];
-    } catch (error) {
-      console.error('Error getting project collaborators:', error);
-      return [];
-    }
-  }
+  // Project collaborators methods - removed duplicate implementation
 
   async getUserProjectCollaborations(userId: number): Promise<(ProjectCollaborator & { project: Project })[]> {
     if (!db) return [];
@@ -1101,20 +1082,7 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
-  async addProjectCollaborator(collaboratorData: InsertProjectCollaborator): Promise<ProjectCollaborator> {
-    if (!db) throw new Error('Database not available');
-    
-    try {
-      const [collaborator] = await db
-        .insert(projectCollaborators)
-        .values(collaboratorData)
-        .returning();
-      return collaborator;
-    } catch (error) {
-      console.error('Error adding project collaborator:', error);
-      throw error;
-    }
-  }
+  // createProjectCollaborator method moved to end of file to avoid duplicates
 
   async updateProjectCollaborator(id: number, collaboratorData: Partial<InsertProjectCollaborator>): Promise<ProjectCollaborator> {
     if (!db) throw new Error('Database not available');
