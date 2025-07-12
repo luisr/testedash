@@ -135,7 +135,7 @@ export function UserProfile({ showEditButton = true, className = "" }: UserProfi
           )}
         </DialogTrigger>
 
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <User className="h-5 w-5" />
@@ -143,114 +143,96 @@ export function UserProfile({ showEditButton = true, className = "" }: UserProfi
             </DialogTitle>
           </DialogHeader>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="space-y-6">
+            {/* Avatar Central */}
+            <div className="flex items-center justify-center">
+              <Avatar className="h-24 w-24">
+                <AvatarImage src={user.profileImageUrl} alt={user.name || user.email} />
+                <AvatarFallback className="bg-primary text-primary-foreground text-xl">
+                  {getInitials(user.name || user.email)}
+                </AvatarFallback>
+              </Avatar>
+            </div>
+
             {/* Informações básicas */}
-            <Card className="md:col-span-2">
-              <CardHeader>
-                <CardTitle className="text-lg">Informações Pessoais</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="name">Nome Completo</Label>
-                    <Input
-                      id="name"
-                      value={editData.name}
-                      onChange={(e) => setEditData(prev => ({ ...prev, name: e.target.value }))}
-                      className="mt-1"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="email">Email</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      value={editData.email}
-                      onChange={(e) => setEditData(prev => ({ ...prev, email: e.target.value }))}
-                      className="mt-1"
-                    />
-                  </div>
-                </div>
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="name">Nome Completo</Label>
+                <Input
+                  id="name"
+                  value={editData.name}
+                  onChange={(e) => setEditData(prev => ({ ...prev, name: e.target.value }))}
+                  className="mt-1"
+                />
+              </div>
+              <div>
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={editData.email}
+                  onChange={(e) => setEditData(prev => ({ ...prev, email: e.target.value }))}
+                  className="mt-1"
+                />
+              </div>
+              <div className="flex items-center gap-2">
+                <Settings className="h-4 w-4 text-muted-foreground" />
+                {getRoleBadge(user.role)}
+              </div>
+            </div>
 
-                <div className="border-t pt-4">
-                  <h4 className="font-medium mb-3">Alterar Senha</h4>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                      <Label htmlFor="currentPassword">Senha Atual</Label>
-                      <Input
-                        id="currentPassword"
-                        type="password"
-                        value={editData.currentPassword}
-                        onChange={(e) => setEditData(prev => ({ ...prev, currentPassword: e.target.value }))}
-                        className="mt-1"
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="newPassword">Nova Senha</Label>
-                      <Input
-                        id="newPassword"
-                        type="password"
-                        value={editData.newPassword}
-                        onChange={(e) => setEditData(prev => ({ ...prev, newPassword: e.target.value }))}
-                        className="mt-1"
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="confirmPassword">Confirmar Senha</Label>
-                      <Input
-                        id="confirmPassword"
-                        type="password"
-                        value={editData.confirmPassword}
-                        onChange={(e) => setEditData(prev => ({ ...prev, confirmPassword: e.target.value }))}
-                        className="mt-1"
-                      />
-                    </div>
-                  </div>
+            {/* Alterar Senha */}
+            <div className="border-t pt-4">
+              <h4 className="font-medium mb-3">Alterar Senha</h4>
+              <div className="space-y-3">
+                <div>
+                  <Label htmlFor="currentPassword">Senha Atual</Label>
+                  <Input
+                    id="currentPassword"
+                    type="password"
+                    value={editData.currentPassword}
+                    onChange={(e) => setEditData(prev => ({ ...prev, currentPassword: e.target.value }))}
+                    className="mt-1"
+                  />
                 </div>
-              </CardContent>
-            </Card>
-
-            {/* Informações da conta */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Informações da Conta</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center justify-center">
-                  <Avatar className="h-20 w-20">
-                    <AvatarImage src={user.profileImageUrl} alt={user.name || user.email} />
-                    <AvatarFallback className="bg-primary text-primary-foreground text-lg">
-                      {getInitials(user.name || user.email)}
-                    </AvatarFallback>
-                  </Avatar>
+                <div>
+                  <Label htmlFor="newPassword">Nova Senha</Label>
+                  <Input
+                    id="newPassword"
+                    type="password"
+                    value={editData.newPassword}
+                    onChange={(e) => setEditData(prev => ({ ...prev, newPassword: e.target.value }))}
+                    className="mt-1"
+                  />
                 </div>
-
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2">
-                    <Mail className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm">{user.email}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Calendar className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm">
-                      Membro desde {new Date(user.createdAt).toLocaleDateString('pt-BR')}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Settings className="h-4 w-4 text-muted-foreground" />
-                    {getRoleBadge(user.role)}
-                  </div>
+                <div>
+                  <Label htmlFor="confirmPassword">Confirmar Senha</Label>
+                  <Input
+                    id="confirmPassword"
+                    type="password"
+                    value={editData.confirmPassword}
+                    onChange={(e) => setEditData(prev => ({ ...prev, confirmPassword: e.target.value }))}
+                    className="mt-1"
+                  />
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </div>
 
           <div className="flex justify-end gap-2 pt-4 border-t">
-            <Button variant="outline" onClick={() => setIsEditing(false)}>
+            <Button 
+              variant="outline" 
+              onClick={() => setIsEditing(false)}
+              className="beachpark-modal-btn-secondary"
+            >
               <X className="h-4 w-4 mr-2" />
               Cancelar
             </Button>
-            <Button onClick={handleSave} disabled={updateProfileMutation.isPending}>
+            <Button 
+              onClick={handleSave} 
+              disabled={updateProfileMutation.isPending}
+              className="beachpark-modal-btn-primary"
+            >
               <Save className="h-4 w-4 mr-2" />
               {updateProfileMutation.isPending ? 'Salvando...' : 'Salvar Alterações'}
             </Button>

@@ -98,15 +98,32 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({
     isLoading: consolidatedDashboard.isLoading,
     error: consolidatedDashboard.error,
     createActivity: () => Promise.resolve({} as any),
-    updateActivity: () => Promise.resolve({} as any),
+    updateActivity: async (id: number, data: Partial<Activity>) => {
+      console.log('Consolidated dashboard update activity:', id, data);
+      // For consolidated dashboard, we'll make a direct API call
+      const response = await fetch(`/api/activities/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+      if (!response.ok) {
+        throw new Error('Failed to update activity');
+      }
+      // Invalidate cache
+      queryClient.invalidateQueries({ queryKey: ['/api/consolidated-dashboard', user?.id] });
+      return response.json();
+    },
     deleteActivity: () => Promise.resolve(false),
     shareDashboard: () => Promise.resolve({} as any)
   } : {
     ...regularDashboard,
     updateActivity: async (id: number, data: Partial<Activity>) => {
+      console.log('Regular dashboard update activity:', id, data);
       await regularDashboard.updateActivity(id, data);
       // Invalidar queries específicas
-      queryClient.invalidateQueries({ queryKey: ['/api/activities', 'dashboard', dashboardId] });
+      queryClient.invalidateQueries({ queryKey: ['/api/activities/dashboard', dashboardId] });
     }
   };
 

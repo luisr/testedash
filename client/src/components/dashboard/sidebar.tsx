@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import beachParkLogo from "@assets/pngegg_1752264509099.png";
+import { UserProfile } from "@/components/user-profile";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -137,27 +138,7 @@ export default function Sidebar({ isOpen, onClose, onActivityLogToggle, onUsersC
         </nav>
         
         <div className="absolute bottom-0 w-full p-4 border-t border-border/50">
-          <div className="flex items-center space-x-3 p-3 rounded-lg hover:bg-accent/50 transition-all duration-300 hover-lift">
-            <Avatar className="w-10 h-10 shadow-elegant ring-2 ring-primary/20">
-              <AvatarImage src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&h=150" alt="Avatar" />
-              <AvatarFallback className="bg-gradient-to-r from-primary to-accent text-primary-foreground font-semibold">JS</AvatarFallback>
-            </Avatar>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-foreground truncate">
-                João Silva
-              </p>
-              <p className="text-xs text-muted-foreground truncate">
-                Administrador
-              </p>
-            </div>
-            <Button 
-              variant="ghost" 
-              size="icon"
-              className="text-muted-foreground hover:text-foreground hover-lift focus-ring rounded-lg"
-            >
-              <LogOut className="w-4 h-4" />
-            </Button>
-          </div>
+          <UserProfile showEditButton={true} className="w-full" />
         </div>
       </div>
     </>

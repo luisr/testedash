@@ -85,6 +85,8 @@ export function useDashboardData(dashboardId: number) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/activities/dashboard", dashboardId] });
       queryClient.invalidateQueries({ queryKey: ["/api/activity-logs", dashboardId] });
+      queryClient.invalidateQueries({ queryKey: ["/api/custom-kpis", dashboardId] });
+      queryClient.invalidateQueries({ queryKey: ["/api/custom-charts", dashboardId] });
       toast({
         title: "Atividade atualizada",
         description: "A atividade foi atualizada com sucesso.",
@@ -162,7 +164,10 @@ export function useDashboardData(dashboardId: number) {
     isLoading,
     error,
     createActivity: createActivityMutation.mutate,
-    updateActivity: (id: number, data: Partial<Activity>) => updateActivityMutation.mutate({ id, data }),
+    updateActivity: async (id: number, data: Partial<Activity>) => {
+      console.log('Updating activity:', id, data);
+      return updateActivityMutation.mutateAsync({ id, data });
+    },
     deleteActivity: deleteActivityMutation.mutate,
     shareDashboard: shareDashboardMutation.mutate,
   };

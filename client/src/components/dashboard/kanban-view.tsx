@@ -55,9 +55,12 @@ export default function KanbanView({ activities, onUpdateActivity }: KanbanViewP
     const activityId = parseInt(draggableId);
     const newStatus = destination.droppableId;
 
+    console.log('Kanban: Moving activity', activityId, 'to status', newStatus);
+
     // Atualiza o status da atividade
     try {
       await onUpdateActivity(activityId, { status: newStatus });
+      console.log('Kanban: Activity updated successfully');
     } catch (error) {
       console.error('Erro ao atualizar status da atividade:', error);
     }

@@ -1,0 +1,222 @@
+/* BeachPark Button Harmony System */
+.beachpark-btn {
+  @apply inline-flex items-center justify-center whitespace-nowrap rounded-lg text-sm font-medium transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.beachpark-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.beachpark-btn-primary {
+  @apply beachpark-btn h-10 px-4 py-2;
+  background: linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.beachpark-btn-primary:hover {
+  background: linear-gradient(135deg, #2563eb 0%, #0891b2 100%);
+}
+
+.beachpark-btn-secondary {
+  @apply beachpark-btn h-10 px-4 py-2;
+  background: rgba(255, 255, 255, 0.1);
+  color: hsl(var(--foreground));
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.beachpark-btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.beachpark-btn-outline {
+  @apply beachpark-btn h-10 px-4 py-2;
+  background: transparent;
+  color: hsl(var(--foreground));
+  border: 1px solid hsl(var(--border));
+}
+
+.beachpark-btn-outline:hover {
+  background: rgba(59, 130, 246, 0.1);
+  border-color: #3b82f6;
+  color: #3b82f6;
+}
+
+.beachpark-btn-ghost {
+  @apply beachpark-btn h-10 px-4 py-2;
+  background: transparent;
+  color: hsl(var(--foreground));
+  border: none;
+}
+
+.beachpark-btn-ghost:hover {
+  background: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
+}
+
+.beachpark-btn-destructive {
+  @apply beachpark-btn h-10 px-4 py-2;
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.beachpark-btn-destructive:hover {
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+}
+
+.beachpark-btn-sm {
+  @apply h-9 px-3 rounded-md;
+}
+
+.beachpark-btn-lg {
+  @apply h-11 px-8 rounded-md;
+}
+
+.beachpark-btn-icon {
+  @apply h-10 w-10 p-0;
+}
+
+/* Action Button Variants */
+.beachpark-action-btn {
+  @apply beachpark-btn-ghost rounded-full p-2 transition-all duration-200;
+  backdrop-filter: blur(12px);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.beachpark-action-btn:hover {
+  background: rgba(59, 130, 246, 0.2);
+  border-color: rgba(59, 130, 246, 0.3);
+  transform: scale(1.05);
+}
+
+.beachpark-action-btn-edit {
+  @apply beachpark-action-btn;
+  color: #10b981;
+}
+
+.beachpark-action-btn-edit:hover {
+  background: rgba(16, 185, 129, 0.1);
+  border-color: rgba(16, 185, 129, 0.3);
+}
+
+.beachpark-action-btn-delete {
+  @apply beachpark-action-btn;
+  color: #ef4444;
+}
+
+.beachpark-action-btn-delete:hover {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.beachpark-action-btn-view {
+  @apply beachpark-action-btn;
+  color: #3b82f6;
+}
+
+.beachpark-action-btn-view:hover {
+  background: rgba(59, 130, 246, 0.1);
+  border-color: rgba(59, 130, 246, 0.3);
+}
+
+/* Status Button Variants */
+.beachpark-status-btn {
+  @apply beachpark-btn-sm px-3 py-1 text-xs font-medium border-none;
+  backdrop-filter: blur(8px);
+  border-radius: 9999px;
+}
+
+.beachpark-status-btn-success {
+  @apply beachpark-status-btn;
+  background: rgba(16, 185, 129, 0.2);
+  color: #10b981;
+}
+
+.beachpark-status-btn-warning {
+  @apply beachpark-status-btn;
+  background: rgba(245, 158, 11, 0.2);
+  color: #f59e0b;
+}
+
+.beachpark-status-btn-error {
+  @apply beachpark-status-btn;
+  background: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+}
+
+.beachpark-status-btn-info {
+  @apply beachpark-status-btn;
+  background: rgba(59, 130, 246, 0.2);
+  color: #3b82f6;
+}
+
+.beachpark-status-btn-secondary {
+  @apply beachpark-status-btn;
+  background: rgba(107, 114, 128, 0.2);
+  color: #6b7280;
+}
+
+/* Floating Action Button */
+.beachpark-fab {
+  @apply fixed bottom-6 right-6 z-50 h-14 w-14 rounded-full shadow-lg transition-all duration-300;
+  background: linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(16px);
+}
+
+.beachpark-fab:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Override default button styles in tables */
+.beachpark-table .beachpark-btn {
+  @apply h-8 px-3 py-1 text-xs;
+}
+
+.beachpark-table .beachpark-action-btn {
+  @apply h-8 w-8 p-1;
+}
+
+/* Navigation Button Variants */
+.beachpark-nav-btn {
+  @apply beachpark-btn w-full justify-start px-4 py-3 text-left font-medium;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.beachpark-nav-btn:hover {
+  background: rgba(59, 130, 246, 0.1);
+  border-color: rgba(59, 130, 246, 0.2);
+  color: #3b82f6;
+}
+
+.beachpark-nav-btn.active {
+  background: rgba(59, 130, 246, 0.2);
+  border-color: rgba(59, 130, 246, 0.3);
+  color: #3b82f6;
+}
+
+/* Modal Button Variants */
+.beachpark-modal-btn {
+  @apply beachpark-btn transition-all duration-200;
+  min-width: 100px;
+}
+
+.beachpark-modal-btn-primary {
+  @apply beachpark-modal-btn beachpark-btn-primary;
+}
+
+.beachpark-modal-btn-secondary {
+  @apply beachpark-modal-btn beachpark-btn-outline;
+}
+
+.beachpark-modal-btn-cancel {
+  @apply beachpark-modal-btn beachpark-btn-ghost;
+}
