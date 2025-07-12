@@ -7,13 +7,15 @@ import CalendarView from './calendar-view';
 import GanttView from './gantt-view';
 import DatalogView from './datalog-view';
 import RoadmapView from './roadmap-view';
+import BacklogView from './backlog-view';
 import { 
   Kanban, 
   Calendar, 
   TrendingUp, 
   BarChart3,
   FileText,
-  MapPin
+  MapPin,
+  List
 } from 'lucide-react';
 
 interface ProjectViewsProps {
@@ -55,6 +57,12 @@ export default function ProjectViews({ activities, projects, onUpdateActivity }:
       label: 'Roadmap',
       icon: MapPin,
       component: RoadmapView
+    },
+    {
+      id: 'backlog',
+      label: 'Backlog',
+      icon: List,
+      component: BacklogView
     }
   ];
 
@@ -69,7 +77,7 @@ export default function ProjectViews({ activities, projects, onUpdateActivity }:
       
       <CardContent className="h-full">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full flex flex-col">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-6">
             {tabs.map(tab => {
               const IconComponent = tab.icon;
               return (
