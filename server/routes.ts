@@ -645,6 +645,76 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Advanced PDF Report generation with Gemini
+  app.post('/api/reports/advanced-pdf', async (req, res) => {
+    try {
+      const { reportType, data } = req.body;
+      
+      if (!reportType || !data) {
+        return res.status(400).json({ error: 'Report type and data are required' });
+      }
+
+      const { AdvancedPDFGenerator } = await import('./advanced-pdf-generator');
+      const pdfGenerator = new AdvancedPDFGenerator();
+      const pdfBuffer = await pdfGenerator.generateAdvancedReport(data);
+
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', `attachment; filename="relatorio-avancado-${new Date().toISOString().split('T')[0]}.pdf"`);
+      res.send(pdfBuffer);
+    } catch (error) {
+      console.error('Error generating advanced PDF report:', error);
+      res.status(500).json({ error: 'Failed to generate advanced report' });
+    }
+  });
+
+  // Gemini observations generation
+  app.post('/api/reports/gemini-observations', async (req, res) => {
+    try {
+      const { data, reportType } = req.body;
+      
+      if (!data || !reportType) {
+        return res.status(400).json({ error: 'Data and report type are required' });
+      }
+
+      // Import gemini functions
+      const { summarizeArticle } = await import('./gemini');
+      
+      // Create comprehensive analysis prompt
+      const analysisPrompt = `
+Analise os seguintes dados do projeto e forneça observações detalhadas em português:
+
+DADOS DO PROJETO:
+- KPIs: SPI=${data.kpis.spi}, CPI=${data.kpis.cpi}, Taxa de Conclusão=${data.kpis.completionRate}%
+- Caminho Crítico: ${data.criticalPath.criticalPathLength} atividades críticas de ${data.criticalPath.activities.length} total
+- Marcos: ${data.roadmap.milestones.length} marcos planejados
+- Nível de Risco: ${data.kpis.riskLevel}
+
+ATIVIDADES:
+${data.activities.slice(0, 10).map(act => `- ${act.name}: ${act.status}, ${act.priority}, ${act.completion || 0}%`).join('\n')}
+
+PROJETOS:
+${data.projects.slice(0, 5).map(proj => `- ${proj.name}: ${proj.status}, Orçamento: R$ ${proj.budget || 0}`).join('\n')}
+
+Por favor, forneça uma análise detalhada incluindo:
+1. Avaliação geral do projeto
+2. Principais riscos identificados
+3. Recomendações para melhoria
+4. Análise do desempenho dos KPIs
+5. Observações sobre o caminho crítico
+6. Sugestões para otimização
+
+Seja específico e prático nas recomendações.
+      `;
+
+      const observations = await summarizeArticle(analysisPrompt);
+      
+      res.json({ observations });
+    } catch (error) {
+      console.error('Error generating Gemini observations:', error);
+      res.status(500).json({ error: 'Failed to generate observations' });
+    }
+  });
+
   // Activities
   app.get("/api/activities/dashboard/:dashboardId", async (req, res) => {
     try {

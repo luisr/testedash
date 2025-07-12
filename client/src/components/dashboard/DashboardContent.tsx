@@ -10,6 +10,7 @@ import ActivityTable from './activity-table';
 import ActivitiesPanel from './activities-panel';
 import ActivitySummary from './activity-summary';
 import ProjectViews from './project-views';
+import AdvancedReports from './advanced-reports';
 import BackupManagement from './backup-management';
 import CreateActivityModal from './create-activity-modal';
 import MilestoneManager from './milestone-manager';
@@ -196,6 +197,13 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({
         activities={activities}
         projects={projects}
         onUpdateActivity={updateActivity}
+      />
+
+      {/* Advanced Reports */}
+      <AdvancedReports 
+        activities={activities} 
+        projects={projects}
+        dashboardId={dashboardId}
       />
 
       {/* Backup Management - Only for regular dashboards */}
