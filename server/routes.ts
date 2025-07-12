@@ -785,16 +785,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
 Analise os seguintes dados do projeto e forneça observações detalhadas em português:
 
 DADOS DO PROJETO:
-- KPIs: SPI=${data.kpis.spi}, CPI=${data.kpis.cpi}, Taxa de Conclusão=${data.kpis.completionRate}%
-- Caminho Crítico: ${data.criticalPath.criticalPathLength} atividades críticas de ${data.criticalPath.activities.length} total
-- Marcos: ${data.roadmap.milestones.length} marcos planejados
-- Nível de Risco: ${data.kpis.riskLevel}
+- KPIs: SPI=${data.kpis?.spi || 1.0}, CPI=${data.kpis?.cpi || 1.0}, Taxa de Conclusão=${data.kpis?.completionRate || 0}%
+- Caminho Crítico: ${data.criticalPath?.criticalPathLength || 0} atividades críticas de ${data.criticalPath?.activities?.length || 0} total
+- Marcos: ${data.roadmap?.milestones?.length || 0} marcos planejados
+- Nível de Risco: ${data.kpis?.riskLevel || 'medium'}
 
 ATIVIDADES:
-${data.activities.slice(0, 10).map(act => `- ${act.name}: ${act.status}, ${act.priority}, ${act.completion || 0}%`).join('\n')}
+${(data.activities || []).slice(0, 10).map(act => `- ${act.name}: ${act.status}, ${act.priority}, ${act.completion || 0}%`).join('\n')}
 
 PROJETOS:
-${data.projects.slice(0, 5).map(proj => `- ${proj.name}: ${proj.status}, Orçamento: R$ ${proj.budget || 0}`).join('\n')}
+${(data.projects || []).slice(0, 5).map(proj => `- ${proj.name}: ${proj.status}, Orçamento: R$ ${proj.budget || 0}`).join('\n')}
 
 Por favor, forneça uma análise detalhada incluindo:
 1. Avaliação geral do projeto
