@@ -62,9 +62,9 @@ export interface IStorage {
   // Project collaborators
   getProjectCollaborators(projectId: number): Promise<(ProjectCollaborator & { user: User })[]>;
   getUserProjectCollaborations(userId: number): Promise<(ProjectCollaborator & { project: Project })[]>;
-  addProjectCollaborator(collaboratorData: InsertProjectCollaborator): Promise<ProjectCollaborator>;
+  createProjectCollaborator(collaboratorData: InsertProjectCollaborator): Promise<ProjectCollaborator>;
   updateProjectCollaborator(id: number, collaboratorData: Partial<InsertProjectCollaborator>): Promise<ProjectCollaborator>;
-  removeProjectCollaborator(id: number): Promise<void>;
+  deleteProjectCollaborator(id: number): Promise<void>;
   checkUserProjectAccess(userId: number, projectId: number): Promise<ProjectCollaborator | null>;
 
   // Dashboards
@@ -1663,6 +1663,139 @@ export class DatabaseStorage implements IStorage {
       console.error('Error updating activity with date audit:', error);
       throw error;
     }
+  }
+  // Project collaborators methods
+  async getProjectCollaborators(projectId: number): Promise<(ProjectCollaborator & { user: User })[]> {
+    if (!db) throw new Error('Database not connected');
+    
+    const collaborators = await db
+      .select({
+        id: projectCollaborators.id,
+        projectId: projectCollaborators.projectId,
+        userId: projectCollaborators.userId,
+        role: projectCollaborators.role,
+        canView: projectCollaborators.canView,
+        canEdit: projectCollaborators.canEdit,
+        canCreate: projectCollaborators.canCreate,
+        canDelete: projectCollaborators.canDelete,
+        canManageActivities: projectCollaborators.canManageActivities,
+        canViewReports: projectCollaborators.canViewReports,
+        canExportData: projectCollaborators.canExportData,
+        canManageCollaborators: projectCollaborators.canManageCollaborators,
+        isActive: projectCollaborators.isActive,
+        invitedById: projectCollaborators.invitedById,
+        invitedAt: projectCollaborators.invitedAt,
+        acceptedAt: projectCollaborators.acceptedAt,
+        expiresAt: projectCollaborators.expiresAt,
+        notes: projectCollaborators.notes,
+        createdAt: projectCollaborators.createdAt,
+        updatedAt: projectCollaborators.updatedAt,
+        user: {
+          id: users.id,
+          email: users.email,
+          name: users.name,
+          avatar: users.avatar,
+          role: users.role,
+          createdAt: users.createdAt,
+          updatedAt: users.updatedAt,
+        }
+      })
+      .from(projectCollaborators)
+      .leftJoin(users, eq(projectCollaborators.userId, users.id))
+      .where(eq(projectCollaborators.projectId, projectId));
+    
+    return collaborators.map(collab => ({
+      ...collab,
+      user: collab.user as User
+    }));
+  }
+
+  async getUserProjectCollaborations(userId: number): Promise<(ProjectCollaborator & { project: Project })[]> {
+    if (!db) throw new Error('Database not connected');
+    
+    const collaborations = await db
+      .select({
+        id: projectCollaborators.id,
+        projectId: projectCollaborators.projectId,
+        userId: projectCollaborators.userId,
+        role: projectCollaborators.role,
+        canView: projectCollaborators.canView,
+        canEdit: projectCollaborators.canEdit,
+        canCreate: projectCollaborators.canCreate,
+        canDelete: projectCollaborators.canDelete,
+        canManageActivities: projectCollaborators.canManageActivities,
+        canViewReports: projectCollaborators.canViewReports,
+        canExportData: projectCollaborators.canExportData,
+        canManageCollaborators: projectCollaborators.canManageCollaborators,
+        isActive: projectCollaborators.isActive,
+        invitedById: projectCollaborators.invitedById,
+        invitedAt: projectCollaborators.invitedAt,
+        acceptedAt: projectCollaborators.acceptedAt,
+        expiresAt: projectCollaborators.expiresAt,
+        notes: projectCollaborators.notes,
+        createdAt: projectCollaborators.createdAt,
+        updatedAt: projectCollaborators.updatedAt,
+        project: {
+          id: projects.id,
+          name: projects.name,
+          description: projects.description,
+          dashboardId: projects.dashboardId,
+          status: projects.status,
+          budget: projects.budget,
+          createdAt: projects.createdAt,
+          updatedAt: projects.updatedAt,
+        }
+      })
+      .from(projectCollaborators)
+      .leftJoin(projects, eq(projectCollaborators.projectId, projects.id))
+      .where(eq(projectCollaborators.userId, userId));
+    
+    return collaborations.map(collab => ({
+      ...collab,
+      project: collab.project as Project
+    }));
+  }
+
+  async createProjectCollaborator(collaboratorData: InsertProjectCollaborator): Promise<ProjectCollaborator> {
+    if (!db) throw new Error('Database not connected');
+    
+    const [collaborator] = await db.insert(projectCollaborators).values(collaboratorData).returning();
+    return collaborator;
+  }
+
+  async updateProjectCollaborator(id: number, collaboratorData: Partial<InsertProjectCollaborator>): Promise<ProjectCollaborator> {
+    if (!db) throw new Error('Database not connected');
+    
+    const [collaborator] = await db
+      .update(projectCollaborators)
+      .set({ ...collaboratorData, updatedAt: new Date() })
+      .where(eq(projectCollaborators.id, id))
+      .returning();
+    
+    return collaborator;
+  }
+
+  async deleteProjectCollaborator(id: number): Promise<void> {
+    if (!db) throw new Error('Database not connected');
+    
+    await db.delete(projectCollaborators).where(eq(projectCollaborators.id, id));
+  }
+
+  async checkUserProjectAccess(userId: number, projectId: number): Promise<ProjectCollaborator | null> {
+    if (!db) throw new Error('Database not connected');
+    
+    const [collaborator] = await db
+      .select()
+      .from(projectCollaborators)
+      .where(
+        and(
+          eq(projectCollaborators.userId, userId),
+          eq(projectCollaborators.projectId, projectId),
+          eq(projectCollaborators.isActive, true)
+        )
+      );
+    
+    return collaborator || null;
   }
 }
 

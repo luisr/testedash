@@ -501,6 +501,52 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Project collaborators routes
+  app.get('/api/project-collaborators/:projectId', async (req, res) => {
+    try {
+      const projectId = parseInt(req.params.projectId);
+      const collaborators = await storage.getProjectCollaborators(projectId);
+      res.json(collaborators);
+    } catch (error) {
+      console.error('Error fetching project collaborators:', error);
+      res.status(500).json({ message: 'Failed to fetch project collaborators' });
+    }
+  });
+
+  app.post('/api/project-collaborators', async (req, res) => {
+    try {
+      const collaboratorData = req.body;
+      const collaborator = await storage.createProjectCollaborator(collaboratorData);
+      res.json(collaborator);
+    } catch (error) {
+      console.error('Error creating project collaborator:', error);
+      res.status(500).json({ message: 'Failed to create project collaborator' });
+    }
+  });
+
+  app.put('/api/project-collaborators/:id', async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const updateData = req.body;
+      const collaborator = await storage.updateProjectCollaborator(id, updateData);
+      res.json(collaborator);
+    } catch (error) {
+      console.error('Error updating project collaborator:', error);
+      res.status(500).json({ message: 'Failed to update project collaborator' });
+    }
+  });
+
+  app.delete('/api/project-collaborators/:id', async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      await storage.deleteProjectCollaborator(id);
+      res.json({ message: 'Project collaborator deleted successfully' });
+    } catch (error) {
+      console.error('Error deleting project collaborator:', error);
+      res.status(500).json({ message: 'Failed to delete project collaborator' });
+    }
+  });
+
   // Dashboards - specific routes first
   app.get("/api/dashboards/project/:projectId", async (req, res) => {
     try {

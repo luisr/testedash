@@ -10,7 +10,7 @@ import { UserProfile } from '@/components/user-profile';
 import { UsersModal } from './modals/users-modal';
 import { ProjectsModal } from './modals/projects-modal';
 import { ReportsModal } from './modals/reports-modal';
-import { SettingsModal } from './modals/settings-modal';
+import SettingsModal from './settings-modal';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -90,8 +90,8 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, dash
         dashboardId={dashboardId}
       />
       <SettingsModal 
-        isOpen={settingsModalOpen} 
-        onClose={() => setSettingsModalOpen(false)} 
+        open={settingsModalOpen} 
+        onOpenChange={setSettingsModalOpen} 
         dashboardId={dashboardId}
       />
     </div>
