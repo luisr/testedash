@@ -1,6 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from "@/components/ui/dialog";
 import { Folder, TrendingDown, TrendingUp, CheckCircle, Plus, Settings2 } from "lucide-react";
 import CustomKPIManager from "./custom-kpi-manager";
 import { useState } from "react";
@@ -107,6 +107,9 @@ export default function KPICards({ metrics, dashboardId, activities, projects, v
                 <Settings2 className="w-5 h-5 text-primary" />
                 Gerenciar KPIs
               </DialogTitle>
+              <DialogDescription className="beachpark-body-sm">
+                Crie, edite e gerencie KPIs customizados para o seu dashboard.
+              </DialogDescription>
             </DialogHeader>
             <CustomKPIManager
               dashboardId={dashboardId}

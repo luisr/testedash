@@ -128,6 +128,12 @@ export function useWebSocketNotifications(userId: number) {
   useEffect(() => {
     if (!userId) return;
 
+    // Skip WebSocket in development to avoid errors
+    if (process.env.NODE_ENV === 'development') {
+      console.log('WebSocket disabled in development mode');
+      return;
+    }
+    
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     const wsUrl = `${protocol}//${window.location.host}/ws?userId=${userId}`;
     
