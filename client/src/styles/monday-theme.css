@@ -16,6 +16,11 @@
   --text-on-primary: #ffffff;
   --text-on-accent: #ffffff;
   
+  /* Force overrides for Tailwind classes */
+  --color-primary: #323338;
+  --color-secondary: #676879;
+  --color-tertiary: #9699a6;
+  
   /* Monday.com Brand Colors */
   --brand-primary: #0073ea;
   --brand-secondary: #00c875;
@@ -190,9 +195,17 @@ html {
 body {
   margin: 0;
   padding: 0;
-  background-color: var(--primary-bg);
-  color: var(--text-primary);
+  background-color: var(--primary-bg) !important;
+  color: var(--text-primary) !important;
   transition: background-color var(--transition-medium), color var(--transition-medium);
+}
+
+/* Force Monday.com theme overrides */
+#root,
+.App,
+[data-theme] {
+  background-color: var(--primary-bg) !important;
+  color: var(--text-primary) !important;
 }
 
 /* Typography */
@@ -248,3 +261,35 @@ p {
 .transition { transition: all var(--transition-fast); }
 .transition-medium { transition: all var(--transition-medium); }
 .transition-slow { transition: all var(--transition-slow); }
+
+/* Force overrides for existing classes */
+.text-primary { color: var(--text-primary) !important; }
+.text-secondary { color: var(--text-secondary) !important; }
+.text-tertiary { color: var(--text-tertiary) !important; }
+
+.bg-primary { background-color: var(--primary-bg) !important; }
+.bg-secondary { background-color: var(--secondary-bg) !important; }
+.bg-tertiary { background-color: var(--tertiary-bg) !important; }
+.bg-elevated { background-color: var(--elevated-bg) !important; }
+
+.brand-primary { color: var(--brand-primary) !important; }
+.brand-secondary { color: var(--brand-secondary) !important; }
+.brand-accent { color: var(--brand-accent) !important; }
+
+/* Monday.com specific overrides */
+.monday-bg { background-color: var(--secondary-bg) !important; }
+.monday-card { 
+  background-color: var(--card-bg) !important; 
+  border: 1px solid var(--card-border) !important;
+  box-shadow: var(--card-shadow) !important;
+}
+.monday-text { color: var(--text-primary) !important; }
+.monday-text-secondary { color: var(--text-secondary) !important; }
+
+/* Tailwind overrides */
+.bg-white { background-color: var(--primary-bg) !important; }
+.bg-gray-50 { background-color: var(--secondary-bg) !important; }
+.bg-gray-100 { background-color: var(--tertiary-bg) !important; }
+.text-gray-900 { color: var(--text-primary) !important; }
+.text-gray-600 { color: var(--text-secondary) !important; }
+.text-gray-400 { color: var(--text-tertiary) !important; }

@@ -36,35 +36,38 @@ export function MondaySidebar({ className }: SidebarProps) {
   const [location] = useLocation();
 
   return (
-    <div className={cn('sidebar', className)}>
-      <div className="sidebar-header">
-        <div className="flex items-center gap-sm">
+    <div className={cn('monday-sidebar', className)}>
+      <div className="monday-p-lg">
+        <div className="monday-flex monday-items-center monday-gap-sm">
           <img src={beachParkLogo} alt="BeachPark" className="w-8 h-8 object-contain" />
           <div>
-            <h2 className="text-lg font-semibold text-primary">BeachPark</h2>
-            <p className="text-xs text-secondary">Tô Sabendo</p>
+            <h2 className="monday-text-lg monday-font-semibold" style={{ color: 'var(--monday-text-primary)' }}>BeachPark</h2>
+            <p className="monday-text-xs" style={{ color: 'var(--monday-text-secondary)' }}>Tô Sabendo</p>
           </div>
         </div>
       </div>
 
-      <div className="sidebar-content">
-        <div className="space-y-md">
-          <Button variant="primary" className="w-full justify-start">
+      <div className="monday-p-md">
+        <div className="monday-mb-lg">
+          <button className="monday-btn monday-btn-primary monday-w-full monday-justify-between">
             <Plus className="w-4 h-4" />
             Novo Projeto
-          </Button>
+          </button>
+        </div>
 
+        <div className="monday-mb-lg">
           <div className="relative">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-tertiary" />
-            <Input
+            <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2" style={{ color: 'var(--monday-text-tertiary)' }} />
+            <input
               type="text"
               placeholder="Buscar..."
-              className="pl-10 w-full"
+              className="monday-input"
+              style={{ paddingLeft: '40px' }}
             />
           </div>
         </div>
 
-        <nav className="space-y-xs mt-lg">
+        <nav className="monday-flex monday-flex-col monday-gap-sm">
           {navigation.map((item) => {
             const Icon = item.icon;
             const isActive = location === item.href || location.startsWith(item.href + '/');
@@ -74,7 +77,7 @@ export function MondaySidebar({ className }: SidebarProps) {
                 key={item.name}
                 href={item.href}
                 className={cn(
-                  'nav-item',
+                  'monday-nav-item',
                   isActive && 'active'
                 )}
               >
@@ -86,11 +89,11 @@ export function MondaySidebar({ className }: SidebarProps) {
         </nav>
       </div>
 
-      <div className="mt-auto p-md border-t border-light">
-        <div className="flex items-center justify-between">
-          <Button variant="ghost" size="sm">
+      <div className="mt-auto monday-p-md border-t" style={{ borderColor: 'var(--monday-border)' }}>
+        <div className="monday-flex monday-items-center monday-justify-between">
+          <button className="monday-btn monday-btn-secondary monday-p-sm">
             <Bell className="w-4 h-4" />
-          </Button>
+          </button>
           <ThemeToggle />
         </div>
       </div>

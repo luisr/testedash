@@ -9,9 +9,9 @@ interface LayoutProps {
 
 export function MondayLayout({ children, className }: LayoutProps) {
   return (
-    <div className="flex h-screen bg-primary">
-      <MondaySidebar className="w-64 flex-none" />
-      <main className={cn('flex-1 overflow-auto bg-secondary', className)}>
+    <div className="monday-layout">
+      <MondaySidebar className="monday-sidebar" />
+      <main className={cn('monday-main', className)}>
         {children}
       </main>
     </div>

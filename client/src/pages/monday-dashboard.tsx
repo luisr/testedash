@@ -16,13 +16,13 @@ import {
 
 export default function MondayDashboard() {
   return (
-    <MondayLayout>
-      <div className="p-xl space-y-xl">
+    <MondayLayout className="monday-bg">
+      <div className="p-xl space-y-xl monday-bg">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-primary">Dashboard</h1>
-            <p className="text-secondary">Visão geral dos seus projetos</p>
+            <h1 className="text-3xl font-bold monday-text">Dashboard</h1>
+            <p className="monday-text-secondary">Visão geral dos seus projetos</p>
           </div>
           <div className="flex gap-sm">
             <Button variant="secondary">
@@ -38,11 +38,11 @@ export default function MondayDashboard() {
 
         {/* KPI Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-lg">
-          <Card>
+          <Card className="monday-card">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <div>
-                <p className="text-sm font-medium text-secondary">Projetos Ativos</p>
-                <p className="text-2xl font-bold text-primary">12</p>
+                <p className="text-sm font-medium monday-text-secondary">Projetos Ativos</p>
+                <p className="text-2xl font-bold monday-text">12</p>
               </div>
               <div className="bg-primary rounded-lg p-sm">
                 <FolderOpen className="w-4 h-4 text-on-primary" />
