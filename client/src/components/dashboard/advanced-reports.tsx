@@ -181,23 +181,28 @@ export default function AdvancedReports({ activities, projects, dashboardId }: A
         }))
       };
 
+      console.log('Sending request to Gemini API with data:', reportData);
+
       const response = await apiRequest('POST', '/api/reports/gemini-observations', { 
         data: reportData,
         reportType: 'advanced-analysis'
       });
 
       console.log('Response from Gemini API:', response);
+      console.log('Response type:', typeof response);
+      console.log('Response observations:', response?.observations);
       
       if (response && response.observations) {
+        console.log('Setting observations:', response.observations);
         setGeminiObservations(response.observations);
+        toast({
+          title: "Observações geradas com sucesso",
+          description: "As observações da IA foram geradas e estão prontas para visualização.",
+        });
       } else {
         console.error('Invalid response structure:', response);
         throw new Error('Resposta inválida da API');
       }
-      toast({
-        title: "Observações geradas com sucesso",
-        description: "As observações da IA foram geradas e estão prontas para visualização.",
-      });
     } catch (error) {
       console.error('Error generating Gemini observations:', error);
       toast({
@@ -243,7 +248,7 @@ export default function AdvancedReports({ activities, projects, dashboardId }: A
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `relatorio-${reportType}-dashboard-${dashboardId}-${new Date().toISOString().split('T')[0]}.pdf`;
+      a.download = `relatorio-${reportType}-dashboard-${dashboardId}-${new Date().toISOString().split('T')[0]}.txt`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -647,6 +652,17 @@ export default function AdvancedReports({ activities, projects, dashboardId }: A
               </CardTitle>
             </CardHeader>
             <CardContent>
+              <div className="mb-4">
+                <Button
+                  onClick={generateGeminiObservations}
+                  disabled={loadingObservations}
+                  className="flex items-center gap-2"
+                >
+                  <Brain className="w-4 h-4" />
+                  {loadingObservations ? 'Gerando...' : 'Gerar Observações IA'}
+                </Button>
+              </div>
+
               {!geminiObservations ? (
                 <div className="text-center py-12">
                   <Lightbulb className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
@@ -656,14 +672,9 @@ export default function AdvancedReports({ activities, projects, dashboardId }: A
                   <p className="text-muted-foreground mb-4">
                     Clique em "Gerar Observações IA" para obter insights inteligentes sobre o projeto.
                   </p>
-                  <Button
-                    onClick={generateGeminiObservations}
-                    disabled={loadingObservations}
-                    className="flex items-center gap-2"
-                  >
-                    <Brain className="w-4 h-4" />
-                    {loadingObservations ? 'Gerando...' : 'Gerar Observações IA'}
-                  </Button>
+                  <div className="text-xs text-muted-foreground">
+                    Estado das observações: {geminiObservations || 'vazio'}
+                  </div>
                 </div>
               ) : (
                 <div className="prose max-w-none">
@@ -676,8 +687,20 @@ export default function AdvancedReports({ activities, projects, dashboardId }: A
                     </p>
                   </div>
                   
-                  <div className="whitespace-pre-wrap text-sm leading-relaxed">
+                  <div className="whitespace-pre-wrap text-sm leading-relaxed bg-gray-50 p-4 rounded-lg">
                     {geminiObservations}
+                  </div>
+                  
+                  <div className="mt-4">
+                    <Button
+                      onClick={generateGeminiObservations}
+                      disabled={loadingObservations}
+                      variant="outline"
+                      className="flex items-center gap-2"
+                    >
+                      <Brain className="w-4 h-4" />
+                      {loadingObservations ? 'Gerando...' : 'Gerar Novamente'}
+                    </Button>
                   </div>
                 </div>
               )}
