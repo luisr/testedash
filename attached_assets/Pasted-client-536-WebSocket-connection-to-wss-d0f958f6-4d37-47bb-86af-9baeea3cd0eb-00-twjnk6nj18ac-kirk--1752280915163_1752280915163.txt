@@ -1,0 +1,66 @@
+client:536 WebSocket connection to 'wss://d0f958f6-4d37-47bb-86af-9baeea3cd0eb-00-twjnk6nj18ac.kirk.replit.dev/?token=7PcP8Dtjpos4' failed: 
+setupWebSocket @ client:536
+(anonymous) @ client:531Understand this error
+client:536 Uncaught (in promise) SyntaxError: Failed to construct 'WebSocket': The URL 'wss://localhost:undefined/?token=7PcP8Dtjpos4' is invalid.
+    at setupWebSocket (client:536:19)
+    at fallback (client:509:16)
+    at WebSocket.<anonymous> (client:555:7)
+setupWebSocket @ client:536
+fallback @ client:509
+(anonymous) @ client:555Understand this error
+chunk-RPCDYKBN.js?v=1907f8c4:21551 Download the React DevTools for a better development experience: https://reactjs.org/link/react-devtools
+queryClient.ts:32  GET https://d0f958f6-4d37-47bb-86af-9baeea3cd0eb-00-twjnk6nj18ac.kirk.replit.dev/api/activities/dashboard/1 500 (Internal Server Error)
+(anonymous) @ queryClient.ts:32
+fetchFn @ @tanstack_react-query.js?v=1907f8c4:840
+run @ @tanstack_react-query.js?v=1907f8c4:494
+start @ @tanstack_react-query.js?v=1907f8c4:536
+fetch @ @tanstack_react-query.js?v=1907f8c4:926
+executeFetch_fn @ @tanstack_react-query.js?v=1907f8c4:2211
+onSubscribe @ @tanstack_react-query.js?v=1907f8c4:1898
+subscribe @ @tanstack_react-query.js?v=1907f8c4:24
+(anonymous) @ @tanstack_react-query.js?v=1907f8c4:3022
+subscribeToStore @ chunk-RPCDYKBN.js?v=1907f8c4:11984
+commitHookEffectListMount @ chunk-RPCDYKBN.js?v=1907f8c4:16915
+commitPassiveMountOnFiber @ chunk-RPCDYKBN.js?v=1907f8c4:18156
+commitPassiveMountEffects_complete @ chunk-RPCDYKBN.js?v=1907f8c4:18129
+commitPassiveMountEffects_begin @ chunk-RPCDYKBN.js?v=1907f8c4:18119
+commitPassiveMountEffects @ chunk-RPCDYKBN.js?v=1907f8c4:18109
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=1907f8c4:19490
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=1907f8c4:19447
+performSyncWorkOnRoot @ chunk-RPCDYKBN.js?v=1907f8c4:18868
+flushSyncCallbacks @ chunk-RPCDYKBN.js?v=1907f8c4:9119
+commitRootImpl @ chunk-RPCDYKBN.js?v=1907f8c4:19432
+commitRoot @ chunk-RPCDYKBN.js?v=1907f8c4:19277
+finishConcurrentRender @ chunk-RPCDYKBN.js?v=1907f8c4:18805
+performConcurrentWorkOnRoot @ chunk-RPCDYKBN.js?v=1907f8c4:18718
+workLoop @ chunk-RPCDYKBN.js?v=1907f8c4:197
+flushWork @ chunk-RPCDYKBN.js?v=1907f8c4:176
+performWorkUntilDeadline @ chunk-RPCDYKBN.js?v=1907f8c4:384Understand this error
+use-consolidated-dashboard.ts:27  GET https://d0f958f6-4d37-47bb-86af-9baeea3cd0eb-00-twjnk6nj18ac.kirk.replit.dev/api/consolidated-dashboard/5 500 (Internal Server Error)
+queryFn @ use-consolidated-dashboard.ts:27
+fetchFn @ @tanstack_react-query.js?v=1907f8c4:840
+run @ @tanstack_react-query.js?v=1907f8c4:494
+start @ @tanstack_react-query.js?v=1907f8c4:536
+fetch @ @tanstack_react-query.js?v=1907f8c4:926
+executeFetch_fn @ @tanstack_react-query.js?v=1907f8c4:2211
+onSubscribe @ @tanstack_react-query.js?v=1907f8c4:1898
+subscribe @ @tanstack_react-query.js?v=1907f8c4:24
+(anonymous) @ @tanstack_react-query.js?v=1907f8c4:3022
+subscribeToStore @ chunk-RPCDYKBN.js?v=1907f8c4:11984
+commitHookEffectListMount @ chunk-RPCDYKBN.js?v=1907f8c4:16915
+commitPassiveMountOnFiber @ chunk-RPCDYKBN.js?v=1907f8c4:18156
+commitPassiveMountEffects_complete @ chunk-RPCDYKBN.js?v=1907f8c4:18129
+commitPassiveMountEffects_begin @ chunk-RPCDYKBN.js?v=1907f8c4:18119
+commitPassiveMountEffects @ chunk-RPCDYKBN.js?v=1907f8c4:18109
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=1907f8c4:19490
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=1907f8c4:19447
+performSyncWorkOnRoot @ chunk-RPCDYKBN.js?v=1907f8c4:18868
+flushSyncCallbacks @ chunk-RPCDYKBN.js?v=1907f8c4:9119
+commitRootImpl @ chunk-RPCDYKBN.js?v=1907f8c4:19432
+commitRoot @ chunk-RPCDYKBN.js?v=1907f8c4:19277
+finishConcurrentRender @ chunk-RPCDYKBN.js?v=1907f8c4:18805
+performConcurrentWorkOnRoot @ chunk-RPCDYKBN.js?v=1907f8c4:18718
+workLoop @ chunk-RPCDYKBN.js?v=1907f8c4:197
+flushWork @ chunk-RPCDYKBN.js?v=1907f8c4:176
+performWorkUntilDeadline @ chunk-RPCDYKBN.js?v=1907f8c4:384Understand this error
+use-consolidated-dashboard.ts:27  GET https://d0f958f6-4d37-47bb-86af-9baeea3cd0eb-00-twjnk6nj18ac.kirk.replit.dev/api/consolidated-dashboard/5 500 (Internal Server Error)
