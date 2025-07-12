@@ -5,19 +5,24 @@ import { Activity } from '@/../shared/schema';
 import KanbanView from './kanban-view';
 import CalendarView from './calendar-view';
 import GanttView from './gantt-view';
+import DatalogView from './datalog-view';
+import RoadmapView from './roadmap-view';
 import { 
   Kanban, 
   Calendar, 
   TrendingUp, 
-  BarChart3 
+  BarChart3,
+  FileText,
+  MapPin
 } from 'lucide-react';
 
 interface ProjectViewsProps {
   activities: Activity[];
+  projects: any[];
   onUpdateActivity: (id: number, data: Partial<Activity>) => void;
 }
 
-export default function ProjectViews({ activities, onUpdateActivity }: ProjectViewsProps) {
+export default function ProjectViews({ activities, projects, onUpdateActivity }: ProjectViewsProps) {
   const [activeTab, setActiveTab] = useState('kanban');
 
   const tabs = [
@@ -38,6 +43,18 @@ export default function ProjectViews({ activities, onUpdateActivity }: ProjectVi
       label: 'Gantt',
       icon: TrendingUp,
       component: GanttView
+    },
+    {
+      id: 'datalog',
+      label: 'Datalog',
+      icon: FileText,
+      component: DatalogView
+    },
+    {
+      id: 'roadmap',
+      label: 'Roadmap',
+      icon: MapPin,
+      component: RoadmapView
     }
   ];
 
@@ -52,7 +69,7 @@ export default function ProjectViews({ activities, onUpdateActivity }: ProjectVi
       
       <CardContent className="h-full">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full flex flex-col">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-5">
             {tabs.map(tab => {
               const IconComponent = tab.icon;
               return (
@@ -73,6 +90,7 @@ export default function ProjectViews({ activities, onUpdateActivity }: ProjectVi
               <TabsContent key={tab.id} value={tab.id} className="h-full m-0">
                 <tab.component
                   activities={activities}
+                  projects={projects}
                   onUpdateActivity={onUpdateActivity}
                 />
               </TabsContent>

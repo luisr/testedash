@@ -12,6 +12,7 @@ import ActivitySummary from './activity-summary';
 import ProjectViews from './project-views';
 import BackupManagement from './backup-management';
 import CreateActivityModal from './create-activity-modal';
+import MilestoneManager from './milestone-manager';
 import { Button } from '@/components/ui/button';
 import { Activity } from '@shared/schema';
 
@@ -32,6 +33,7 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [showCreateActivityModal, setShowCreateActivityModal] = useState(false);
+  const [showMilestoneManager, setShowMilestoneManager] = useState(false);
   const [visibleFields, setVisibleFields] = useState<string[]>([
     // Campos padrão da tabela
     'name', 'status', 'priority', 'responsible', 'discipline', 'completionPercentage', 
@@ -154,7 +156,10 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({
       />
 
       {/* Activity Summary */}
-      <ActivitySummary activities={activities} />
+      <ActivitySummary 
+        activities={activities} 
+        onManageMilestones={() => setShowMilestoneManager(true)}
+      />
 
       {/* Charts Section */}
       <ChartsSection 
@@ -189,6 +194,7 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({
       {/* Project Views */}
       <ProjectViews 
         activities={activities}
+        projects={projects}
         onUpdateActivity={updateActivity}
       />
 
@@ -207,6 +213,14 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({
       <CreateActivityModal
         open={showCreateActivityModal}
         onClose={() => setShowCreateActivityModal(false)}
+        dashboardId={dashboardId}
+      />
+
+      {/* Modal para gerenciar marcos */}
+      <MilestoneManager
+        open={showMilestoneManager}
+        onClose={() => setShowMilestoneManager(false)}
+        activities={activities}
         dashboardId={dashboardId}
       />
     </div>

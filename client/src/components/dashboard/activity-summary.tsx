@@ -1,13 +1,15 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Calendar, Clock, AlertTriangle, CheckCircle2, TrendingUp, TrendingDown } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Calendar, Clock, AlertTriangle, CheckCircle2, TrendingUp, TrendingDown, Star } from "lucide-react";
 
 interface ActivitySummaryProps {
   activities: any[];
+  onManageMilestones?: () => void;
 }
 
-export default function ActivitySummary({ activities = [] }: ActivitySummaryProps) {
+export default function ActivitySummary({ activities = [], onManageMilestones }: ActivitySummaryProps) {
   const today = new Date();
   
   const summary = {
@@ -15,6 +17,7 @@ export default function ActivitySummary({ activities = [] }: ActivitySummaryProp
     completed: activities.filter(a => a.status === 'completed').length,
     inProgress: activities.filter(a => a.status === 'in_progress').length,
     notStarted: activities.filter(a => a.status === 'not_started').length,
+    milestones: activities.filter(a => a.isMilestone).length,
     overdue: activities.filter(a => {
       if (!a.finishDate) return false;
       const finishDate = new Date(a.finishDate);
@@ -33,7 +36,25 @@ export default function ActivitySummary({ activities = [] }: ActivitySummaryProp
   const completionRate = summary.total > 0 ? (summary.completed / summary.total) * 100 : 0;
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+    <div className="space-y-4 mb-6">
+      {/* Header with Milestone Button */}
+      <div className="flex items-center justify-between">
+        <h3 className="text-lg font-semibold text-foreground">Resumo das Atividades</h3>
+        {onManageMilestones && (
+          <Button 
+            onClick={onManageMilestones}
+            variant="outline"
+            size="sm"
+            className="flex items-center gap-2"
+          >
+            <Star className="w-4 h-4" />
+            Gerenciar Marcos ({summary.milestones})
+          </Button>
+        )}
+      </div>
+
+      {/* Summary Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
       <Card className="border-l-4 border-l-blue-500">
         <CardHeader className="pb-3">
           <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
@@ -102,6 +123,7 @@ export default function ActivitySummary({ activities = [] }: ActivitySummaryProp
           )}
         </CardContent>
       </Card>
+      </div>
     </div>
   );
 }
