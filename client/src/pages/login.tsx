@@ -1,15 +1,14 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button-new";
+import { Input } from "@/components/ui/input-new";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card-new";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Eye, EyeOff, LogIn, Shield } from "lucide-react";
 import beachParkLogo from "@assets/pngegg_1752264509099.png";
 import ChangePasswordModal from "@/components/auth/change-password-modal";
-import { ThemeToggle } from "@/components/ui/theme-toggle";
-import "@/styles/login-theme.css";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
 
 export default function Login() {
   const [, setLocation] = useLocation();
@@ -64,10 +63,10 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen beachpark-gradient-bg flex items-center justify-center p-4">
+    <div className="min-h-screen bg-primary flex items-center justify-center p-4">
       {/* Theme Toggle - Top Right */}
       <div className="fixed top-4 right-4 z-50">
-        <div className="beachpark-card p-1 rounded-full">
+        <div className="card p-2 rounded-full shadow-md">
           <ThemeToggle />
         </div>
       </div>
@@ -76,21 +75,23 @@ export default function Login() {
         {/* Logo/Header */}
         <div className="text-center space-y-4">
           <div className="flex justify-center">
-            <div className="beachpark-logo-container beachpark-hover-lift">
+            <div className="hover-lift">
               <img src={beachParkLogo} alt="BeachPark Logo" className="w-16 h-16 object-contain" />
             </div>
           </div>
-          <h1 className="text-4xl font-bold beachpark-text-gradient">Tô Sabendo</h1>
-          <p className="text-white/80 dark:text-slate-300">Sistema de Gerenciamento de Projetos</p>
+          <h1 className="text-4xl font-bold text-primary" style={{ background: 'var(--brand-gradient)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+            Tô Sabendo
+          </h1>
+          <p className="text-secondary">Sistema de Gerenciamento de Projetos</p>
         </div>
 
         {/* Login Form */}
-        <Card className="beachpark-card beachpark-shadow-elegant-xl backdrop-blur-xl">
-          <CardHeader className="space-y-1">
-            <CardTitle className="text-2xl font-semibold text-center">
+        <Card className="glass shadow-xl">
+          <CardHeader>
+            <CardTitle className="text-2xl font-semibold text-center text-primary">
               Fazer Login
             </CardTitle>
-            <CardDescription className="text-center">
+            <CardDescription className="text-center text-secondary">
               Entre com suas credenciais para acessar seus projetos
             </CardDescription>
           </CardHeader>
@@ -102,8 +103,8 @@ export default function Login() {
                 </Alert>
               )}
 
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+              <div className="input-group">
+                <Label htmlFor="email" className="input-label">Email</Label>
                 <Input
                   id="email"
                   type="email"
@@ -111,12 +112,11 @@ export default function Login() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="beachpark-input"
                 />
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="password">Senha</Label>
+              <div className="input-group">
+                <Label htmlFor="password" className="input-label">Senha</Label>
                 <div className="relative">
                   <Input
                     id="password"
@@ -125,12 +125,12 @@ export default function Login() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
-                    className="beachpark-input pr-10"
+                    className="pr-10"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-secondary hover:text-primary transition-colors"
                   >
                     {showPassword ? (
                       <EyeOff className="h-4 w-4" />
@@ -144,48 +144,39 @@ export default function Login() {
               <Button
                 type="submit"
                 disabled={isLoading}
-                className="beachpark-btn-primary w-full h-12"
+                className="w-full hover-lift"
               >
                 {isLoading ? (
-                  <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
                     Entrando...
-                  </div>
+                  </>
                 ) : (
-                  <div className="flex items-center gap-2">
-                    <LogIn className="w-5 h-5" />
+                  <>
+                    <LogIn className="mr-2 h-4 w-4" />
                     Entrar
-                  </div>
+                  </>
                 )}
               </Button>
-            </form>
 
-            {/* Demo credentials */}
-            <div className="mt-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-              <h4 className="font-medium text-sm mb-2 text-gray-700 dark:text-gray-300">
-                Credenciais de Demo:
-              </h4>
-              <div className="space-y-1 text-xs text-gray-600 dark:text-gray-400">
-                <p>• Email: ana.lima@empresa.com</p>
-                <p>• Senha: password123</p>
+              <div className="text-center text-sm text-secondary">
+                <p>
+                  <Shield className="inline w-4 h-4 mr-1" />
+                  Sistema seguro e protegido
+                </p>
               </div>
-            </div>
+            </form>
           </CardContent>
         </Card>
-
-        {/* Footer */}
-        <p className="text-center text-sm text-muted-foreground">
-          Sistema de autenticação por colaborador
-        </p>
       </div>
-      
+
       {/* Change Password Modal */}
-      {showChangePasswordModal && loggedInUser && (
+      {showChangePasswordModal && (
         <ChangePasswordModal
           isOpen={showChangePasswordModal}
           onClose={() => setShowChangePasswordModal(false)}
-          userId={loggedInUser.id}
           onPasswordChanged={handlePasswordChanged}
+          user={loggedInUser}
         />
       )}
     </div>
