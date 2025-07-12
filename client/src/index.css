@@ -73,6 +73,99 @@
   inset: auto !important;
 }
 
+/* Force all dialogs to be completely stable */
+[data-radix-dialog-content]:not([data-state="closed"]) {
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  z-index: 9999 !important;
+  will-change: unset !important;
+  transition: none !important;
+  animation: none !important;
+  pointer-events: auto !important;
+}
+
+/* Force stability on all child elements */
+[data-radix-dialog-content] * {
+  will-change: unset !important;
+  transition: none !important;
+  animation: none !important;
+}
+
+/* Override any hover effects that might cause movement */
+[data-radix-dialog-content]:hover,
+[data-radix-dialog-content]:focus-within,
+[data-radix-dialog-content] *:hover,
+[data-radix-dialog-content] *:focus {
+  transform: none !important;
+  transition: none !important;
+  animation: none !important;
+}
+
+/* Ultra-aggressive modal fixing for specific classes */
+.fixed-modal {
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  will-change: unset !important;
+  transition: none !important;
+  animation: none !important;
+  z-index: 9999 !important;
+  pointer-events: auto !important;
+}
+
+.fixed-modal,
+.fixed-modal * {
+  will-change: unset !important;
+  transition: none !important;
+  animation: none !important;
+  transform-origin: center !important;
+}
+
+.fixed-modal:hover,
+.fixed-modal:focus,
+.fixed-modal:active,
+.fixed-modal:focus-within {
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+}
+
+/* Force disable all hover effects on modal children */
+.fixed-modal * {
+  transition: none !important;
+  animation: none !important;
+}
+
+.fixed-modal *:hover,
+.fixed-modal *:focus,
+.fixed-modal *:active {
+  transform: none !important;
+  transition: none !important;
+  animation: none !important;
+}
+
+/* Override any Tailwind/component library transitions */
+.fixed-modal .transition-all,
+.fixed-modal .transition-transform,
+.fixed-modal .transition-opacity,
+.fixed-modal .transition-colors,
+.fixed-modal .animate-in,
+.fixed-modal .animate-out {
+  transition: none !important;
+  animation: none !important;
+  transform: none !important;
+}
+
+/* Force stable positioning regardless of content changes */
+.fixed-modal {
+  contain: layout !important;
+  isolation: isolate !important;
+}
+
 @layer base {
   :root {
     /* Light Theme - Harmonious Professional Colors */
