@@ -55,10 +55,12 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, dash
                 Tô Sabendo - Dashboard
               </h1>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
               <NotificationsDropdown />
-              <ThemeToggle />
-              <div className="text-sm text-muted-foreground">
+              <div className="bg-gradient-to-r from-blue-500/10 to-cyan-500/10 rounded-full p-1">
+                <ThemeToggle />
+              </div>
+              <div className="text-sm text-muted-foreground font-medium">
                 {user?.name || user?.email}
               </div>
             </div>
