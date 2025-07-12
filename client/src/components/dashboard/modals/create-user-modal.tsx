@@ -26,18 +26,28 @@ export function CreateUserModal({ isOpen, onClose }: CreateUserModalProps) {
 
   const createUserMutation = useMutation({
     mutationFn: async (userData: typeof formData) => {
-      return await apiRequest("/api/users", "POST", userData);
+      console.log('Creating user with data:', userData);
+      const payload = {
+        ...userData,
+        password: 'BeachPark@123',
+        mustChangePassword: true,
+        isActive: true
+      };
+      console.log('Sending payload:', payload);
+      return await apiRequest("/api/users", "POST", payload);
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      console.log('User created successfully:', data);
       toast({
         title: "Usuário criado com sucesso",
-        description: "O usuário foi criado e receberá as credenciais por email.",
+        description: "O usuário foi criado com a senha padrão BeachPark@123.",
       });
       queryClient.invalidateQueries({ queryKey: ["/api/users"] });
       onClose();
       setFormData({ name: "", email: "", role: "user" });
     },
     onError: (error: any) => {
+      console.error('Error creating user:', error);
       toast({
         title: "Erro ao criar usuário",
         description: error.message || "Ocorreu um erro inesperado.",
