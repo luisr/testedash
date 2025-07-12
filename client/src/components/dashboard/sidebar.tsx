@@ -57,7 +57,7 @@ export default function Sidebar({ isOpen, onClose, onActivityLogToggle, onUsersC
       
       {/* BeachPark Sidebar */}
       <div className={cn(
-        "fixed inset-y-0 left-0 z-50 w-64 beachpark-sidebar beachpark-shadow-elegant-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0",
+        "fixed inset-y-0 left-0 z-50 w-64 beachpark-sidebar transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0",
         isOpen ? "translate-x-0" : "-translate-x-full"
       )}>
         <div className="flex items-center justify-between h-16 px-6 border-b border-border/50">
@@ -65,7 +65,7 @@ export default function Sidebar({ isOpen, onClose, onActivityLogToggle, onUsersC
             <div className="w-12 h-12 beachpark-card rounded-xl flex items-center justify-center beachpark-hover-lift">
               <img src={beachParkLogo} alt="BeachPark Logo" className="w-10 h-10 object-contain" />
             </div>
-            <h1 className="text-xl font-bold beachpark-text-gradient">Tô Sabendo</h1>
+            <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-sky-500 bg-clip-text text-transparent">Tô Sabendo</h1>
           </div>
           <Button 
             variant="ghost" 
