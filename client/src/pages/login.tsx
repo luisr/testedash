@@ -9,6 +9,7 @@ import { Eye, EyeOff, LogIn, Shield } from "lucide-react";
 import beachParkLogo from "@assets/pngegg_1752264509099.png";
 import ChangePasswordModal from "@/components/auth/change-password-modal";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
+import "@/styles/login-theme.css";
 
 export default function Login() {
   const [, setLocation] = useLocation();
@@ -63,28 +64,28 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen dashboard-container flex items-center justify-center p-4">
+    <div className="min-h-screen beachpark-gradient-bg flex items-center justify-center p-4">
       {/* Theme Toggle - Top Right */}
       <div className="fixed top-4 right-4 z-50">
-        <div className="bg-gradient-to-r from-blue-500/10 to-cyan-500/10 rounded-full p-1">
+        <div className="beachpark-card p-1 rounded-full">
           <ThemeToggle />
         </div>
       </div>
       
       <div className="w-full max-w-md space-y-8">
         {/* Logo/Header */}
-        <div className="text-center space-y-2">
+        <div className="text-center space-y-4">
           <div className="flex justify-center">
-            <div className="w-20 h-20 rounded-2xl flex items-center justify-center bg-white p-2">
+            <div className="beachpark-logo-container beachpark-hover-lift">
               <img src={beachParkLogo} alt="BeachPark Logo" className="w-16 h-16 object-contain" />
             </div>
           </div>
-          <h1 className="text-3xl font-bold text-foreground">Tô Sabendo</h1>
-          <p className="text-muted-foreground">Sistema de Gerenciamento de Projetos</p>
+          <h1 className="text-4xl font-bold beachpark-text-gradient">Tô Sabendo</h1>
+          <p className="text-white/80 dark:text-slate-300">Sistema de Gerenciamento de Projetos</p>
         </div>
 
         {/* Login Form */}
-        <Card className="border-0 shadow-2xl backdrop-blur-xl bg-white/95 dark:bg-slate-900/95">
+        <Card className="beachpark-card beachpark-shadow-elegant-xl backdrop-blur-xl">
           <CardHeader className="space-y-1">
             <CardTitle className="text-2xl font-semibold text-center">
               Fazer Login
@@ -110,7 +111,7 @@ export default function Login() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="h-12"
+                  className="beachpark-input"
                 />
               </div>
 
@@ -124,7 +125,7 @@ export default function Login() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
-                    className="h-12 pr-10"
+                    className="beachpark-input pr-10"
                   />
                   <button
                     type="button"
@@ -143,7 +144,7 @@ export default function Login() {
               <Button
                 type="submit"
                 disabled={isLoading}
-                className="w-full h-12 text-lg bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 shadow-lg hover:shadow-xl transition-all duration-200"
+                className="beachpark-btn-primary w-full h-12"
               >
                 {isLoading ? (
                   <div className="flex items-center gap-2">
