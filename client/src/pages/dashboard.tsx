@@ -15,20 +15,23 @@ import {
 
 export default function Dashboard() {
   return (
-    <Layout>
+    <div className="min-h-screen" style={{ 
+      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      color: 'white'
+    }}>
       <div className="p-lg space-y-xl">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-primary">Dashboard</h1>
-            <p className="text-secondary">Visão geral dos seus projetos</p>
+            <h1 className="text-3xl font-bold text-white">Dashboard</h1>
+            <p className="text-white/70">Visão geral dos seus projetos</p>
           </div>
           <div className="flex gap-sm">
-            <Button variant="secondary">
+            <Button variant="secondary" className="bg-white/10 text-white border-white/20 hover:bg-white/20">
               <Calendar className="w-4 h-4 mr-2" />
               Calendário
             </Button>
-            <Button>
+            <Button className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white">
               <FolderOpen className="w-4 h-4 mr-2" />
               Novo Projeto
             </Button>
@@ -37,62 +40,82 @@ export default function Dashboard() {
 
         {/* KPI Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-lg">
-          <Card className="hover-lift">
+          <Card className="hover-lift" style={{ 
+            background: 'rgba(255, 255, 255, 0.1)',
+            backdropFilter: 'blur(10px)',
+            border: '1px solid rgba(255, 255, 255, 0.2)',
+            color: 'white'
+          }}>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-secondary">
+              <CardTitle className="text-sm font-medium text-white">
                 Projetos Ativos
               </CardTitle>
-              <FolderOpen className="w-4 h-4 text-secondary" />
+              <FolderOpen className="w-4 h-4 text-white/70" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-primary">12</div>
-              <p className="text-xs text-secondary">
-                <span className="text-success">+2</span> este mês
+              <div className="text-2xl font-bold text-white">12</div>
+              <p className="text-xs text-white/70">
+                <span className="text-green-400">+2</span> este mês
               </p>
             </CardContent>
           </Card>
 
-          <Card className="hover-lift">
+          <Card className="hover-lift" style={{ 
+            background: 'rgba(255, 255, 255, 0.1)',
+            backdropFilter: 'blur(10px)',
+            border: '1px solid rgba(255, 255, 255, 0.2)',
+            color: 'white'
+          }}>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-secondary">
+              <CardTitle className="text-sm font-medium text-white">
                 Tarefas Concluídas
               </CardTitle>
-              <CheckCircle className="w-4 h-4 text-success" />
+              <CheckCircle className="w-4 h-4 text-green-400" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-primary">284</div>
-              <p className="text-xs text-secondary">
-                <span className="text-success">+12%</span> vs mês passado
+              <div className="text-2xl font-bold text-white">284</div>
+              <p className="text-xs text-white/70">
+                <span className="text-green-400">+12%</span> vs mês passado
               </p>
             </CardContent>
           </Card>
 
-          <Card className="hover-lift">
+          <Card className="hover-lift" style={{ 
+            background: 'rgba(255, 255, 255, 0.1)',
+            backdropFilter: 'blur(10px)',
+            border: '1px solid rgba(255, 255, 255, 0.2)',
+            color: 'white'
+          }}>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-secondary">
+              <CardTitle className="text-sm font-medium text-white">
                 Equipe Ativa
               </CardTitle>
-              <Users className="w-4 h-4 text-secondary" />
+              <Users className="w-4 h-4 text-white/70" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-primary">24</div>
-              <p className="text-xs text-secondary">
-                <span className="text-info">+3</span> novos colaboradores
+              <div className="text-2xl font-bold text-white">24</div>
+              <p className="text-xs text-white/70">
+                <span className="text-cyan-400">+3</span> novos colaboradores
               </p>
             </CardContent>
           </Card>
 
-          <Card className="hover-lift">
+          <Card className="hover-lift" style={{ 
+            background: 'rgba(255, 255, 255, 0.1)',
+            backdropFilter: 'blur(10px)',
+            border: '1px solid rgba(255, 255, 255, 0.2)',
+            color: 'white'
+          }}>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-secondary">
+              <CardTitle className="text-sm font-medium text-white">
                 Performance
               </CardTitle>
-              <TrendingUp className="w-4 h-4 text-success" />
+              <TrendingUp className="w-4 h-4 text-green-400" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-primary">94%</div>
-              <p className="text-xs text-secondary">
-                <span className="text-success">+5%</span> eficiência
+              <div className="text-2xl font-bold text-white">94%</div>
+              <p className="text-xs text-white/70">
+                <span className="text-green-400">+5%</span> eficiência
               </p>
             </CardContent>
           </Card>
@@ -101,9 +124,14 @@ export default function Dashboard() {
         {/* Main Content */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-lg">
           {/* Projects Overview */}
-          <Card className="lg:col-span-2">
+          <Card className="lg:col-span-2" style={{ 
+            background: 'rgba(255, 255, 255, 0.1)',
+            backdropFilter: 'blur(10px)',
+            border: '1px solid rgba(255, 255, 255, 0.2)',
+            color: 'white'
+          }}>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
+              <CardTitle className="flex items-center gap-2 text-white">
                 <BarChart3 className="w-5 h-5" />
                 Projetos Recentes
               </CardTitle>
@@ -140,10 +168,10 @@ export default function Dashboard() {
                     deadline: "12 Jan 2025"
                   }
                 ].map((project, index) => (
-                  <div key={index} className="flex items-center justify-between p-md bg-secondary rounded-lg">
+                  <div key={index} className="flex items-center justify-between p-md bg-white/10 rounded-lg">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1">
-                        <h4 className="font-medium text-primary">{project.name}</h4>
+                        <h4 className="font-medium text-white">{project.name}</h4>
                         <Badge 
                           variant={
                             project.status === 'completed' ? 'success' :
@@ -154,7 +182,7 @@ export default function Dashboard() {
                            project.status === 'delayed' ? 'Atrasado' : 'Em Andamento'}
                         </Badge>
                       </div>
-                      <div className="flex items-center gap-4 text-sm text-secondary">
+                      <div className="flex items-center gap-4 text-sm text-white/70">
                         <span>Equipe: {project.team}</span>
                         <span>Prazo: {project.deadline}</span>
                       </div>
@@ -165,7 +193,7 @@ export default function Dashboard() {
                             style={{ width: `${project.progress}%` }}
                           ></div>
                         </div>
-                        <span className="text-xs text-secondary mt-1">{project.progress}% concluído</span>
+                        <span className="text-xs text-white/70 mt-1">{project.progress}% concluído</span>
                       </div>
                     </div>
                   </div>
@@ -175,9 +203,14 @@ export default function Dashboard() {
           </Card>
 
           {/* Activity Feed */}
-          <Card>
+          <Card style={{ 
+            background: 'rgba(255, 255, 255, 0.1)',
+            backdropFilter: 'blur(10px)',
+            border: '1px solid rgba(255, 255, 255, 0.2)',
+            color: 'white'
+          }}>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
+              <CardTitle className="flex items-center gap-2 text-white">
                 <Clock className="w-5 h-5" />
                 Atividades Recentes
               </CardTitle>
@@ -214,17 +247,17 @@ export default function Dashboard() {
                     type: "info"
                   }
                 ].map((activity, index) => (
-                  <div key={index} className="flex items-start gap-3 p-sm">
+                  <div key={index} className="flex items-start gap-3 p-sm bg-white/5 rounded-lg">
                     <div className={`w-2 h-2 rounded-full mt-2 ${
                       activity.type === 'success' ? 'bg-success' :
                       activity.type === 'warning' ? 'bg-warning' : 'bg-info'
                     }`}></div>
                     <div className="flex-1">
-                      <p className="text-sm text-primary">
+                      <p className="text-sm text-white">
                         <strong>{activity.user}</strong> {activity.action}{' '}
-                        <span className="text-accent">{activity.target}</span>
+                        <span className="text-cyan-400">{activity.target}</span>
                       </p>
-                      <p className="text-xs text-secondary">{activity.time}</p>
+                      <p className="text-xs text-white/70">{activity.time}</p>
                     </div>
                   </div>
                 ))}
@@ -234,25 +267,30 @@ export default function Dashboard() {
         </div>
 
         {/* Quick Actions */}
-        <Card>
+        <Card style={{ 
+          background: 'rgba(255, 255, 255, 0.1)',
+          backdropFilter: 'blur(10px)',
+          border: '1px solid rgba(255, 255, 255, 0.2)',
+          color: 'white'
+        }}>
           <CardHeader>
-            <CardTitle>Ações Rápidas</CardTitle>
+            <CardTitle className="text-white">Ações Rápidas</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-md">
-              <Button className="h-auto p-md flex-col gap-2">
+              <Button className="h-auto p-md flex-col gap-2 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white">
                 <FolderOpen className="w-6 h-6" />
                 <span>Novo Projeto</span>
               </Button>
-              <Button variant="secondary" className="h-auto p-md flex-col gap-2">
+              <Button variant="secondary" className="h-auto p-md flex-col gap-2 bg-white/10 text-white border-white/20 hover:bg-white/20">
                 <Users className="w-6 h-6" />
                 <span>Gerenciar Equipe</span>
               </Button>
-              <Button variant="secondary" className="h-auto p-md flex-col gap-2">
+              <Button variant="secondary" className="h-auto p-md flex-col gap-2 bg-white/10 text-white border-white/20 hover:bg-white/20">
                 <BarChart3 className="w-6 h-6" />
                 <span>Ver Relatórios</span>
               </Button>
-              <Button variant="secondary" className="h-auto p-md flex-col gap-2">
+              <Button variant="secondary" className="h-auto p-md flex-col gap-2 bg-white/10 text-white border-white/20 hover:bg-white/20">
                 <Calendar className="w-6 h-6" />
                 <span>Agendar Reunião</span>
               </Button>
@@ -260,6 +298,6 @@ export default function Dashboard() {
           </CardContent>
         </Card>
       </div>
-    </Layout>
+    </div>
   );
 }
