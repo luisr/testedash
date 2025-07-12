@@ -112,6 +112,57 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update user profile
+  app.put("/api/users/:userId", async (req, res) => {
+    try {
+      const userId = parseInt(req.params.userId);
+      const { name, email, currentPassword, newPassword } = req.body;
+      
+      if (!name || !email) {
+        return res.status(400).json({ message: "Nome e email são obrigatórios" });
+      }
+      
+      // Check if email is already in use by another user
+      const existingUser = await storage.getUserByEmail(email);
+      if (existingUser && existingUser.id !== userId) {
+        return res.status(400).json({ message: "Este email já está em uso por outro usuário" });
+      }
+      
+      const updateData: any = { name, email };
+      
+      // Handle password change if provided
+      if (newPassword && currentPassword) {
+        const user = await storage.getUser(userId);
+        if (!user) {
+          return res.status(404).json({ message: "Usuário não encontrado" });
+        }
+        
+        const bcrypt = await import('bcrypt');
+        const isValidPassword = await bcrypt.compare(currentPassword, user.passwordHash || '');
+        
+        if (!isValidPassword) {
+          return res.status(401).json({ message: "Senha atual incorreta" });
+        }
+        
+        if (newPassword.length < 8) {
+          return res.status(400).json({ message: "A nova senha deve ter pelo menos 8 caracteres" });
+        }
+        
+        const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+        updateData.passwordHash = hashedNewPassword;
+      }
+      
+      const updatedUser = await storage.updateUser(userId, updateData);
+      
+      // Return user data without password hash
+      const { passwordHash, ...userWithoutPassword } = updatedUser;
+      res.json(userWithoutPassword);
+    } catch (error) {
+      console.error("Update profile error:", error);
+      res.status(500).json({ message: "Erro interno do servidor" });
+    }
+  });
+
   app.get("/api/auth/user-collaborations/:userId", async (req, res) => {
     try {
       const userId = parseInt(req.params.userId);
@@ -579,16 +630,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Reports endpoints
+  // Reports endpoints - Dashboard specific
   app.get("/api/reports/projects/pdf", async (req, res) => {
     try {
+      const dashboardId = parseInt(req.query.dashboardId as string) || 1;
       const { PDFGenerator } = await import('./pdf-generator-simple');
-      const projects = await storage.getProjectsByDashboardId(1);
+      const projects = await storage.getProjectsByDashboardId(dashboardId);
       const generator = new PDFGenerator();
       const reportContent = await generator.generateProjectsReport(projects);
       
       res.setHeader('Content-Type', 'application/pdf');
-      res.setHeader('Content-Disposition', 'attachment; filename="relatorio-projetos.pdf"');
+      res.setHeader('Content-Disposition', `attachment; filename="relatorio-projetos-dashboard-${dashboardId}.pdf"`);
       res.send(reportContent);
     } catch (error) {
       console.error("Error generating projects report:", error);
@@ -598,13 +650,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/reports/users/pdf", async (req, res) => {
     try {
+      const dashboardId = parseInt(req.query.dashboardId as string) || 1;
       const { PDFGenerator } = await import('./pdf-generator-simple');
       const users = await storage.getUsers();
       const generator = new PDFGenerator();
       const reportContent = await generator.generateUsersReport(users);
       
       res.setHeader('Content-Type', 'application/pdf');
-      res.setHeader('Content-Disposition', 'attachment; filename="relatorio-usuarios.pdf"');
+      res.setHeader('Content-Disposition', `attachment; filename="relatorio-usuarios-dashboard-${dashboardId}.pdf"`);
       res.send(reportContent);
     } catch (error) {
       console.error("Error generating users report:", error);
@@ -614,13 +667,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/reports/financial/pdf", async (req, res) => {
     try {
+      const dashboardId = parseInt(req.query.dashboardId as string) || 1;
       const { PDFGenerator } = await import('./pdf-generator-simple');
-      const projects = await storage.getProjectsByDashboardId(1);
+      const projects = await storage.getProjectsByDashboardId(dashboardId);
       const generator = new PDFGenerator();
       const reportContent = await generator.generateFinancialReport(projects);
       
       res.setHeader('Content-Type', 'application/pdf');
-      res.setHeader('Content-Disposition', 'attachment; filename="relatorio-financeiro.pdf"');
+      res.setHeader('Content-Disposition', `attachment; filename="relatorio-financeiro-dashboard-${dashboardId}.pdf"`);
       res.send(reportContent);
     } catch (error) {
       console.error("Error generating financial report:", error);
@@ -630,14 +684,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/reports/general/pdf", async (req, res) => {
     try {
+      const dashboardId = parseInt(req.query.dashboardId as string) || 1;
       const { PDFGenerator } = await import('./pdf-generator-simple');
       const users = await storage.getUsers();
-      const projects = await storage.getProjectsByDashboardId(1);
+      const projects = await storage.getProjectsByDashboardId(dashboardId);
       const generator = new PDFGenerator();
       const reportContent = await generator.generateGeneralReport(users, projects);
       
       res.setHeader('Content-Type', 'application/pdf');
-      res.setHeader('Content-Disposition', 'attachment; filename="relatorio-geral.pdf"');
+      res.setHeader('Content-Disposition', `attachment; filename="relatorio-executivo-dashboard-${dashboardId}.pdf"`);
       res.send(reportContent);
     } catch (error) {
       console.error("Error generating general report:", error);

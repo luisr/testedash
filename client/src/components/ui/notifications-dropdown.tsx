@@ -15,7 +15,11 @@ interface Notification {
   read: boolean;
 }
 
-export function NotificationsDropdown() {
+interface NotificationsDropdownProps {
+  dashboardId: number;
+}
+
+export function NotificationsDropdown({ dashboardId }: NotificationsDropdownProps) {
   const [notifications, setNotifications] = useState<Notification[]>([
     {
       id: 1,

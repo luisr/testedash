@@ -8,9 +8,10 @@ import { BarChart3, Download, FileText, Users, DollarSign, TrendingUp } from "lu
 interface ReportsModalProps {
   isOpen: boolean;
   onClose: () => void;
+  dashboardId: number;
 }
 
-export function ReportsModal({ isOpen, onClose }: ReportsModalProps) {
+export function ReportsModal({ isOpen, onClose, dashboardId }: ReportsModalProps) {
   const [loading, setLoading] = useState<string | null>(null);
 
   const reports = [
@@ -55,7 +56,7 @@ export function ReportsModal({ isOpen, onClose }: ReportsModalProps) {
   const handleDownloadReport = async (reportId: string) => {
     setLoading(reportId);
     try {
-      const response = await fetch(`/api/reports/${reportId}`, {
+      const response = await fetch(`/api/reports/${reportId}/pdf?dashboardId=${dashboardId}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/pdf',
@@ -71,7 +72,7 @@ export function ReportsModal({ isOpen, onClose }: ReportsModalProps) {
       const a = document.createElement('a');
       a.style.display = 'none';
       a.href = url;
-      a.download = `relatorio-${reportId}-${new Date().toISOString().split('T')[0]}.pdf`;
+      a.download = `relatorio-${reportId}-dashboard-${dashboardId}-${new Date().toISOString().split('T')[0]}.pdf`;
       document.body.appendChild(a);
       a.click();
       window.URL.revokeObjectURL(url);
@@ -143,7 +144,7 @@ export function ReportsModal({ isOpen, onClose }: ReportsModalProps) {
           </div>
 
           <div className="text-xs text-muted-foreground mt-4 p-3 bg-muted/30 rounded-lg">
-            <strong>Nota:</strong> Os relatórios são gerados com dados atualizados do sistema e incluem 
+            <strong>Nota:</strong> Os relatórios são gerados com dados atualizados do Dashboard {dashboardId} e incluem 
             análises inteligentes baseadas em IA para fornecer insights valiosos sobre o desempenho dos projetos.
           </div>
         </div>

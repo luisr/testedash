@@ -8,6 +8,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Eye, EyeOff, LogIn, Shield } from "lucide-react";
 import beachParkLogo from "@assets/pngegg_1752264509099.png";
 import ChangePasswordModal from "@/components/auth/change-password-modal";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 export default function Login() {
   const [, setLocation] = useLocation();
@@ -63,6 +64,13 @@ export default function Login() {
 
   return (
     <div className="min-h-screen dashboard-container flex items-center justify-center p-4">
+      {/* Theme Toggle - Top Right */}
+      <div className="fixed top-4 right-4 z-50">
+        <div className="bg-gradient-to-r from-blue-500/10 to-cyan-500/10 rounded-full p-1">
+          <ThemeToggle />
+        </div>
+      </div>
+      
       <div className="w-full max-w-md space-y-8">
         {/* Logo/Header */}
         <div className="text-center space-y-2">

@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Menu } from 'lucide-react';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { NotificationsDropdown } from '@/components/ui/notifications-dropdown';
+import { UserProfile } from '@/components/user-profile';
 import { UsersModal } from './modals/users-modal';
 import { ProjectsModal } from './modals/projects-modal';
 import { ReportsModal } from './modals/reports-modal';
@@ -56,13 +57,11 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, dash
               </h1>
             </div>
             <div className="flex items-center gap-3">
-              <NotificationsDropdown />
+              <NotificationsDropdown dashboardId={dashboardId} />
               <div className="bg-gradient-to-r from-blue-500/10 to-cyan-500/10 rounded-full p-1">
                 <ThemeToggle />
               </div>
-              <div className="text-sm text-muted-foreground font-medium">
-                {user?.name || user?.email}
-              </div>
+              <UserProfile showEditButton={true} />
             </div>
           </header>
           
@@ -74,22 +73,26 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, dash
         </div>
       </div>
       
-      {/* Modais */}
+      {/* Modais específicos por dashboard */}
       <UsersModal 
         isOpen={usersModalOpen} 
         onClose={() => setUsersModalOpen(false)} 
+        dashboardId={dashboardId}
       />
       <ProjectsModal 
         isOpen={projectsModalOpen} 
         onClose={() => setProjectsModalOpen(false)} 
+        dashboardId={dashboardId}
       />
       <ReportsModal 
         isOpen={reportsModalOpen} 
         onClose={() => setReportsModalOpen(false)} 
+        dashboardId={dashboardId}
       />
       <SettingsModal 
         isOpen={settingsModalOpen} 
         onClose={() => setSettingsModalOpen(false)} 
+        dashboardId={dashboardId}
       />
     </div>
   );

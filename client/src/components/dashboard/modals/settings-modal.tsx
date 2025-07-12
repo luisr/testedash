@@ -12,9 +12,10 @@ import { useToast } from "@/hooks/use-toast";
 interface SettingsModalProps {
   isOpen: boolean;
   onClose: () => void;
+  dashboardId: number;
 }
 
-export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
+export function SettingsModal({ isOpen, onClose, dashboardId }: SettingsModalProps) {
   const [settings, setSettings] = useState({
     notifications: {
       email: true,

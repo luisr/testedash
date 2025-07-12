@@ -13,9 +13,10 @@ import { CreateProjectModal } from "./create-project-modal";
 interface ProjectsModalProps {
   isOpen: boolean;
   onClose: () => void;
+  dashboardId: number;
 }
 
-export function ProjectsModal({ isOpen, onClose }: ProjectsModalProps) {
+export function ProjectsModal({ isOpen, onClose, dashboardId }: ProjectsModalProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [createProjectModalOpen, setCreateProjectModalOpen] = useState(false);
 

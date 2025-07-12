@@ -13,9 +13,10 @@ import { CreateUserModal } from "./create-user-modal";
 interface UsersModalProps {
   isOpen: boolean;
   onClose: () => void;
+  dashboardId: number;
 }
 
-export function UsersModal({ isOpen, onClose }: UsersModalProps) {
+export function UsersModal({ isOpen, onClose, dashboardId }: UsersModalProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [createUserModalOpen, setCreateUserModalOpen] = useState(false);
 
