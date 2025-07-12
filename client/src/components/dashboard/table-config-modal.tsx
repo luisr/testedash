@@ -222,7 +222,11 @@ export default function TableConfigModal({
             discipline: 'Geral',
             responsible: 'Usuário',
             status: 'not_started',
-            priority: 'medium'
+            priority: 'medium',
+            plannedValue: '0',
+            actualCost: '0',
+            earnedValue: '0',
+            completionPercentage: '0'
           };
           
           headers.forEach((header, index) => {

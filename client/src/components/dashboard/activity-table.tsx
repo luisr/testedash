@@ -696,7 +696,10 @@ export default function ActivityTable({
                                         variant="ghost"
                                         size="icon"
                                         className="text-destructive hover:text-destructive/80 beachpark-hover-lift h-8 w-8"
-                                        onClick={() => onActivityDelete(activity.id)}
+                                        onClick={() => {
+                                          console.log('Deleting activity:', activity.id);
+                                          onActivityDelete(activity.id);
+                                        }}
                                       >
                                         <Trash2 className="w-4 h-4" />
                                       </Button>

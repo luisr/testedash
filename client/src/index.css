@@ -114,6 +114,48 @@
   animation: none !important;
   z-index: 9999 !important;
   pointer-events: auto !important;
+  margin: 0 !important;
+  inset: auto !important;
+}
+
+/* Force all dialog elements to stay put */
+[data-radix-dialog-content].fixed-modal {
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  will-change: unset !important;
+  transition: none !important;
+  animation: none !important;
+  z-index: 9999 !important;
+  pointer-events: auto !important;
+  margin: 0 !important;
+  inset: auto !important;
+}
+
+/* Nuclear option - disable ALL transforms on ALL radix dialogs */
+[data-radix-dialog-content] {
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  will-change: unset !important;
+  transition: none !important;
+  animation: none !important;
+  z-index: 9999 !important;
+  pointer-events: auto !important;
+  margin: 0 !important;
+  inset: auto !important;
+}
+
+/* Prevent any hover effects on all dialog content */
+[data-radix-dialog-content]:hover,
+[data-radix-dialog-content]:focus,
+[data-radix-dialog-content]:active {
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
 }
 
 .fixed-modal,
