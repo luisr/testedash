@@ -1,5 +1,5 @@
-import jsPDF from 'jspdf';
-import 'jspdf-autotable';
+const { jsPDF } = require('jspdf');
+require('jspdf-autotable');
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import * as fs from 'fs';

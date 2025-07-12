@@ -755,16 +755,56 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: 'Report type and data are required' });
       }
 
-      const { AdvancedPDFGenerator } = await import('./advanced-pdf-generator');
-      const pdfGenerator = new AdvancedPDFGenerator();
-      const pdfBuffer = await pdfGenerator.generateAdvancedReport(data);
+      // Generate comprehensive report text
+      const reportText = `
+RELATÓRIO AVANÇADO DE PROJETO
+Dashboard: ${data.dashboardId || 'N/A'}
+Data: ${new Date().toLocaleDateString('pt-BR')}
+
+=== RESUMO EXECUTIVO ===
+- SPI (Índice de Performance de Cronograma): ${data.kpis?.spi || 0}
+- CPI (Índice de Performance de Custo): ${data.kpis?.cpi || 0}
+- Taxa de Conclusão: ${data.kpis?.completionRate || 0}%
+- Variação de Orçamento: ${data.kpis?.budgetVariance || 0}%
+- Variação de Cronograma: ${data.kpis?.scheduleVariance || 0}%
+- Nível de Risco: ${data.kpis?.riskLevel || 'N/A'}
+
+=== ANÁLISE DO CAMINHO CRÍTICO ===
+- Atividades no Caminho Crítico: ${data.criticalPath?.criticalPathLength || 0}
+- Total de Atividades: ${data.criticalPath?.activities?.length || 0}
+- Duração Total: ${data.criticalPath?.totalDuration || 0} dias
+
+=== ROADMAP E MARCOS ===
+- Marcos Planejados: ${data.roadmap?.milestones?.length || 0}
+- Distribuição por Trimestre: ${data.roadmap?.roadmapByQuarter?.length || 0} trimestres
+
+=== ATIVIDADES ===
+${(data.activities || []).map(act => `- ${act.name}: ${act.status} (${act.priority}) - ${act.completion || 0}%`).join('\n')}
+
+=== PROJETOS ===
+${(data.projects || []).map(proj => `- ${proj.name}: ${proj.status} - R$ ${proj.budget || 0}`).join('\n')}
+
+=== OBSERVAÇÕES DA IA ===
+${data.geminiObservations || 'Nenhuma observação disponível'}
+
+=== RECOMENDAÇÕES ===
+1. Monitorar atividades do caminho crítico
+2. Acompanhar variações de orçamento e cronograma
+3. Revisar marcos e entregas
+4. Implementar melhorias sugeridas pela IA
+`;
+
+      // Use the working PDF generator
+      const { PDFGenerator } = await import('./pdf-generator-simple');
+      const pdfGenerator = new PDFGenerator();
+      const pdfBuffer = await pdfGenerator.generateCustomReport(reportText, `Relatório Avançado - Dashboard ${data.dashboardId}`);
 
       res.setHeader('Content-Type', 'application/pdf');
-      res.setHeader('Content-Disposition', `attachment; filename="relatorio-avancado-${new Date().toISOString().split('T')[0]}.pdf"`);
+      res.setHeader('Content-Disposition', `attachment; filename="relatorio-avancado-dashboard-${data.dashboardId}-${new Date().toISOString().split('T')[0]}.pdf"`);
       res.send(pdfBuffer);
     } catch (error) {
       console.error('Error generating advanced PDF report:', error);
-      res.status(500).json({ error: 'Failed to generate advanced report' });
+      res.status(500).json({ error: 'Failed to generate advanced report', details: error.message });
     }
   });
 

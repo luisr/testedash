@@ -181,12 +181,9 @@ export default function AdvancedReports({ activities, projects, dashboardId }: A
         }))
       };
 
-      const response = await apiRequest('/api/reports/gemini-observations', {
-        method: 'POST',
-        body: JSON.stringify({ 
-          data: reportData,
-          reportType: 'advanced-analysis'
-        })
+      const response = await apiRequest('POST', '/api/reports/gemini-observations', { 
+        data: reportData,
+        reportType: 'advanced-analysis'
       });
 
       setGeminiObservations(response.observations);
@@ -219,8 +216,11 @@ export default function AdvancedReports({ activities, projects, dashboardId }: A
         dashboardId
       };
 
-      const response = await apiRequest('/api/reports/advanced-pdf', {
+      const response = await fetch('/api/reports/advanced-pdf', {
         method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify({ 
           data: reportData,
           reportType

@@ -2,6 +2,10 @@ import type { User, Project } from '@shared/schema';
 import { jsPDF } from 'jspdf';
 
 export class PDFGenerator {
+  async generateCustomReport(reportText: string, title: string): Promise<Buffer> {
+    return Buffer.from(reportText, 'utf8');
+  }
+
   private async generateGeminiObservations(data: any, reportType: string): Promise<string> {
     try {
       const { GoogleGenAI } = await import('@google/genai');
