@@ -18,9 +18,14 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, dash
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 dashboard-container">
       <div className="flex h-screen overflow-hidden">
         <Sidebar 
-          open={sidebarOpen} 
+          isOpen={sidebarOpen} 
           onClose={() => setSidebarOpen(false)}
-          dashboardId={dashboardId}
+          onActivityLogToggle={() => {}}
+          onUsersClick={() => {}}
+          onProjectsClick={() => {}}
+          onReportsClick={() => {}}
+          onSettingsClick={() => {}}
+          onScheduleClick={() => {}}
         />
         
         <div className="flex-1 flex flex-col overflow-hidden">

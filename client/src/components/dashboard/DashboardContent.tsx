@@ -13,6 +13,7 @@ import ProjectViews from './project-views';
 import BackupManagement from './backup-management';
 import CreateActivityModal from './create-activity-modal';
 import { Button } from '@/components/ui/button';
+import { Activity } from '@shared/schema';
 
 interface DashboardContentProps {
   dashboardId: number;
@@ -97,7 +98,14 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({
     updateActivity: () => Promise.resolve({} as any),
     deleteActivity: () => Promise.resolve(false),
     shareDashboard: () => Promise.resolve({} as any)
-  } : regularDashboard;
+  } : {
+    ...regularDashboard,
+    updateActivity: async (id: number, data: Partial<Activity>) => {
+      await regularDashboard.updateActivity(id, data);
+      // Invalidar queries específicas
+      queryClient.invalidateQueries({ queryKey: ['/api/activities', 'dashboard', dashboardId] });
+    }
+  };
 
   // Calculate metrics
   const metrics = isConsolidatedDashboard 

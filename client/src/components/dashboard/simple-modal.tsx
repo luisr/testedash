@@ -55,21 +55,32 @@ export default function SimpleModal({
     setIsImporting(true);
     try {
       const text = await csvFile.text();
-      const lines = text.split('\n');
-      const headers = lines[0].split(',').map(h => h.trim());
+      const lines = text.split('\n').filter(line => line.trim());
+      if (lines.length < 2) {
+        alert('Arquivo CSV deve ter pelo menos uma linha de cabeçalho e uma linha de dados.');
+        return;
+      }
+      
+      const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
       
       const activities = [];
       for (let i = 1; i < lines.length; i++) {
-        const values = lines[i].split(',').map(v => v.trim());
-        if (values.length >= 3) {
+        const values = lines[i].split(',').map(v => v.trim().replace(/"/g, ''));
+        if (values.length >= 1 && values[0]) {
           const activity = {
             name: values[0] || `Atividade ${i}`,
             description: values[1] || '',
             discipline: values[2] || 'Geral',
             responsible: values[3] || 'Não definido',
-            priority: values[4] || 'medium',
-            status: values[5] || 'not_started',
-            plannedValue: values[6] || '0',
+            priority: ['low', 'medium', 'high', 'critical'].includes(values[4]) ? values[4] : 'medium',
+            status: ['not_started', 'in_progress', 'completed', 'delayed', 'cancelled'].includes(values[5]) ? values[5] : 'not_started',
+            plannedCost: values[6] || '0',
+            actualCost: values[7] || '0',
+            completionPercentage: Math.max(0, Math.min(100, parseInt(values[8]) || 0)),
+            plannedStartDate: values[9] ? new Date(values[9]).toISOString().split('T')[0] : null,
+            plannedFinishDate: values[10] ? new Date(values[10]).toISOString().split('T')[0] : null,
+            actualStartDate: values[11] ? new Date(values[11]).toISOString().split('T')[0] : null,
+            actualFinishDate: values[12] ? new Date(values[12]).toISOString().split('T')[0] : null,
             dashboardId: dashboardId
           };
           activities.push(activity);

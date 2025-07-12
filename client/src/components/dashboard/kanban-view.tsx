@@ -46,7 +46,7 @@ const priorityLabels = {
 export default function KanbanView({ activities, onUpdateActivity }: KanbanViewProps) {
   const [draggedItem, setDraggedItem] = useState<string | null>(null);
 
-  const handleDragEnd = (result: any) => {
+  const handleDragEnd = async (result: any) => {
     const { destination, source, draggableId } = result;
     
     if (!destination) return;
@@ -55,7 +55,13 @@ export default function KanbanView({ activities, onUpdateActivity }: KanbanViewP
     const activityId = parseInt(draggableId);
     const newStatus = destination.droppableId;
 
-    onUpdateActivity(activityId, { status: newStatus });
+    // Atualiza o status da atividade
+    try {
+      await onUpdateActivity(activityId, { status: newStatus });
+    } catch (error) {
+      console.error('Erro ao atualizar status da atividade:', error);
+    }
+    
     setDraggedItem(null);
   };
 
