@@ -148,6 +148,54 @@
   inset: auto !important;
 }
 
+/* Absolutely force all modals to center and never move */
+[data-radix-dialog-content] {
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  margin: 0 !important;
+  inset: 50% auto auto 50% !important;
+  translate: -50% -50% !important;
+}
+
+/* Disable all possible hover effects */
+[data-radix-dialog-content]:hover {
+  position: fixed !important;
+  top: 50% !important;  
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  margin: 0 !important;
+  inset: 50% auto auto 50% !important;
+  translate: -50% -50% !important;
+}
+
+/* Final nuclear option - completely override all positioning */
+.beachpark-modal [data-radix-dialog-content] {
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  margin: 0 !important;
+  inset: 50% auto auto 50% !important;
+  translate: -50% -50% !important;
+  transition: none !important;
+  animation: none !important;
+  will-change: unset !important;
+}
+
+.beachpark-modal [data-radix-dialog-content]:hover,
+.beachpark-modal [data-radix-dialog-content]:focus,
+.beachpark-modal [data-radix-dialog-content]:active {
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  margin: 0 !important;
+  inset: 50% auto auto 50% !important;
+  translate: -50% -50% !important;
+}
+
 /* Prevent any hover effects on all dialog content */
 [data-radix-dialog-content]:hover,
 [data-radix-dialog-content]:focus,

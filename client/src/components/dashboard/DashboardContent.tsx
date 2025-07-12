@@ -115,13 +115,31 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({
       queryClient.invalidateQueries({ queryKey: ['/api/consolidated-dashboard', user?.id] });
       return response.json();
     },
-    deleteActivity: () => Promise.resolve(false),
+    deleteActivity: async (id: number) => {
+      console.log('Consolidated dashboard delete activity:', id);
+      // For consolidated dashboard, we'll make a direct API call
+      const response = await fetch(`/api/activities/${id}`, {
+        method: 'DELETE',
+      });
+      if (!response.ok) {
+        throw new Error('Failed to delete activity');
+      }
+      // Invalidate cache
+      queryClient.invalidateQueries({ queryKey: ['/api/consolidated-dashboard', user?.id] });
+      return response.json();
+    },
     shareDashboard: () => Promise.resolve({} as any)
   } : {
     ...regularDashboard,
     updateActivity: async (id: number, data: Partial<Activity>) => {
       console.log('Regular dashboard update activity:', id, data);
       await regularDashboard.updateActivity(id, data);
+      // Invalidar queries específicas
+      queryClient.invalidateQueries({ queryKey: ['/api/activities/dashboard', dashboardId] });
+    },
+    deleteActivity: async (id: number) => {
+      console.log('Regular dashboard delete activity:', id);
+      await regularDashboard.deleteActivity(id);
       // Invalidar queries específicas
       queryClient.invalidateQueries({ queryKey: ['/api/activities/dashboard', dashboardId] });
     }
