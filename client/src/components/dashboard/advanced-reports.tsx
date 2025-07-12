@@ -183,24 +183,36 @@ export default function AdvancedReports({ activities, projects, dashboardId }: A
 
       console.log('Sending request to Gemini API with data:', reportData);
 
-      const response = await apiRequest('POST', '/api/reports/gemini-observations', { 
-        data: reportData,
-        reportType: 'advanced-analysis'
+      const response = await fetch('/api/reports/gemini-observations', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          data: reportData,
+          reportType: 'advanced-analysis'
+        })
       });
 
-      console.log('Response from Gemini API:', response);
-      console.log('Response type:', typeof response);
-      console.log('Response observations:', response?.observations);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
       
-      if (response && response.observations) {
-        console.log('Setting observations:', response.observations);
-        setGeminiObservations(response.observations);
+      console.log('Response from Gemini API:', data);
+      console.log('Response type:', typeof data);
+      console.log('Response observations:', data?.observations);
+      
+      if (data && data.observations) {
+        console.log('Setting observations:', data.observations);
+        setGeminiObservations(data.observations);
         toast({
           title: "Observações geradas com sucesso",
           description: "As observações da IA foram geradas e estão prontas para visualização.",
         });
       } else {
-        console.error('Invalid response structure:', response);
+        console.error('Invalid response structure:', data);
         throw new Error('Resposta inválida da API');
       }
     } catch (error) {
@@ -248,7 +260,7 @@ export default function AdvancedReports({ activities, projects, dashboardId }: A
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `relatorio-${reportType}-dashboard-${dashboardId}-${new Date().toISOString().split('T')[0]}.txt`;
+      a.download = `relatorio-${reportType}-dashboard-${dashboardId}-${new Date().toISOString().split('T')[0]}.html`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
