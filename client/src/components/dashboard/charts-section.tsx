@@ -17,10 +17,11 @@ interface ChartsSectionProps {
   dashboardId: number;
   activities: any[];
   projects: any[];
+  visibleFields: string[];
   onChartsUpdate: () => void;
 }
 
-export default function ChartsSection({ metrics, customCharts, dashboardId, activities, projects, onChartsUpdate }: ChartsSectionProps) {
+export default function ChartsSection({ metrics, customCharts, dashboardId, activities, projects, visibleFields, onChartsUpdate }: ChartsSectionProps) {
   const [isChartBuilderOpen, setIsChartBuilderOpen] = useState(false);
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 
@@ -45,6 +46,11 @@ export default function ChartsSection({ metrics, customCharts, dashboardId, acti
     { month: 'Mai', planned: 70, actual: 60 },
     { month: 'Jun', planned: 85, actual: 72 }
   ];
+
+  // Função para verificar se um gráfico deve ser exibido
+  const isChartVisible = (chartId: string) => {
+    return visibleFields.length === 0 || visibleFields.includes(chartId);
+  };
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -78,105 +84,111 @@ export default function ChartsSection({ metrics, customCharts, dashboardId, acti
       </div>
       
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card className="chart-container shadow-elegant hover-lift">
-        <CardHeader className="flex flex-row items-center justify-between pb-4">
-          <CardTitle className="text-lg font-semibold text-foreground">
-            Status dos Projetos
-          </CardTitle>
-          <Button variant="ghost" size="icon" className="hover-lift focus-ring">
-            <MoreHorizontal className="w-5 h-5" />
-          </Button>
-        </CardHeader>
-        <CardContent>
-          <div className="h-64">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={statusData}
-                  cx="50%"
-                  cy="50%"
-                  outerRadius={80}
-                  fill="#8884d8"
-                  dataKey="value"
-                  label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                >
-                  {statusData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
-                <Tooltip 
-                  contentStyle={{ 
-                    backgroundColor: 'hsl(var(--card))', 
-                    border: '1px solid hsl(var(--border))',
-                    borderRadius: '8px',
-                    boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
-                  }}
-                />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-        </CardContent>
-        </Card>
+        {/* Gráfico de Status dos Projetos */}
+        {isChartVisible('chart_status') && (
+          <Card className="chart-container shadow-elegant hover-lift">
+            <CardHeader className="flex flex-row items-center justify-between pb-4">
+              <CardTitle className="text-lg font-semibold text-foreground">
+                Status dos Projetos
+              </CardTitle>
+              <Button variant="ghost" size="icon" className="hover-lift focus-ring">
+                <MoreHorizontal className="w-5 h-5" />
+              </Button>
+            </CardHeader>
+            <CardContent>
+              <div className="h-64">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={statusData}
+                      cx="50%"
+                      cy="50%"
+                      outerRadius={80}
+                      fill="#8884d8"
+                      dataKey="value"
+                      label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                    >
+                      {statusData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip 
+                      contentStyle={{ 
+                        backgroundColor: 'hsl(var(--card))', 
+                        border: '1px solid hsl(var(--border))',
+                        borderRadius: '8px',
+                        boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
+                      }}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
-        <Card className="chart-container shadow-elegant hover-lift">
-        <CardHeader className="flex flex-row items-center justify-between pb-4">
-          <CardTitle className="text-lg font-semibold text-foreground">
-            Progresso Mensal
-          </CardTitle>
-          <Button variant="ghost" size="icon" className="hover-lift focus-ring">
-            <MoreHorizontal className="w-5 h-5" />
-          </Button>
-        </CardHeader>
-        <CardContent>
-          <div className="h-64">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={progressData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                <XAxis 
-                  dataKey="month" 
-                  axisLine={false}
-                  tickLine={false}
-                  tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
-                />
-                <YAxis 
-                  axisLine={false}
-                  tickLine={false}
-                  tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
-                />
-                <Tooltip 
-                  contentStyle={{ 
-                    backgroundColor: 'hsl(var(--card))', 
-                    border: '1px solid hsl(var(--border))',
-                    borderRadius: '8px',
-                    boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
-                  }}
-                />
-                <Legend />
-                <Line 
-                  type="monotone" 
-                  dataKey="planned" 
-                  stroke="hsl(var(--primary))" 
-                  strokeWidth={3}
-                  name="Planejado"
-                  dot={{ fill: 'hsl(var(--primary))', strokeWidth: 2, r: 4 }}
-                />
-                <Line 
-                  type="monotone" 
-                  dataKey="actual" 
-                  stroke="hsl(var(--status-completed))" 
-                  strokeWidth={3}
-                  name="Real"
-                  dot={{ fill: 'hsl(var(--status-completed))', strokeWidth: 2, r: 4 }}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-        </CardContent>
-        </Card>
+        {/* Gráfico de Progresso Mensal */}
+        {isChartVisible('chart_progress') && (
+          <Card className="chart-container shadow-elegant hover-lift">
+            <CardHeader className="flex flex-row items-center justify-between pb-4">
+              <CardTitle className="text-lg font-semibold text-foreground">
+                Progresso Mensal
+              </CardTitle>
+              <Button variant="ghost" size="icon" className="hover-lift focus-ring">
+                <MoreHorizontal className="w-5 h-5" />
+              </Button>
+            </CardHeader>
+            <CardContent>
+              <div className="h-64">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={progressData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                    <XAxis 
+                      dataKey="month" 
+                      axisLine={false}
+                      tickLine={false}
+                      tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
+                    />
+                    <YAxis 
+                      axisLine={false}
+                      tickLine={false}
+                      tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
+                    />
+                    <Tooltip 
+                      contentStyle={{ 
+                        backgroundColor: 'hsl(var(--card))', 
+                        border: '1px solid hsl(var(--border))',
+                        borderRadius: '8px',
+                        boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
+                      }}
+                    />
+                    <Legend />
+                    <Line 
+                      type="monotone" 
+                      dataKey="planned" 
+                      stroke="hsl(var(--primary))" 
+                      strokeWidth={3}
+                      name="Planejado"
+                      dot={{ fill: 'hsl(var(--primary))', strokeWidth: 2, r: 4 }}
+                    />
+                    <Line 
+                      type="monotone" 
+                      dataKey="actual" 
+                      stroke="hsl(var(--status-completed))" 
+                      strokeWidth={3}
+                      name="Real"
+                      dot={{ fill: 'hsl(var(--status-completed))', strokeWidth: 2, r: 4 }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </div>
 
       {/* Gráficos Customizados */}
-      {customChartsData.length > 0 && (
+      {isChartVisible('chart_custom') && customChartsData.length > 0 && (
         <div className="mt-8">
           <h3 className="text-lg font-semibold text-foreground mb-4">Gráficos Customizados</h3>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

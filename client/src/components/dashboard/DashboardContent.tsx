@@ -31,7 +31,16 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [showCreateActivityModal, setShowCreateActivityModal] = useState(false);
-  const [visibleFields, setVisibleFields] = useState<string[]>([]);
+  const [visibleFields, setVisibleFields] = useState<string[]>([
+    // Campos padrão da tabela
+    'name', 'status', 'priority', 'responsible', 'discipline', 'completionPercentage', 
+    'plannedStartDate', 'actualStartDate', 'plannedFinishDate', 'actualFinishDate', 
+    'plannedCost', 'actualCost', 'actions',
+    // KPIs
+    'kpi_progress', 'kpi_budget', 'kpi_performance', 'kpi_custom',
+    // Gráficos
+    'chart_progress', 'chart_status', 'chart_budget', 'chart_custom'
+  ]);
 
   // Get dashboard data
   const regularDashboard = useDashboardData(dashboardId);
@@ -129,6 +138,7 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({
         dashboardId={dashboardId}
         activities={activities}
         projects={projects}
+        visibleFields={visibleFields}
         onKPIUpdate={() => {
           // Invalidar apenas as queries relacionadas aos KPIs
           queryClient.invalidateQueries({ queryKey: ['/api/custom-kpis', dashboardId] });
@@ -144,6 +154,7 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({
         projects={projects}
         customCharts={customCharts}
         dashboardId={dashboardId}
+        visibleFields={visibleFields}
         onChartsUpdate={() => {
           // Invalidar apenas as queries relacionadas aos gráficos
           queryClient.invalidateQueries({ queryKey: ['/api/custom-charts', dashboardId] });

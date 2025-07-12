@@ -215,10 +215,11 @@ export default function TableSettingsModal({
         </DialogHeader>
         
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="status">Status Customizados</TabsTrigger>
             <TabsTrigger value="columns">Colunas</TabsTrigger>
             <TabsTrigger value="display">Exibição</TabsTrigger>
+            <TabsTrigger value="components">Componentes</TabsTrigger>
           </TabsList>
           
           <TabsContent value="status" className="space-y-4">
@@ -395,14 +396,33 @@ export default function TableSettingsModal({
                           {column.type} - {column.description}
                         </span>
                       </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleDeleteColumn(column.id)}
-                        className="text-red-600 hover:text-red-800"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => toggleFieldVisibility(`custom_${column.id}`)}
+                        >
+                          {localVisibleFields.includes(`custom_${column.id}`) ? (
+                            <>
+                              <Eye className="w-4 h-4 mr-2" />
+                              Visível
+                            </>
+                          ) : (
+                            <>
+                              <EyeOff className="w-4 h-4 mr-2" />
+                              Oculto
+                            </>
+                          )}
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDeleteColumn(column.id)}
+                          className="text-red-600 hover:text-red-800"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
                     </div>
                   ))}
                   
@@ -460,6 +480,257 @@ export default function TableSettingsModal({
                   <Button 
                     variant="outline"
                     onClick={() => setLocalVisibleFields([])}
+                  >
+                    Ocultar Todos
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+          
+          <TabsContent value="components" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Visibilidade dos KPIs</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="flex items-center justify-between p-3 border rounded-lg">
+                    <div>
+                      <h4 className="font-medium">Progresso Geral</h4>
+                      <p className="text-sm text-muted-foreground">
+                        Mostra o progresso geral do projeto
+                      </p>
+                    </div>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => toggleFieldVisibility('kpi_progress')}
+                    >
+                      {localVisibleFields.includes('kpi_progress') ? (
+                        <>
+                          <Eye className="w-4 h-4 mr-2" />
+                          Visível
+                        </>
+                      ) : (
+                        <>
+                          <EyeOff className="w-4 h-4 mr-2" />
+                          Oculto
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                  
+                  <div className="flex items-center justify-between p-3 border rounded-lg">
+                    <div>
+                      <h4 className="font-medium">Orçamento</h4>
+                      <p className="text-sm text-muted-foreground">
+                        Mostra informações orçamentárias
+                      </p>
+                    </div>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => toggleFieldVisibility('kpi_budget')}
+                    >
+                      {localVisibleFields.includes('kpi_budget') ? (
+                        <>
+                          <Eye className="w-4 h-4 mr-2" />
+                          Visível
+                        </>
+                      ) : (
+                        <>
+                          <EyeOff className="w-4 h-4 mr-2" />
+                          Oculto
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                  
+                  <div className="flex items-center justify-between p-3 border rounded-lg">
+                    <div>
+                      <h4 className="font-medium">Indicadores SPI/CPI</h4>
+                      <p className="text-sm text-muted-foreground">
+                        Indicadores de performance do projeto
+                      </p>
+                    </div>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => toggleFieldVisibility('kpi_performance')}
+                    >
+                      {localVisibleFields.includes('kpi_performance') ? (
+                        <>
+                          <Eye className="w-4 h-4 mr-2" />
+                          Visível
+                        </>
+                      ) : (
+                        <>
+                          <EyeOff className="w-4 h-4 mr-2" />
+                          Oculto
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                  
+                  <div className="flex items-center justify-between p-3 border rounded-lg">
+                    <div>
+                      <h4 className="font-medium">KPIs Customizados</h4>
+                      <p className="text-sm text-muted-foreground">
+                        KPIs criados personalizadamente
+                      </p>
+                    </div>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => toggleFieldVisibility('kpi_custom')}
+                    >
+                      {localVisibleFields.includes('kpi_custom') ? (
+                        <>
+                          <Eye className="w-4 h-4 mr-2" />
+                          Visível
+                        </>
+                      ) : (
+                        <>
+                          <EyeOff className="w-4 h-4 mr-2" />
+                          Oculto
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardHeader>
+                <CardTitle>Visibilidade dos Gráficos</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="flex items-center justify-between p-3 border rounded-lg">
+                    <div>
+                      <h4 className="font-medium">Gráfico de Progresso</h4>
+                      <p className="text-sm text-muted-foreground">
+                        Gráfico de evolução do progresso
+                      </p>
+                    </div>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => toggleFieldVisibility('chart_progress')}
+                    >
+                      {localVisibleFields.includes('chart_progress') ? (
+                        <>
+                          <Eye className="w-4 h-4 mr-2" />
+                          Visível
+                        </>
+                      ) : (
+                        <>
+                          <EyeOff className="w-4 h-4 mr-2" />
+                          Oculto
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                  
+                  <div className="flex items-center justify-between p-3 border rounded-lg">
+                    <div>
+                      <h4 className="font-medium">Gráfico de Status</h4>
+                      <p className="text-sm text-muted-foreground">
+                        Distribuição por status das atividades
+                      </p>
+                    </div>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => toggleFieldVisibility('chart_status')}
+                    >
+                      {localVisibleFields.includes('chart_status') ? (
+                        <>
+                          <Eye className="w-4 h-4 mr-2" />
+                          Visível
+                        </>
+                      ) : (
+                        <>
+                          <EyeOff className="w-4 h-4 mr-2" />
+                          Oculto
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                  
+                  <div className="flex items-center justify-between p-3 border rounded-lg">
+                    <div>
+                      <h4 className="font-medium">Gráfico de Orçamento</h4>
+                      <p className="text-sm text-muted-foreground">
+                        Comparação orçamento planejado vs realizado
+                      </p>
+                    </div>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => toggleFieldVisibility('chart_budget')}
+                    >
+                      {localVisibleFields.includes('chart_budget') ? (
+                        <>
+                          <Eye className="w-4 h-4 mr-2" />
+                          Visível
+                        </>
+                      ) : (
+                        <>
+                          <EyeOff className="w-4 h-4 mr-2" />
+                          Oculto
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                  
+                  <div className="flex items-center justify-between p-3 border rounded-lg">
+                    <div>
+                      <h4 className="font-medium">Gráficos Customizados</h4>
+                      <p className="text-sm text-muted-foreground">
+                        Gráficos criados personalizadamente
+                      </p>
+                    </div>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => toggleFieldVisibility('chart_custom')}
+                    >
+                      {localVisibleFields.includes('chart_custom') ? (
+                        <>
+                          <Eye className="w-4 h-4 mr-2" />
+                          Visível
+                        </>
+                      ) : (
+                        <>
+                          <EyeOff className="w-4 h-4 mr-2" />
+                          Oculto
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </div>
+                
+                <div className="flex justify-between pt-4 border-t">
+                  <Button 
+                    variant="outline"
+                    onClick={() => {
+                      const kpiFields = ['kpi_progress', 'kpi_budget', 'kpi_performance', 'kpi_custom'];
+                      const chartFields = ['chart_progress', 'chart_status', 'chart_budget', 'chart_custom'];
+                      setLocalVisibleFields(prev => [...prev, ...kpiFields, ...chartFields]);
+                    }}
+                  >
+                    Mostrar Todos
+                  </Button>
+                  <Button 
+                    variant="outline"
+                    onClick={() => {
+                      const kpiFields = ['kpi_progress', 'kpi_budget', 'kpi_performance', 'kpi_custom'];
+                      const chartFields = ['chart_progress', 'chart_status', 'chart_budget', 'chart_custom'];
+                      setLocalVisibleFields(prev => prev.filter(field => ![...kpiFields, ...chartFields].includes(field)));
+                    }}
                   >
                     Ocultar Todos
                   </Button>

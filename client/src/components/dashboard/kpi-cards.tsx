@@ -19,10 +19,11 @@ interface KPICardsProps {
   dashboardId: number;
   activities: any[];
   projects: any[];
+  visibleFields: string[];
   onKPIUpdate: () => void;
 }
 
-export default function KPICards({ metrics, dashboardId, activities, projects, onKPIUpdate }: KPICardsProps) {
+export default function KPICards({ metrics, dashboardId, activities, projects, visibleFields, onKPIUpdate }: KPICardsProps) {
   const [isKPIManagerOpen, setIsKPIManagerOpen] = useState(false);
   const totalProjects = projects?.length || 0;
   const activeProjects = projects?.filter(p => p.status === 'active' || p.status === 'in_progress')?.length || 0;
@@ -39,6 +40,7 @@ export default function KPICards({ metrics, dashboardId, activities, projects, o
 
   const kpis = [
     {
+      id: 'kpi_progress',
       title: "Total de Projetos",
       value: totalProjects,
       icon: Folder,
@@ -49,6 +51,7 @@ export default function KPICards({ metrics, dashboardId, activities, projects, o
       iconColor: "text-blue-600 dark:text-blue-400"
     },
     {
+      id: 'kpi_progress',
       title: "Taxa de Conclusão",
       value: `${completionRate.toFixed(1)}%`,
       icon: CheckCircle,
@@ -59,6 +62,7 @@ export default function KPICards({ metrics, dashboardId, activities, projects, o
       iconColor: completionRate > 75 ? "text-green-600 dark:text-green-400" : "text-yellow-600 dark:text-yellow-400"
     },
     {
+      id: 'kpi_budget',
       title: "Orçamento Total",
       value: new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(totalBudget),
       icon: TrendingUp,
@@ -69,6 +73,7 @@ export default function KPICards({ metrics, dashboardId, activities, projects, o
       iconColor: budgetVariance <= 0 ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"
     },
     {
+      id: 'kpi_performance',
       title: "SPI Médio",
       value: (metrics.averageSPI || 1).toFixed(2),
       icon: TrendingDown,
@@ -79,6 +84,11 @@ export default function KPICards({ metrics, dashboardId, activities, projects, o
       iconColor: metrics.averageSPI >= 1 ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"
     }
   ];
+
+  // Função para verificar se um KPI deve ser exibido
+  const isKPIVisible = (kpiId: string) => {
+    return visibleFields.length === 0 || visibleFields.includes(kpiId);
+  };
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -113,7 +123,7 @@ export default function KPICards({ metrics, dashboardId, activities, projects, o
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {/* KPIs Padrão */}
-        {kpis.map((kpi, index) => (
+        {kpis.filter(kpi => isKPIVisible(kpi.id)).map((kpi, index) => (
           <Card key={index} className="card-enhanced group cursor-pointer">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
@@ -148,7 +158,7 @@ export default function KPICards({ metrics, dashboardId, activities, projects, o
         ))}
 
         {/* KPIs Customizados */}
-        {customKPIs.map((customKPI: any, index: number) => (
+        {isKPIVisible('kpi_custom') && customKPIs.map((customKPI: any, index: number) => (
           <Card key={`custom-${index}`} className="card-enhanced group cursor-pointer border-dashed border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-cyan-50">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
