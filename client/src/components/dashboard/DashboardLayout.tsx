@@ -15,7 +15,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, dash
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 dashboard-container">
+    <div className="min-h-screen beachpark-gradient-bg">
       <div className="flex h-screen overflow-hidden">
         <Sidebar 
           isOpen={sidebarOpen} 
@@ -29,33 +29,35 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, dash
         />
         
         <div className="flex-1 flex flex-col overflow-hidden">
-          {/* Simplified Header */}
-          <header className="bg-white/80 backdrop-blur-sm border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+          {/* BeachPark Header */}
+          <header className="beachpark-glass border-b border-border/50 px-6 py-4 flex items-center justify-between beachpark-fade-in">
             <div className="flex items-center gap-4">
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => setSidebarOpen(true)}
-                className="lg:hidden"
+                className="lg:hidden beachpark-hover-lift"
               >
                 <Menu className="h-4 w-4" />
               </Button>
-              <h1 className="text-xl font-semibold text-gray-900">
+              <h1 className="text-xl font-semibold beachpark-text-gradient">
                 Tô Sabendo - Dashboard
               </h1>
             </div>
             <div className="flex items-center gap-2">
-              <Button variant="ghost" size="sm">
+              <Button variant="ghost" size="sm" className="beachpark-hover-lift">
                 <Bell className="h-4 w-4" />
               </Button>
-              <div className="text-sm text-gray-600">
+              <div className="text-sm text-muted-foreground">
                 {user?.name || user?.email}
               </div>
             </div>
           </header>
           
-          <main className="flex-1 overflow-y-auto p-6">
-            {children}
+          <main className="flex-1 overflow-y-auto p-6 beachpark-scrollbar">
+            <div className="beachpark-slide-up">
+              {children}
+            </div>
           </main>
         </div>
       </div>
