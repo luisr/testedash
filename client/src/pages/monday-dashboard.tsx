@@ -1,7 +1,6 @@
 import { MondayLayout } from "@/components/layout/MondayLayout";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/monday-card";
-import { Badge } from "@/components/ui/monday-badge";
-import { Button } from "@/components/ui/monday-button";
+import { useState } from "react";
+import { useLocation } from "wouter";
 import { 
   BarChart3, 
   TrendingUp, 
@@ -11,122 +10,145 @@ import {
   CheckCircle,
   Clock,
   ArrowUp,
-  ArrowDown
+  ArrowDown,
+  Plus,
+  Settings
 } from "lucide-react";
 
 export default function MondayDashboard() {
+  const [, setLocation] = useLocation();
+  const [showNewProjectModal, setShowNewProjectModal] = useState(false);
+
+  const handleNavigation = (path: string) => {
+    setLocation(path);
+  };
+
+  const handleNewProject = () => {
+    setShowNewProjectModal(true);
+  };
+
+  const handleManageTeam = () => {
+    setLocation('/users');
+  };
+
+  const handleViewReports = () => {
+    setLocation('/reports');
+  };
+
+  const handleScheduleMeeting = () => {
+    setLocation('/calendar');
+  };
+
   return (
-    <MondayLayout className="monday-bg">
-      <div className="p-xl space-y-xl monday-bg">
+    <MondayLayout>
+      <div className="monday-main">
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="monday-header">
           <div>
-            <h1 className="text-3xl font-bold monday-text">Dashboard</h1>
-            <p className="monday-text-secondary">Visão geral dos seus projetos</p>
+            <h1 className="monday-title">Dashboard</h1>
+            <p className="monday-subtitle">Visão geral dos seus projetos</p>
           </div>
-          <div className="flex gap-sm">
-            <Button variant="secondary">
+          <div className="monday-flex monday-gap-sm">
+            <button 
+              className="monday-btn monday-btn-secondary"
+              onClick={() => handleNavigation('/calendar')}
+            >
               <Calendar className="w-4 h-4" />
               Calendário
-            </Button>
-            <Button variant="primary">
+            </button>
+            <button 
+              className="monday-btn monday-btn-primary"
+              onClick={handleNewProject}
+            >
               <FolderOpen className="w-4 h-4" />
               Novo Projeto
-            </Button>
+            </button>
           </div>
         </div>
 
         {/* KPI Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-lg">
-          <Card className="monday-card">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
+        <div className="monday-grid monday-grid-cols-1 monday-md-grid-cols-2 monday-lg-grid-cols-4">
+          <div className="monday-kpi-card">
+            <div className="monday-flex monday-items-center monday-justify-between monday-mb-sm">
               <div>
-                <p className="text-sm font-medium monday-text-secondary">Projetos Ativos</p>
-                <p className="text-2xl font-bold monday-text">12</p>
+                <p className="monday-kpi-label">Projetos Ativos</p>
+                <p className="monday-kpi-value">12</p>
               </div>
-              <div className="bg-primary rounded-lg p-sm">
-                <FolderOpen className="w-4 h-4 text-on-primary" />
+              <div className="monday-rounded-lg monday-p-sm" style={{ backgroundColor: 'var(--monday-primary)' }}>
+                <FolderOpen className="w-4 h-4" style={{ color: 'white' }} />
               </div>
-            </CardHeader>
-            <CardContent className="pt-0">
-              <div className="flex items-center gap-xs text-sm">
-                <ArrowUp className="w-3 h-3 text-success" />
-                <span className="text-success font-medium">+2</span>
-                <span className="text-tertiary">este mês</span>
-              </div>
-            </CardContent>
-          </Card>
+            </div>
+            <div className="monday-kpi-change positive">
+              <ArrowUp className="w-3 h-3" />
+              <span className="monday-font-medium">+2</span>
+              <span>este mês</span>
+            </div>
+          </div>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
+          <div className="monday-kpi-card">
+            <div className="monday-flex monday-items-center monday-justify-between monday-mb-sm">
               <div>
-                <p className="text-sm font-medium text-secondary">Tarefas Concluídas</p>
-                <p className="text-2xl font-bold text-primary">284</p>
+                <p className="monday-kpi-label">Tarefas Concluídas</p>
+                <p className="monday-kpi-value">284</p>
               </div>
-              <div className="bg-secondary rounded-lg p-sm">
-                <CheckCircle className="w-4 h-4 text-success" />
+              <div className="monday-rounded-lg monday-p-sm" style={{ backgroundColor: 'var(--monday-secondary)' }}>
+                <CheckCircle className="w-4 h-4" style={{ color: 'white' }} />
               </div>
-            </CardHeader>
-            <CardContent className="pt-0">
-              <div className="flex items-center gap-xs text-sm">
-                <ArrowUp className="w-3 h-3 text-success" />
-                <span className="text-success font-medium">+12%</span>
-                <span className="text-tertiary">vs mês passado</span>
-              </div>
-            </CardContent>
-          </Card>
+            </div>
+            <div className="monday-kpi-change positive">
+              <ArrowUp className="w-3 h-3" />
+              <span className="monday-font-medium">+12%</span>
+              <span>vs mês passado</span>
+            </div>
+          </div>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
+          <div className="monday-kpi-card">
+            <div className="monday-flex monday-items-center monday-justify-between monday-mb-sm">
               <div>
-                <p className="text-sm font-medium text-secondary">Equipe Ativa</p>
-                <p className="text-2xl font-bold text-primary">24</p>
+                <p className="monday-kpi-label">Equipe Ativa</p>
+                <p className="monday-kpi-value">24</p>
               </div>
-              <div className="bg-accent rounded-lg p-sm">
-                <Users className="w-4 h-4 text-primary" />
+              <div className="monday-rounded-lg monday-p-sm" style={{ backgroundColor: 'var(--monday-accent)' }}>
+                <Users className="w-4 h-4" style={{ color: 'var(--monday-text-primary)' }} />
               </div>
-            </CardHeader>
-            <CardContent className="pt-0">
-              <div className="flex items-center gap-xs text-sm">
-                <ArrowUp className="w-3 h-3 text-success" />
-                <span className="text-success font-medium">+3</span>
-                <span className="text-tertiary">novos colaboradores</span>
-              </div>
-            </CardContent>
-          </Card>
+            </div>
+            <div className="monday-kpi-change positive">
+              <ArrowUp className="w-3 h-3" />
+              <span className="monday-font-medium">+3</span>
+              <span>novos colaboradores</span>
+            </div>
+          </div>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
+          <div className="monday-kpi-card">
+            <div className="monday-flex monday-items-center monday-justify-between monday-mb-sm">
               <div>
-                <p className="text-sm font-medium text-secondary">Performance</p>
-                <p className="text-2xl font-bold text-primary">94%</p>
+                <p className="monday-kpi-label">Performance</p>
+                <p className="monday-kpi-value">94%</p>
               </div>
-              <div className="bg-success rounded-lg p-sm">
-                <TrendingUp className="w-4 h-4 text-on-primary" />
+              <div className="monday-rounded-lg monday-p-sm" style={{ backgroundColor: 'var(--monday-secondary)' }}>
+                <TrendingUp className="w-4 h-4" style={{ color: 'white' }} />
               </div>
-            </CardHeader>
-            <CardContent className="pt-0">
-              <div className="flex items-center gap-xs text-sm">
-                <ArrowUp className="w-3 h-3 text-success" />
-                <span className="text-success font-medium">+5%</span>
-                <span className="text-tertiary">eficiência</span>
-              </div>
-            </CardContent>
-          </Card>
+            </div>
+            <div className="monday-kpi-change positive">
+              <ArrowUp className="w-3 h-3" />
+              <span className="monday-font-medium">+5%</span>
+              <span>eficiência</span>
+            </div>
+          </div>
         </div>
 
         {/* Main Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-xl">
+        <div className="monday-grid monday-grid-cols-1 monday-lg-grid-cols-3">
           {/* Projects Overview */}
-          <Card className="lg:col-span-2">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-sm">
-                <BarChart3 className="w-5 h-5 brand-primary" />
+          <div className="monday-card" style={{ gridColumn: 'span 2' }}>
+            <div className="monday-card-header">
+              <h3 className="monday-card-title monday-flex monday-items-center monday-gap-sm">
+                <BarChart3 className="w-5 h-5" style={{ color: 'var(--monday-primary)' }} />
                 Projetos Recentes
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-md">
+              </h3>
+            </div>
+            <div className="monday-card-content">
+              <div className="monday-flex monday-flex-col monday-gap-md">
                 {[
                   {
                     name: "Sistema de Vendas",
@@ -157,50 +179,48 @@ export default function MondayDashboard() {
                     deadline: "12 Jan 2025"
                   }
                 ].map((project, index) => (
-                  <div key={index} className="flex items-center justify-between p-md bg-tertiary rounded-lg">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-sm mb-xs">
-                        <h4 className="font-medium text-primary">{project.name}</h4>
-                        <Badge 
-                          variant={
-                            project.status === 'completed' ? 'success' :
-                            project.status === 'delayed' ? 'error' : 'primary'
-                          }
-                        >
+                  <div key={index} className="monday-flex monday-items-center monday-justify-between monday-p-md monday-rounded-lg" style={{ backgroundColor: 'var(--monday-bg-tertiary)' }}>
+                    <div className="monday-flex-1">
+                      <div className="monday-flex monday-items-center monday-gap-sm monday-mb-xs">
+                        <h4 className="monday-font-medium" style={{ color: 'var(--monday-text-primary)' }}>{project.name}</h4>
+                        <span className={`monday-badge ${
+                          project.status === 'completed' ? 'success' :
+                          project.status === 'delayed' ? 'error' : 'primary'
+                        }`}>
                           {project.status === 'completed' ? 'Concluído' :
                            project.status === 'delayed' ? 'Atrasado' : 'Em Andamento'}
-                        </Badge>
+                        </span>
                       </div>
-                      <div className="flex items-center gap-md text-sm text-secondary mb-sm">
+                      <div className="monday-flex monday-items-center monday-gap-md monday-text-sm monday-mb-sm" style={{ color: 'var(--monday-text-secondary)' }}>
                         <span>Equipe: {project.team}</span>
                         <span>Prazo: {project.deadline}</span>
                       </div>
                       <div>
-                        <div className="progress">
+                        <div className="monday-progress">
                           <div 
-                            className={`progress-bar ${project.status === 'completed' ? 'progress-success' : project.status === 'delayed' ? 'progress-error' : ''}`}
+                            className={`monday-progress-bar ${project.status === 'completed' ? 'success' : project.status === 'delayed' ? 'error' : ''}`}
                             style={{ width: `${project.progress}%` }}
                           ></div>
                         </div>
-                        <span className="text-xs text-tertiary mt-xs block">{project.progress}% concluído</span>
+                        <span className="monday-text-xs monday-mt-xs" style={{ color: 'var(--monday-text-tertiary)', display: 'block' }}>{project.progress}% concluído</span>
                       </div>
                     </div>
                   </div>
                 ))}
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
 
           {/* Activity Feed */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-sm">
-                <Clock className="w-5 h-5 brand-primary" />
+          <div className="monday-card">
+            <div className="monday-card-header">
+              <h3 className="monday-card-title monday-flex monday-items-center monday-gap-sm">
+                <Clock className="w-5 h-5" style={{ color: 'var(--monday-primary)' }} />
                 Atividades Recentes
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-md">
+              </h3>
+            </div>
+            <div className="monday-card-content">
+              <div className="monday-flex monday-flex-col monday-gap-md">
                 {[
                   {
                     user: "Ana Silva",
@@ -231,51 +251,101 @@ export default function MondayDashboard() {
                     type: "info"
                   }
                 ].map((activity, index) => (
-                  <div key={index} className="flex items-start gap-sm">
-                    <div className={`w-2 h-2 rounded-full mt-2 ${
-                      activity.type === 'success' ? 'bg-success' :
-                      activity.type === 'warning' ? 'bg-warning' : 'bg-primary'
-                    }`}></div>
-                    <div className="flex-1">
-                      <p className="text-sm text-primary">
+                  <div key={index} className="monday-flex monday-items-start monday-gap-sm">
+                    <div 
+                      className="monday-rounded-full" 
+                      style={{ 
+                        width: '8px', 
+                        height: '8px', 
+                        marginTop: '8px',
+                        backgroundColor: activity.type === 'success' ? 'var(--monday-secondary)' :
+                                      activity.type === 'warning' ? 'var(--monday-accent)' : 'var(--monday-primary)'
+                      }}
+                    ></div>
+                    <div className="monday-flex-1">
+                      <p className="monday-text-sm" style={{ color: 'var(--monday-text-primary)' }}>
                         <strong>{activity.user}</strong> {activity.action}{' '}
-                        <span className="brand-primary">{activity.target}</span>
+                        <span style={{ color: 'var(--monday-primary)' }}>{activity.target}</span>
                       </p>
-                      <p className="text-xs text-tertiary">{activity.time}</p>
+                      <p className="monday-text-xs" style={{ color: 'var(--monday-text-tertiary)' }}>{activity.time}</p>
                     </div>
                   </div>
                 ))}
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </div>
 
         {/* Quick Actions */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Ações Rápidas</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-md">
-              <Button variant="primary" className="h-auto p-lg flex-col gap-sm">
+        <div className="monday-card">
+          <div className="monday-card-header">
+            <h3 className="monday-card-title">Ações Rápidas</h3>
+          </div>
+          <div className="monday-card-content">
+            <div className="monday-grid monday-grid-cols-1 monday-md-grid-cols-4">
+              <button 
+                className="monday-btn monday-btn-primary monday-flex monday-flex-col monday-gap-sm monday-p-lg"
+                onClick={handleNewProject}
+              >
                 <FolderOpen className="w-6 h-6" />
                 <span>Novo Projeto</span>
-              </Button>
-              <Button variant="secondary" className="h-auto p-lg flex-col gap-sm">
+              </button>
+              <button 
+                className="monday-btn monday-btn-secondary monday-flex monday-flex-col monday-gap-sm monday-p-lg"
+                onClick={handleManageTeam}
+              >
                 <Users className="w-6 h-6" />
                 <span>Gerenciar Equipe</span>
-              </Button>
-              <Button variant="secondary" className="h-auto p-lg flex-col gap-sm">
+              </button>
+              <button 
+                className="monday-btn monday-btn-secondary monday-flex monday-flex-col monday-gap-sm monday-p-lg"
+                onClick={handleViewReports}
+              >
                 <BarChart3 className="w-6 h-6" />
                 <span>Ver Relatórios</span>
-              </Button>
-              <Button variant="secondary" className="h-auto p-lg flex-col gap-sm">
+              </button>
+              <button 
+                className="monday-btn monday-btn-secondary monday-flex monday-flex-col monday-gap-sm monday-p-lg"
+                onClick={handleScheduleMeeting}
+              >
                 <Calendar className="w-6 h-6" />
                 <span>Agendar Reunião</span>
-              </Button>
+              </button>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
+
+        {/* New Project Modal */}
+        {showNewProjectModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 monday-flex monday-items-center monday-justify-center" style={{ zIndex: 1000 }}>
+            <div className="monday-card" style={{ maxWidth: '400px', width: '90%' }}>
+              <div className="monday-card-header">
+                <h3 className="monday-card-title">Novo Projeto</h3>
+                <p className="monday-card-description">Crie um novo projeto para sua equipe</p>
+              </div>
+              <div className="monday-card-content">
+                <div className="monday-flex monday-flex-col monday-gap-md">
+                  <button 
+                    className="monday-btn monday-btn-primary"
+                    onClick={() => {
+                      setShowNewProjectModal(false);
+                      setLocation('/projects');
+                    }}
+                  >
+                    <Plus className="w-4 h-4" />
+                    Criar Projeto
+                  </button>
+                  <button 
+                    className="monday-btn monday-btn-secondary"
+                    onClick={() => setShowNewProjectModal(false)}
+                  >
+                    Cancelar
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </MondayLayout>
   );

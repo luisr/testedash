@@ -139,6 +139,10 @@ body,
   transform: translateY(-1px) !important;
 }
 
+.monday-btn-primary.monday-justify-between {
+  justify-content: space-between !important;
+}
+
 .monday-btn-secondary {
   background-color: var(--monday-bg-secondary) !important;
   color: var(--monday-text-primary) !important;
@@ -194,6 +198,10 @@ body,
   font-weight: 500 !important;
   transition: all 0.15s ease !important;
   cursor: pointer !important;
+  border: none !important;
+  background: transparent !important;
+  width: 100% !important;
+  text-align: left !important;
 }
 
 .monday-nav-item:hover {
@@ -425,4 +433,13 @@ body,
   .monday-lg-grid-cols-2 { grid-template-columns: repeat(2, 1fr) !important; }
   .monday-lg-grid-cols-3 { grid-template-columns: repeat(3, 1fr) !important; }
   .monday-lg-grid-cols-4 { grid-template-columns: repeat(4, 1fr) !important; }
+}
+
+/* Additional utility classes */
+.monday-justify-start {
+  justify-content: flex-start !important;
+}
+
+.monday-text-left {
+  text-align: left !important;
 }

@@ -49,7 +49,10 @@ export function MondaySidebar({ className }: SidebarProps) {
 
       <div className="monday-p-md">
         <div className="monday-mb-lg">
-          <button className="monday-btn monday-btn-primary monday-w-full monday-justify-between">
+          <button 
+            className="monday-btn monday-btn-primary monday-w-full monday-justify-start"
+            onClick={() => window.location.href = '/projects'}
+          >
             <Plus className="w-4 h-4" />
             Novo Projeto
           </button>
@@ -73,9 +76,9 @@ export function MondaySidebar({ className }: SidebarProps) {
             const isActive = location === item.href || location.startsWith(item.href + '/');
             
             return (
-              <Link
+              <button
                 key={item.name}
-                href={item.href}
+                onClick={() => window.location.href = item.href}
                 className={cn(
                   'monday-nav-item',
                   isActive && 'active'
@@ -83,7 +86,7 @@ export function MondaySidebar({ className }: SidebarProps) {
               >
                 <Icon className="w-4 h-4" />
                 {item.name}
-              </Link>
+              </button>
             );
           })}
         </nav>
