@@ -63,7 +63,7 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-primary flex items-center justify-center p-4">
+    <div className="login-container">
       {/* Theme Toggle - Top Right */}
       <div className="fixed top-4 right-4 z-50">
         <div className="card p-2 rounded-full shadow-md">
@@ -71,103 +71,95 @@ export default function Login() {
         </div>
       </div>
       
-      <div className="w-full max-w-md space-y-8">
+      <div className="login-card">
         {/* Logo/Header */}
-        <div className="text-center space-y-4">
-          <div className="flex justify-center">
+        <div className="text-center mb-8">
+          <div className="flex justify-center mb-4">
             <div className="hover-lift">
-              <img src={beachParkLogo} alt="BeachPark Logo" className="w-16 h-16 object-contain" />
+              <img src={beachParkLogo} alt="BeachPark Logo" className="w-20 h-20 object-contain" />
             </div>
           </div>
-          <h1 className="text-4xl font-bold text-primary" style={{ background: 'var(--brand-gradient)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+          <h1 className="login-title">
             Tô Sabendo
           </h1>
-          <p className="text-secondary">Sistema de Gerenciamento de Projetos</p>
+          <p className="login-subtitle">Sistema de Gerenciamento de Projetos</p>
         </div>
 
         {/* Login Form */}
-        <Card className="glass shadow-xl">
-          <CardHeader>
-            <CardTitle className="text-2xl font-semibold text-center text-primary">
-              Fazer Login
-            </CardTitle>
-            <CardDescription className="text-center text-secondary">
-              Entre com suas credenciais para acessar seus projetos
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              {error && (
-                <Alert variant="destructive">
-                  <AlertDescription>{error}</AlertDescription>
-                </Alert>
-              )}
+        <form onSubmit={handleSubmit}>
+          {error && (
+            <Alert variant="destructive" className="mb-4">
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
 
-              <div className="input-group">
-                <Label htmlFor="email" className="input-label">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="seu@email.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                />
-              </div>
+          <div className="login-form-group">
+            <label htmlFor="email" className="login-label">Email</label>
+            <input
+              id="email"
+              type="email"
+              placeholder="seu@email.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="login-input"
+            />
+          </div>
 
-              <div className="input-group">
-                <Label htmlFor="password" className="input-label">Senha</Label>
-                <div className="relative">
-                  <Input
-                    id="password"
-                    type={showPassword ? "text" : "password"}
-                    placeholder="Sua senha"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                    className="pr-10"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-secondary hover:text-primary transition-colors"
-                  >
-                    {showPassword ? (
-                      <EyeOff className="h-4 w-4" />
-                    ) : (
-                      <Eye className="h-4 w-4" />
-                    )}
-                  </button>
-                </div>
-              </div>
-
-              <Button
-                type="submit"
-                disabled={isLoading}
-                className="w-full hover-lift"
+          <div className="login-form-group">
+            <label htmlFor="password" className="login-label">Senha</label>
+            <div className="relative">
+              <input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                placeholder="Sua senha"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                className="login-input"
+                style={{ paddingRight: '48px' }}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute inset-y-0 right-0 pr-3 flex items-center text-secondary hover:text-primary transition-colors"
               >
-                {isLoading ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                    Entrando...
-                  </>
+                {showPassword ? (
+                  <EyeOff className="h-5 w-5" />
                 ) : (
-                  <>
-                    <LogIn className="mr-2 h-4 w-4" />
-                    Entrar
-                  </>
+                  <Eye className="h-5 w-5" />
                 )}
-              </Button>
+              </button>
+            </div>
+          </div>
 
-              <div className="text-center text-sm text-secondary">
-                <p>
-                  <Shield className="inline w-4 h-4 mr-1" />
-                  Sistema seguro e protegido
-                </p>
-              </div>
-            </form>
-          </CardContent>
-        </Card>
+          <div className="login-form-group">
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="login-button"
+            >
+              {isLoading ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                  Entrando...
+                </>
+              ) : (
+                <>
+                  <LogIn className="mr-2 h-4 w-4" />
+                  Entrar
+                </>
+              )}
+            </button>
+          </div>
+
+          <div className="login-footer">
+            <p>
+              <Shield className="inline w-4 h-4 mr-1" />
+              Sistema seguro e protegido
+            </p>
+          </div>
+        </form>
       </div>
 
       {/* Change Password Modal */}
