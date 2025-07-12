@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { AuthProvider } from "@/contexts/AuthContext";
 import Dashboard from "@/pages/dashboard";
+import MondayDashboard from "@/pages/monday-dashboard";
 import Login from "@/pages/login";
 import Projects from "@/pages/projects";
 import AdminDashboard from "@/pages/admin-dashboard";
@@ -17,7 +18,7 @@ function Router() {
       <Route path="/login" component={Login} />
       <Route path="/projects" component={Projects} />
       <Route path="/dashboard/:id" component={Dashboard} />
-      <Route path="/dashboard" component={Dashboard} />
+      <Route path="/dashboard" component={MondayDashboard} />
       <Route path="/admin-dashboard" component={AdminDashboard} />
       <Route path="/" component={Login} />
       <Route component={NotFound} />

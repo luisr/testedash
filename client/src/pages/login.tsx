@@ -1,9 +1,8 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
-import { Button } from "@/components/ui/button-new";
-import { Input } from "@/components/ui/input-new";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card-new";
+import { Button } from "@/components/ui/monday-button";
+import { Input } from "@/components/ui/monday-input";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/monday-card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Eye, EyeOff, LogIn, Shield } from "lucide-react";
 import beachParkLogo from "@assets/pngegg_1752264509099.png";
@@ -43,7 +42,7 @@ export default function Login() {
           setLoggedInUser(data.user);
           setShowChangePasswordModal(true);
         } else {
-          setLocation("/admin-dashboard");
+          setLocation("/dashboard");
         }
       } else {
         const errorData = await response.json();
@@ -59,107 +58,114 @@ export default function Login() {
 
   const handlePasswordChanged = () => {
     setShowChangePasswordModal(false);
-    setLocation("/admin-dashboard");
+    setLocation("/dashboard");
   };
 
   return (
-    <div className="login-container">
+    <div className="min-h-screen bg-primary flex items-center justify-center" style={{ padding: 'var(--space-lg)' }}>
       {/* Theme Toggle - Top Right */}
       <div className="fixed top-4 right-4 z-50">
-        <div className="card p-2 rounded-full shadow-md">
-          <ThemeToggle />
-        </div>
+        <ThemeToggle />
       </div>
       
-      <div className="login-card">
+      <div className="w-full" style={{ maxWidth: '400px' }}>
         {/* Logo/Header */}
-        <div className="text-center mb-8">
-          <div className="flex justify-center mb-4">
-            <div className="hover-lift">
-              <img src={beachParkLogo} alt="BeachPark Logo" className="w-20 h-20 object-contain" />
-            </div>
+        <div className="text-center space-y-md mb-xl">
+          <div className="flex justify-center">
+            <img src={beachParkLogo} alt="BeachPark Logo" className="w-16 h-16 object-contain" />
           </div>
-          <h1 className="login-title">
-            Tô Sabendo
-          </h1>
-          <p className="login-subtitle">Sistema de Gerenciamento de Projetos</p>
+          <div>
+            <h1 className="text-3xl font-bold brand-primary mb-xs">
+              Tô Sabendo
+            </h1>
+            <p className="text-secondary">Sistema de Gerenciamento de Projetos</p>
+          </div>
         </div>
 
         {/* Login Form */}
-        <form onSubmit={handleSubmit}>
-          {error && (
-            <Alert variant="destructive" className="mb-4">
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          )}
-
-          <div className="login-form-group">
-            <label htmlFor="email" className="login-label">Email</label>
-            <input
-              id="email"
-              type="email"
-              placeholder="seu@email.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="login-input"
-            />
-          </div>
-
-          <div className="login-form-group">
-            <label htmlFor="password" className="login-label">Senha</label>
-            <div className="relative">
-              <input
-                id="password"
-                type={showPassword ? "text" : "password"}
-                placeholder="Sua senha"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className="login-input"
-                style={{ paddingRight: '48px' }}
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute inset-y-0 right-0 pr-3 flex items-center text-secondary hover:text-primary transition-colors"
-              >
-                {showPassword ? (
-                  <EyeOff className="h-5 w-5" />
-                ) : (
-                  <Eye className="h-5 w-5" />
-                )}
-              </button>
-            </div>
-          </div>
-
-          <div className="login-form-group">
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="login-button"
-            >
-              {isLoading ? (
-                <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                  Entrando...
-                </>
-              ) : (
-                <>
-                  <LogIn className="mr-2 h-4 w-4" />
-                  Entrar
-                </>
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-center">
+              Fazer Login
+            </CardTitle>
+            <CardDescription className="text-center">
+              Entre com suas credenciais para acessar seus projetos
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit} className="space-y-lg">
+              {error && (
+                <Alert variant="destructive">
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
               )}
-            </button>
-          </div>
 
-          <div className="login-footer">
-            <p>
-              <Shield className="inline w-4 h-4 mr-1" />
-              Sistema seguro e protegido
-            </p>
-          </div>
-        </form>
+              <div className="input-group">
+                <label htmlFor="email" className="input-label">Email</label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="seu@email.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+              </div>
+
+              <div className="input-group">
+                <label htmlFor="password" className="input-label">Senha</label>
+                <div className="relative">
+                  <Input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Sua senha"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    style={{ paddingRight: '48px' }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-tertiary hover:text-primary transition"
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-5 w-5" />
+                    ) : (
+                      <Eye className="h-5 w-5" />
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              <Button
+                type="submit"
+                disabled={isLoading}
+                className="w-full"
+                size="lg"
+              >
+                {isLoading ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    Entrando...
+                  </>
+                ) : (
+                  <>
+                    <LogIn className="w-4 h-4" />
+                    Entrar
+                  </>
+                )}
+              </Button>
+
+              <div className="text-center text-sm text-tertiary pt-md">
+                <p className="flex items-center justify-center gap-xs">
+                  <Shield className="w-4 h-4" />
+                  Sistema seguro e protegido
+                </p>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Change Password Modal */}
