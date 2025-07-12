@@ -222,7 +222,10 @@ export default function AdminDashboard() {
   if (!user) return null;
 
   return (
-    <div className="min-h-screen dashboard-container">
+    <div className="min-h-screen" style={{ 
+      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      color: 'white'
+    }}>
       {/* Header */}
       <div className="border-b border-white/20 bg-white/10 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -232,8 +235,8 @@ export default function AdminDashboard() {
                 <img src={beachParkLogo} alt="BeachPark Logo" className="w-10 h-10 object-contain" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-foreground">Tô Sabendo</h1>
-                <p className="text-sm text-muted-foreground">Painel de Administração</p>
+                <h1 className="text-2xl font-bold text-white">Tô Sabendo</h1>
+                <p className="text-sm text-white/70">Painel de Administração</p>
               </div>
             </div>
             
@@ -246,8 +249,8 @@ export default function AdminDashboard() {
                   </AvatarFallback>
                 </Avatar>
                 <div className="text-sm">
-                  <div className="font-medium text-foreground">{user.name}</div>
-                  <div className="text-muted-foreground">{user.email}</div>
+                  <div className="font-medium text-white">{user.name}</div>
+                  <div className="text-white/70">{user.email}</div>
                 </div>
                 {user.isSuperUser && (
                   <Badge className="bg-gradient-to-r from-purple-500 to-pink-500 text-white">
@@ -260,7 +263,7 @@ export default function AdminDashboard() {
                 variant="ghost" 
                 size="sm"
                 onClick={handleLogout}
-                className="text-muted-foreground hover:text-foreground"
+                className="text-white/70 hover:text-white hover:bg-white/10"
               >
                 <LogOut className="w-4 h-4 mr-2" />
                 Sair
@@ -273,76 +276,105 @@ export default function AdminDashboard() {
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-5 mb-8">
-            <TabsTrigger value="overview">Visão Geral</TabsTrigger>
-            <TabsTrigger value="projects">Projetos</TabsTrigger>
-            <TabsTrigger value="users">Usuários</TabsTrigger>
-            <TabsTrigger value="reports">Relatórios</TabsTrigger>
-            <TabsTrigger value="profile">Perfil</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-5 mb-8" style={{ 
+            background: 'rgba(255, 255, 255, 0.1)',
+            backdropFilter: 'blur(10px)',
+            border: '1px solid rgba(255, 255, 255, 0.2)'
+          }}>
+            <TabsTrigger value="overview" className="text-white data-[state=active]:bg-white/20 data-[state=active]:text-white">Visão Geral</TabsTrigger>
+            <TabsTrigger value="projects" className="text-white data-[state=active]:bg-white/20 data-[state=active]:text-white">Projetos</TabsTrigger>
+            <TabsTrigger value="users" className="text-white data-[state=active]:bg-white/20 data-[state=active]:text-white">Usuários</TabsTrigger>
+            <TabsTrigger value="reports" className="text-white data-[state=active]:bg-white/20 data-[state=active]:text-white">Relatórios</TabsTrigger>
+            <TabsTrigger value="profile" className="text-white data-[state=active]:bg-white/20 data-[state=active]:text-white">Perfil</TabsTrigger>
           </TabsList>
 
           {/* Overview Tab */}
           <TabsContent value="overview" className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <Card>
+              <Card style={{ 
+                background: 'rgba(255, 255, 255, 0.1)',
+                backdropFilter: 'blur(10px)',
+                border: '1px solid rgba(255, 255, 255, 0.2)',
+                color: 'white'
+              }}>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Total de Projetos</CardTitle>
-                  <FolderOpen className="h-4 w-4 text-muted-foreground" />
+                  <CardTitle className="text-sm font-medium text-white">Total de Projetos</CardTitle>
+                  <FolderOpen className="h-4 w-4 text-white/70" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{projects.length}</div>
-                  <p className="text-xs text-muted-foreground">Projetos ativos</p>
+                  <div className="text-2xl font-bold text-white">{projects.length}</div>
+                  <p className="text-xs text-white/70">Projetos ativos</p>
                 </CardContent>
               </Card>
 
-              <Card>
+              <Card style={{ 
+                background: 'rgba(255, 255, 255, 0.1)',
+                backdropFilter: 'blur(10px)',
+                border: '1px solid rgba(255, 255, 255, 0.2)',
+                color: 'white'
+              }}>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Total de Usuários</CardTitle>
-                  <Users className="h-4 w-4 text-muted-foreground" />
+                  <CardTitle className="text-sm font-medium text-white">Total de Usuários</CardTitle>
+                  <Users className="h-4 w-4 text-white/70" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{users.length}</div>
-                  <p className="text-xs text-muted-foreground">Usuários cadastrados</p>
+                  <div className="text-2xl font-bold text-white">{users.length}</div>
+                  <p className="text-xs text-white/70">Usuários cadastrados</p>
                 </CardContent>
               </Card>
 
-              <Card>
+              <Card style={{ 
+                background: 'rgba(255, 255, 255, 0.1)',
+                backdropFilter: 'blur(10px)',
+                border: '1px solid rgba(255, 255, 255, 0.2)',
+                color: 'white'
+              }}>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Orçamento Total</CardTitle>
-                  <DollarSign className="h-4 w-4 text-muted-foreground" />
+                  <CardTitle className="text-sm font-medium text-white">Orçamento Total</CardTitle>
+                  <DollarSign className="h-4 w-4 text-white/70" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">
+                  <div className="text-2xl font-bold text-white">
                     R$ {projects.reduce((sum, p) => sum + parseFloat(p.budget || '0'), 0).toLocaleString('pt-BR')}
                   </div>
-                  <p className="text-xs text-muted-foreground">Em todos os projetos</p>
+                  <p className="text-xs text-white/70">Em todos os projetos</p>
                 </CardContent>
               </Card>
 
-              <Card>
+              <Card style={{ 
+                background: 'rgba(255, 255, 255, 0.1)',
+                backdropFilter: 'blur(10px)',
+                border: '1px solid rgba(255, 255, 255, 0.2)',
+                color: 'white'
+              }}>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Relatórios</CardTitle>
-                  <BarChart3 className="h-4 w-4 text-muted-foreground" />
+                  <CardTitle className="text-sm font-medium text-white">Relatórios</CardTitle>
+                  <BarChart3 className="h-4 w-4 text-white/70" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">12</div>
-                  <p className="text-xs text-muted-foreground">Relatórios gerados</p>
+                  <div className="text-2xl font-bold text-white">12</div>
+                  <p className="text-xs text-white/70">Relatórios gerados</p>
                 </CardContent>
               </Card>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Card>
+              <Card style={{ 
+                background: 'rgba(255, 255, 255, 0.1)',
+                backdropFilter: 'blur(10px)',
+                border: '1px solid rgba(255, 255, 255, 0.2)',
+                color: 'white'
+              }}>
                 <CardHeader>
-                  <CardTitle>Projetos Recentes</CardTitle>
+                  <CardTitle className="text-white">Projetos Recentes</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
                     {projects.slice(0, 5).map((project) => (
-                      <div key={project.id} className="flex items-center justify-between p-3 rounded-lg bg-gray-50 dark:bg-gray-800">
+                      <div key={project.id} className="flex items-center justify-between p-3 rounded-lg bg-white/10">
                         <div>
-                          <div className="font-medium">{project.name}</div>
-                          <div className="text-sm text-muted-foreground">{project.description}</div>
+                          <div className="font-medium text-white">{project.name}</div>
+                          <div className="text-sm text-white/70">{project.description}</div>
                         </div>
                         <Badge className={getStatusColor(project.status)}>
                           {project.status}
@@ -353,21 +385,26 @@ export default function AdminDashboard() {
                 </CardContent>
               </Card>
 
-              <Card>
+              <Card style={{ 
+                background: 'rgba(255, 255, 255, 0.1)',
+                backdropFilter: 'blur(10px)',
+                border: '1px solid rgba(255, 255, 255, 0.2)',
+                color: 'white'
+              }}>
                 <CardHeader>
-                  <CardTitle>Usuários Ativos</CardTitle>
+                  <CardTitle className="text-white">Usuários Ativos</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
                     {users.filter(u => u.isActive).slice(0, 5).map((user) => (
-                      <div key={user.id} className="flex items-center gap-3 p-3 rounded-lg bg-gray-50 dark:bg-gray-800">
+                      <div key={user.id} className="flex items-center gap-3 p-3 rounded-lg bg-white/10">
                         <Avatar className="h-8 w-8">
                           <AvatarImage src={user.avatar} alt={user.name} />
                           <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
                         </Avatar>
                         <div>
-                          <div className="font-medium">{user.name}</div>
-                          <div className="text-sm text-muted-foreground">{getRoleLabel(user.role)}</div>
+                          <div className="font-medium text-white">{user.name}</div>
+                          <div className="text-sm text-white/70">{getRoleLabel(user.role)}</div>
                         </div>
                         {user.isSuperUser && (
                           <Badge variant="secondary">
@@ -386,8 +423,8 @@ export default function AdminDashboard() {
           {/* Projects Tab */}
           <TabsContent value="projects" className="space-y-6">
             <div className="flex justify-between items-center">
-              <h2 className="text-2xl font-bold">Gerenciamento de Projetos</h2>
-              <Button onClick={() => setShowNewProjectModal(true)}>
+              <h2 className="text-2xl font-bold text-white">Gerenciamento de Projetos</h2>
+              <Button onClick={() => setShowNewProjectModal(true)} className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white">
                 <Plus className="w-4 h-4 mr-2" />
                 Novo Projeto
               </Button>
@@ -398,19 +435,20 @@ export default function AdminDashboard() {
             <div className="flex gap-4 mb-6">
               <div className="flex-1">
                 <div className="relative">
-                  <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Search className="absolute left-3 top-3 h-4 w-4 text-white/70" />
                   <Input
                     placeholder="Buscar projetos..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10"
+                    className="pl-10 bg-white/10 border-white/20 text-white placeholder:text-white/50"
                   />
                 </div>
               </div>
               <select 
                 value={filterStatus} 
                 onChange={(e) => setFilterStatus(e.target.value)}
-                className="px-3 py-2 border rounded-md"
+                className="px-3 py-2 border rounded-md bg-white/10 border-white/20 text-white"
+                style={{ background: 'rgba(255, 255, 255, 0.1)' }}
               >
                 <option value="all">Todos os Status</option>
                 <option value="active">Ativo</option>
@@ -422,29 +460,34 @@ export default function AdminDashboard() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredProjects.map((project) => (
-                <Card key={project.id} className="hover:shadow-lg transition-shadow">
+                <Card key={project.id} className="hover:shadow-lg transition-shadow" style={{ 
+                  background: 'rgba(255, 255, 255, 0.1)',
+                  backdropFilter: 'blur(10px)',
+                  border: '1px solid rgba(255, 255, 255, 0.2)',
+                  color: 'white'
+                }}>
                   <CardHeader>
                     <div className="flex justify-between items-start">
-                      <CardTitle className="text-lg">{project.name}</CardTitle>
+                      <CardTitle className="text-lg text-white">{project.name}</CardTitle>
                       <Badge className={getStatusColor(project.status)}>
                         {project.status}
                       </Badge>
                     </div>
-                    <CardDescription>{project.description}</CardDescription>
+                    <CardDescription className="text-white/70">{project.description}</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-2">
                       <div className="flex justify-between">
-                        <span className="text-sm text-muted-foreground">Orçamento:</span>
-                        <span className="font-medium">R$ {parseFloat(project.budget || '0').toLocaleString('pt-BR')}</span>
+                        <span className="text-sm text-white/70">Orçamento:</span>
+                        <span className="font-medium text-white">R$ {parseFloat(project.budget || '0').toLocaleString('pt-BR')}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-sm text-muted-foreground">Custo Atual:</span>
-                        <span className="font-medium">R$ {parseFloat(project.actualCost || '0').toLocaleString('pt-BR')}</span>
+                        <span className="text-sm text-white/70">Custo Atual:</span>
+                        <span className="font-medium text-white">R$ {parseFloat(project.actualCost || '0').toLocaleString('pt-BR')}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-sm text-muted-foreground">Data de Início:</span>
-                        <span className="font-medium">{new Date(project.startDate).toLocaleDateString('pt-BR')}</span>
+                        <span className="text-sm text-white/70">Data de Início:</span>
+                        <span className="font-medium text-white">{new Date(project.startDate).toLocaleDateString('pt-BR')}</span>
                       </div>
                     </div>
                     <div className="flex gap-2 mt-4">
