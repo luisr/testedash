@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useDashboardData } from '@/hooks/use-dashboard-data';
 import { useConsolidatedDashboard } from '@/hooks/use-consolidated-dashboard';
 import { useActivityMetrics } from '@/hooks/use-activity-metrics';
