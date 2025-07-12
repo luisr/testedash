@@ -35,6 +35,7 @@ interface HierarchicalTaskTableProps {
   onEditActivity: (activity: Activity) => void;
   showDependencies?: boolean;
   onManageDependencies?: (activityId: number) => void;
+  visibleFields?: string[];
 }
 
 interface ActivityNode extends Activity {
@@ -65,12 +66,19 @@ export default function HierarchicalTaskTable({
   onCreateSubActivity,
   onEditActivity,
   showDependencies = false,
-  onManageDependencies
+  onManageDependencies,
+  visibleFields = []
 }: HierarchicalTaskTableProps) {
   const [expandedNodes, setExpandedNodes] = useState<Set<number>>(new Set());
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
   const [filterPriority, setFilterPriority] = useState('all');
+  
+  // Função para verificar se um campo deve ser visível
+  const isFieldVisible = (fieldKey: string) => {
+    if (!visibleFields || visibleFields.length === 0) return true; // Se não há configuração, mostra todos
+    return visibleFields.includes(fieldKey);
+  };
 
   // Build hierarchical tree structure
   const buildHierarchy = (activities: Activity[]): ActivityNode[] => {
@@ -256,13 +264,13 @@ export default function HierarchicalTaskTable({
             <TableHeader>
               <TableRow className="bg-muted/50">
                 <TableHead className="w-8"></TableHead>
-                <TableHead className="font-semibold">Tarefa</TableHead>
-                <TableHead className="font-semibold">Responsável</TableHead>
-                <TableHead className="font-semibold">Status</TableHead>
-                <TableHead className="font-semibold">Prioridade</TableHead>
-                <TableHead className="font-semibold">Progresso</TableHead>
-                <TableHead className="font-semibold">Datas</TableHead>
-                <TableHead className="font-semibold">Ações</TableHead>
+                {isFieldVisible('name') && <TableHead className="font-semibold">Tarefa</TableHead>}
+                {isFieldVisible('responsible') && <TableHead className="font-semibold">Responsável</TableHead>}
+                {isFieldVisible('status') && <TableHead className="font-semibold">Status</TableHead>}
+                {isFieldVisible('priority') && <TableHead className="font-semibold">Prioridade</TableHead>}
+                {isFieldVisible('completionPercentage') && <TableHead className="font-semibold">Progresso</TableHead>}
+                {isFieldVisible('plannedStartDate') && <TableHead className="font-semibold">Datas</TableHead>}
+                {isFieldVisible('actions') && <TableHead className="font-semibold">Ações</TableHead>}
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -294,118 +302,132 @@ export default function HierarchicalTaskTable({
                     </div>
                   </TableCell>
                   
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <div>
-                        <div className="font-medium text-foreground">
-                          {activity.name}
-                          {activity.level > 0 && (
-                            <Badge variant="outline" className="ml-2 text-xs">
-                              Subtarefa
-                            </Badge>
+                  {isFieldVisible('name') && (
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <div>
+                          <div className="font-medium text-foreground">
+                            {activity.name}
+                            {activity.level > 0 && (
+                              <Badge variant="outline" className="ml-2 text-xs">
+                                Subtarefa
+                              </Badge>
+                            )}
+                          </div>
+                          {activity.description && (
+                            <div className="text-sm text-muted-foreground line-clamp-1">
+                              {activity.description}
+                            </div>
                           )}
                         </div>
-                        {activity.description && (
-                          <div className="text-sm text-muted-foreground line-clamp-1">
-                            {activity.description}
+                      </div>
+                    </TableCell>
+                  )}
+
+                  {isFieldVisible('responsible') && (
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                          <User className="w-4 h-4 text-primary" />
+                        </div>
+                        <div>
+                          <div className="text-sm font-medium">
+                            {activity.responsible || 'Não atribuído'}
                           </div>
-                        )}
-                      </div>
-                    </div>
-                  </TableCell>
-
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                        <User className="w-4 h-4 text-primary" />
-                      </div>
-                      <div>
-                        <div className="text-sm font-medium">
-                          {activity.responsible || 'Não atribuído'}
-                        </div>
-                        <div className="text-xs text-muted-foreground">
-                          {activity.discipline || 'Geral'}
+                          <div className="text-xs text-muted-foreground">
+                            {activity.discipline || 'Geral'}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </TableCell>
+                    </TableCell>
+                  )}
 
-                  <TableCell>
-                    {getStatusBadge(activity.status)}
-                  </TableCell>
+                  {isFieldVisible('status') && (
+                    <TableCell>
+                      {getStatusBadge(activity.status)}
+                    </TableCell>
+                  )}
 
-                  <TableCell>
-                    {getPriorityBadge(activity.priority)}
-                  </TableCell>
+                  {isFieldVisible('priority') && (
+                    <TableCell>
+                      {getPriorityBadge(activity.priority)}
+                    </TableCell>
+                  )}
 
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <div className="w-24">
-                        <Progress 
-                          value={parseFloat(activity.completionPercentage || "0")} 
-                          className="h-2"
-                        />
-                      </div>
-                      <span className="text-sm font-medium min-w-[3rem]">
-                        {activity.completionPercentage || 0}%
-                      </span>
-                    </div>
-                  </TableCell>
-
-                  <TableCell>
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-1 text-sm">
-                        <Calendar className="w-3 h-3 text-muted-foreground" />
-                        <span className="text-muted-foreground">
-                          {formatDate(activity.startDate)}
+                  {isFieldVisible('completionPercentage') && (
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <div className="w-24">
+                          <Progress 
+                            value={parseFloat(activity.completionPercentage || "0")} 
+                            className="h-2"
+                          />
+                        </div>
+                        <span className="text-sm font-medium min-w-[3rem]">
+                          {activity.completionPercentage || 0}%
                         </span>
                       </div>
-                      <div className="text-xs text-muted-foreground">
-                        até {formatDate(activity.finishDate)}
+                    </TableCell>
+                  )}
+
+                  {isFieldVisible('plannedStartDate') && (
+                    <TableCell>
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-1 text-sm">
+                          <Calendar className="w-3 h-3 text-muted-foreground" />
+                          <span className="text-muted-foreground">
+                            {formatDate(activity.startDate)}
+                          </span>
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          até {formatDate(activity.finishDate)}
+                        </div>
                       </div>
-                    </div>
-                  </TableCell>
+                    </TableCell>
+                  )}
 
-                  <TableCell>
-                    <div className="flex items-center gap-1">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-8 w-8 p-0"
-                        onClick={() => onEditActivity(activity)}
-                      >
-                        <Edit2 className="w-4 h-4" />
-                      </Button>
-                      
-                      <CreateSubActivityModal
-                        parentActivity={activity}
-                        onSuccess={() => {
-                          // Refresh the activities by calling the onCreateSubActivity callback
-                          onCreateSubActivity(activity.id);
-                        }}
-                      />
-
-                      {showDependencies && onManageDependencies && (
+                  {isFieldVisible('actions') && (
+                    <TableCell>
+                      <div className="flex items-center gap-1">
                         <Button
                           variant="ghost"
                           size="sm"
                           className="h-8 w-8 p-0"
-                          onClick={() => onManageDependencies(activity.id)}
+                          onClick={() => onEditActivity(activity)}
                         >
-                          <GitBranch className="w-4 h-4" />
+                          <Edit2 className="w-4 h-4" />
                         </Button>
-                      )}
-                      
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-8 w-8 p-0 text-destructive"
-                        onClick={() => onDeleteActivity(activity.id)}
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </TableCell>
+                        
+                        <CreateSubActivityModal
+                          parentActivity={activity}
+                          onSuccess={() => {
+                            // Refresh the activities by calling the onCreateSubActivity callback
+                            onCreateSubActivity(activity.id);
+                          }}
+                        />
+
+                        {showDependencies && onManageDependencies && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-8 w-8 p-0"
+                            onClick={() => onManageDependencies(activity.id)}
+                          >
+                            <GitBranch className="w-4 h-4" />
+                          </Button>
+                        )}
+                        
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 w-8 p-0 text-destructive"
+                          onClick={() => onDeleteActivity(activity.id)}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  )}
                 </TableRow>
               ))}
             </TableBody>

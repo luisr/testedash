@@ -32,6 +32,8 @@ interface ActivitiesPanelProps {
   onCreateSubActivity: (parentId: number) => void;
   onBulkImport: (activities: any[]) => void;
   customColumns?: any[];
+  visibleFields?: string[];
+  onVisibleFieldsChange?: (fields: string[]) => void;
 }
 
 const ActivitiesPanel: React.FC<ActivitiesPanelProps> = ({
@@ -45,7 +47,9 @@ const ActivitiesPanel: React.FC<ActivitiesPanelProps> = ({
   onEditActivity,
   onCreateSubActivity,
   onBulkImport,
-  customColumns = []
+  customColumns = [],
+  visibleFields = [],
+  onVisibleFieldsChange
 }) => {
   const queryClient = useQueryClient();
   const [viewMode, setViewMode] = useState<'hierarchical' | 'table'>('hierarchical');
@@ -227,6 +231,7 @@ const ActivitiesPanel: React.FC<ActivitiesPanelProps> = ({
             // Handle dependency management for specific activity
             console.log('Managing dependencies for activity:', activityId);
           }}
+          visibleFields={visibleFields}
         />
       </CardContent>
 
@@ -235,6 +240,8 @@ const ActivitiesPanel: React.FC<ActivitiesPanelProps> = ({
         open={showTableSettings}
         onClose={() => setShowTableSettings(false)}
         dashboardId={dashboardId}
+        visibleFields={visibleFields}
+        onVisibleFieldsChange={onVisibleFieldsChange}
       />
     </Card>
   );

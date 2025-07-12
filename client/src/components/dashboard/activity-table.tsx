@@ -61,6 +61,7 @@ interface ActivityTableProps {
   onNewActivity?: () => void;
   onManageDependencies?: () => void;
   isReadOnly?: boolean;
+  visibleFields?: string[];
 }
 
 interface ActivityWithChildren extends Activity {
@@ -89,7 +90,8 @@ export default function ActivityTable({
   dashboardId,
   onNewActivity,
   onManageDependencies,
-  isReadOnly = false
+  isReadOnly = false,
+  visibleFields = []
 }: ActivityTableProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [configModalOpen, setConfigModalOpen] = useState(false);
@@ -104,6 +106,12 @@ export default function ActivityTable({
   const [isProcessing, setIsProcessing] = useState(false);
   const itemsPerPage = 10;
   const { toast } = useToast();
+  
+  // Função para verificar se um campo deve ser visível
+  const isFieldVisible = (fieldKey: string) => {
+    if (!visibleFields || visibleFields.length === 0) return true; // Se não há configuração, mostra todos
+    return visibleFields.includes(fieldKey);
+  };
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -471,30 +479,46 @@ export default function ActivityTable({
                       className="ml-2"
                     />
                   </TableHead>
-                  <TableHead className="font-medium text-muted-foreground">
-                    Atividade
-                  </TableHead>
-                  <TableHead className="font-medium text-muted-foreground">
-                    Disciplina
-                  </TableHead>
-                  <TableHead className="font-medium text-muted-foreground">
-                    Responsável
-                  </TableHead>
-                  <TableHead className="font-medium text-muted-foreground">
-                    Status
-                  </TableHead>
-                  <TableHead className="font-medium text-muted-foreground">
-                    Progresso
-                  </TableHead>
-                  <TableHead className="font-medium text-muted-foreground">
-                    SPI
-                  </TableHead>
-                  <TableHead className="font-medium text-muted-foreground">
-                    CPI
-                  </TableHead>
-                  <TableHead className="font-medium text-muted-foreground">
-                    Ações
-                  </TableHead>
+                  {isFieldVisible('name') && (
+                    <TableHead className="font-medium text-muted-foreground">
+                      Atividade
+                    </TableHead>
+                  )}
+                  {isFieldVisible('discipline') && (
+                    <TableHead className="font-medium text-muted-foreground">
+                      Disciplina
+                    </TableHead>
+                  )}
+                  {isFieldVisible('responsible') && (
+                    <TableHead className="font-medium text-muted-foreground">
+                      Responsável
+                    </TableHead>
+                  )}
+                  {isFieldVisible('status') && (
+                    <TableHead className="font-medium text-muted-foreground">
+                      Status
+                    </TableHead>
+                  )}
+                  {isFieldVisible('completionPercentage') && (
+                    <TableHead className="font-medium text-muted-foreground">
+                      Progresso
+                    </TableHead>
+                  )}
+                  {isFieldVisible('spi') && (
+                    <TableHead className="font-medium text-muted-foreground">
+                      SPI
+                    </TableHead>
+                  )}
+                  {isFieldVisible('cpi') && (
+                    <TableHead className="font-medium text-muted-foreground">
+                      CPI
+                    </TableHead>
+                  )}
+                  {isFieldVisible('actions') && (
+                    <TableHead className="font-medium text-muted-foreground">
+                      Ações
+                    </TableHead>
+                  )}
                 </TableRow>
               </TableHeader>
               <Droppable droppableId="activities-table">
@@ -528,141 +552,157 @@ export default function ActivityTable({
                                 className="ml-2"
                               />
                             </TableCell>
-                            <TableCell>
-                              <div className="flex items-center">
-                                <div style={{ marginLeft: `${(activity.level || 0) * 20}px` }} className="flex items-center">
-                                  {activity.children && activity.children.length > 0 ? (
-                                    <button
-                                      onClick={() => toggleExpanded(activity.id)}
-                                      className="mr-2 p-1 hover:bg-gray-100 rounded flex items-center justify-center"
-                                    >
-                                      {expandedRows.has(activity.id) ? (
-                                        <ChevronDown className="w-4 h-4 text-muted-foreground" />
-                                      ) : (
-                                        <ChevronRight className="w-4 h-4 text-muted-foreground" />
-                                      )}
-                                    </button>
-                                  ) : (
-                                    <div className="w-6 h-6 mr-2"></div>
+                            {isFieldVisible('name') && (
+                              <TableCell>
+                                <div className="flex items-center">
+                                  <div style={{ marginLeft: `${(activity.level || 0) * 20}px` }} className="flex items-center">
+                                    {activity.children && activity.children.length > 0 ? (
+                                      <button
+                                        onClick={() => toggleExpanded(activity.id)}
+                                        className="mr-2 p-1 hover:bg-gray-100 rounded flex items-center justify-center"
+                                      >
+                                        {expandedRows.has(activity.id) ? (
+                                          <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                                        ) : (
+                                          <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                                        )}
+                                      </button>
+                                    ) : (
+                                      <div className="w-6 h-6 mr-2"></div>
+                                    )}
+                                    <div>
+                                      <div className="font-medium text-foreground">
+                                        {activity.name}
+                                        {activity.parentActivityId && (
+                                          <span className="ml-2 px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded">
+                                            Sub
+                                          </span>
+                                        )}
+                                      </div>
+                                      <div className="text-sm text-muted-foreground">
+                                        {activity.startDate && activity.finishDate ? (
+                                          <>
+                                            {new Date(activity.startDate).toLocaleDateString('pt-BR')} - {new Date(activity.finishDate).toLocaleDateString('pt-BR')}
+                                          </>
+                                        ) : (
+                                          'Datas não definidas'
+                                        )}
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </TableCell>
+                            )}
+                            {isFieldVisible('discipline') && (
+                              <TableCell className="text-foreground">
+                                <Badge variant="secondary" className="text-xs">
+                                  {activity.discipline || 'Geral'}
+                                </Badge>
+                              </TableCell>
+                            )}
+                            {isFieldVisible('responsible') && (
+                              <TableCell>
+                                <div className="flex items-center">
+                                  <Avatar className="w-8 h-8">
+                                    <AvatarImage src={`https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face`} />
+                                    <AvatarFallback>
+                                      {activity.responsible ? activity.responsible.split(' ').map(n => n[0]).join('') : 'N/A'}
+                                    </AvatarFallback>
+                                  </Avatar>
+                                  <div className="ml-3">
+                                    <div className="text-sm font-medium text-foreground">
+                                      {activity.responsible || 'Não atribuído'}
+                                    </div>
+                                  </div>
+                                </div>
+                              </TableCell>
+                            )}
+                            {isFieldVisible('status') && (
+                              <TableCell>
+                                {getStatusBadge(activity.status)}
+                              </TableCell>
+                            )}
+                            {isFieldVisible('completionPercentage') && (
+                              <TableCell>
+                                <div className="flex items-center">
+                                  <Progress 
+                                    value={parseFloat(activity.completionPercentage || "0")} 
+                                    className="w-16 mr-2"
+                                  />
+                                  <span className="text-sm text-foreground">
+                                    {activity.completionPercentage}%
+                                  </span>
+                                </div>
+                              </TableCell>
+                            )}
+                            {isFieldVisible('spi') && (
+                              <TableCell className="text-foreground">
+                                <div className="flex items-center">
+                                  <span className={`text-sm font-medium ${
+                                    parseFloat(calculateSPI(activity)) >= 1 ? 'text-green-600' : 'text-red-600'
+                                  }`}>
+                                    {calculateSPI(activity)}
+                                  </span>
+                                  <div className="ml-2 w-2 h-2 rounded-full bg-current opacity-50"></div>
+                                </div>
+                              </TableCell>
+                            )}
+                            {isFieldVisible('cpi') && (
+                              <TableCell className="text-foreground">
+                                <div className="flex items-center">
+                                  <span className={`text-sm font-medium ${
+                                    parseFloat(calculateCPI(activity)) >= 1 ? 'text-green-600' : 'text-red-600'
+                                  }`}>
+                                    {calculateCPI(activity)}
+                                  </span>
+                                  <div className="ml-2 w-2 h-2 rounded-full bg-current opacity-50"></div>
+                                </div>
+                              </TableCell>
+                            )}
+                            {isFieldVisible('actions') && (
+                              <TableCell>
+                                <div className="flex items-center space-x-1">
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="text-muted-foreground hover:text-foreground hover-lift focus-ring h-8 w-8"
+                                  >
+                                    <Eye className="w-4 h-4" />
+                                  </Button>
+                                  {!isReadOnly && (
+                                    <>
+                                      <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="text-primary hover:text-primary/80 hover-lift focus-ring h-8 w-8"
+                                        onClick={() => {
+                                          setSelectedActivity(activity);
+                                          setEditModalOpen(true);
+                                        }}
+                                      >
+                                        <Edit2 className="w-4 h-4" />
+                                      </Button>
+                                      <ActivityDateEditor
+                                        activity={activity}
+                                        userId={5} // Luis Ribeiro user ID
+                                        onSuccess={() => {
+                                          // Não recarregar a página, apenas invalidar queries específicas
+                                          // O ActivityDateEditor já faz isso internamente
+                                        }}
+                                      />
+                                      <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="text-destructive hover:text-destructive/80 hover-lift focus-ring h-8 w-8"
+                                        onClick={() => onActivityDelete(activity.id)}
+                                      >
+                                        <Trash2 className="w-4 h-4" />
+                                      </Button>
+                                    </>
                                   )}
-                                  <div>
-                                    <div className="font-medium text-foreground">
-                                      {activity.name}
-                                      {activity.parentActivityId && (
-                                        <span className="ml-2 px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded">
-                                          Sub
-                                        </span>
-                                      )}
-                                    </div>
-                                    <div className="text-sm text-muted-foreground">
-                                      {activity.startDate && activity.finishDate ? (
-                                        <>
-                                          {new Date(activity.startDate).toLocaleDateString('pt-BR')} - {new Date(activity.finishDate).toLocaleDateString('pt-BR')}
-                                        </>
-                                      ) : (
-                                        'Datas não definidas'
-                                      )}
-                                    </div>
-                                  </div>
                                 </div>
-                              </div>
-                            </TableCell>
-                            <TableCell className="text-foreground">
-                              <Badge variant="secondary" className="text-xs">
-                                {activity.discipline || 'Geral'}
-                              </Badge>
-                            </TableCell>
-                            <TableCell>
-                              <div className="flex items-center">
-                                <Avatar className="w-8 h-8">
-                                  <AvatarImage src={`https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face`} />
-                                  <AvatarFallback>
-                                    {activity.responsible ? activity.responsible.split(' ').map(n => n[0]).join('') : 'N/A'}
-                                  </AvatarFallback>
-                                </Avatar>
-                                <div className="ml-3">
-                                  <div className="text-sm font-medium text-foreground">
-                                    {activity.responsible || 'Não atribuído'}
-                                  </div>
-                                </div>
-                              </div>
-                            </TableCell>
-                            <TableCell>
-                              {getStatusBadge(activity.status)}
-                            </TableCell>
-                            <TableCell>
-                              <div className="flex items-center">
-                                <Progress 
-                                  value={parseFloat(activity.completionPercentage || "0")} 
-                                  className="w-16 mr-2"
-                                />
-                                <span className="text-sm text-foreground">
-                                  {activity.completionPercentage}%
-                                </span>
-                              </div>
-                            </TableCell>
-                            <TableCell className="text-foreground">
-                              <div className="flex items-center">
-                                <span className={`text-sm font-medium ${
-                                  parseFloat(calculateSPI(activity)) >= 1 ? 'text-green-600' : 'text-red-600'
-                                }`}>
-                                  {calculateSPI(activity)}
-                                </span>
-                                <div className="ml-2 w-2 h-2 rounded-full bg-current opacity-50"></div>
-                              </div>
-                            </TableCell>
-                            <TableCell className="text-foreground">
-                              <div className="flex items-center">
-                                <span className={`text-sm font-medium ${
-                                  parseFloat(calculateCPI(activity)) >= 1 ? 'text-green-600' : 'text-red-600'
-                                }`}>
-                                  {calculateCPI(activity)}
-                                </span>
-                                <div className="ml-2 w-2 h-2 rounded-full bg-current opacity-50"></div>
-                              </div>
-                            </TableCell>
-                            <TableCell>
-                              <div className="flex items-center space-x-1">
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  className="text-muted-foreground hover:text-foreground hover-lift focus-ring h-8 w-8"
-                                >
-                                  <Eye className="w-4 h-4" />
-                                </Button>
-                                {!isReadOnly && (
-                                  <>
-                                    <Button
-                                      variant="ghost"
-                                      size="icon"
-                                      className="text-primary hover:text-primary/80 hover-lift focus-ring h-8 w-8"
-                                      onClick={() => {
-                                        setSelectedActivity(activity);
-                                        setEditModalOpen(true);
-                                      }}
-                                    >
-                                      <Edit2 className="w-4 h-4" />
-                                    </Button>
-                                    <ActivityDateEditor
-                                      activity={activity}
-                                      userId={5} // Luis Ribeiro user ID
-                                      onSuccess={() => {
-                                        // Não recarregar a página, apenas invalidar queries específicas
-                                        // O ActivityDateEditor já faz isso internamente
-                                      }}
-                                    />
-                                    <Button
-                                      variant="ghost"
-                                      size="icon"
-                                      className="text-destructive hover:text-destructive/80 hover-lift focus-ring h-8 w-8"
-                                      onClick={() => onActivityDelete(activity.id)}
-                                    >
-                                      <Trash2 className="w-4 h-4" />
-                                    </Button>
-                                  </>
-                                )}
-                              </div>
-                            </TableCell>
+                              </TableCell>
+                            )}
                           </TableRow>
                         )}
                       </Draggable>

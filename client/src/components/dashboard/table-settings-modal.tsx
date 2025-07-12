@@ -17,9 +17,17 @@ interface TableSettingsModalProps {
   open: boolean;
   onClose: () => void;
   dashboardId: number;
+  visibleFields?: string[];
+  onVisibleFieldsChange?: (fields: string[]) => void;
 }
 
-export default function TableSettingsModal({ open, onClose, dashboardId }: TableSettingsModalProps) {
+export default function TableSettingsModal({ 
+  open, 
+  onClose, 
+  dashboardId, 
+  visibleFields = [],
+  onVisibleFieldsChange 
+}: TableSettingsModalProps) {
   const [activeTab, setActiveTab] = useState("status");
   const [isCreating, setIsCreating] = useState(false);
   const [newStatus, setNewStatus] = useState({
@@ -32,6 +40,33 @@ export default function TableSettingsModal({ open, onClose, dashboardId }: Table
     type: 'text',
     description: ''
   });
+  
+  const [localVisibleFields, setLocalVisibleFields] = useState<string[]>(visibleFields);
+  
+  // Lista de campos disponíveis na tabela
+  const getTableFields = () => [
+    { key: 'name', label: 'Nome', description: 'Nome da atividade' },
+    { key: 'status', label: 'Status', description: 'Status atual da atividade' },
+    { key: 'priority', label: 'Prioridade', description: 'Nível de prioridade' },
+    { key: 'responsible', label: 'Responsável', description: 'Pessoa responsável pela atividade' },
+    { key: 'discipline', label: 'Disciplina', description: 'Disciplina da atividade' },
+    { key: 'completionPercentage', label: 'Progresso', description: 'Percentual de conclusão' },
+    { key: 'plannedStartDate', label: 'Data Inicial', description: 'Data de início planejada' },
+    { key: 'plannedEndDate', label: 'Data Final', description: 'Data de fim planejada' },
+    { key: 'actualStartDate', label: 'Início Real', description: 'Data de início real' },
+    { key: 'actualEndDate', label: 'Fim Real', description: 'Data de fim real' },
+    { key: 'plannedBudget', label: 'Orçamento Planejado', description: 'Orçamento planejado' },
+    { key: 'actualBudget', label: 'Orçamento Real', description: 'Orçamento real gasto' },
+    { key: 'actions', label: 'Ações', description: 'Botões de ação (editar, excluir, etc.)' }
+  ];
+  
+  const toggleFieldVisibility = (fieldKey: string) => {
+    const newFields = localVisibleFields.includes(fieldKey)
+      ? localVisibleFields.filter(f => f !== fieldKey)
+      : [...localVisibleFields, fieldKey];
+    setLocalVisibleFields(newFields);
+    onVisibleFieldsChange?.(newFields);
+  };
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -384,45 +419,49 @@ export default function TableSettingsModal({ open, onClose, dashboardId }: Table
           <TabsContent value="display" className="space-y-4">
             <Card>
               <CardHeader>
-                <CardTitle>Configurações de Exibição</CardTitle>
+                <CardTitle>Campos Visíveis na Tabela</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h4 className="font-medium">Mostrar hierarquia</h4>
-                    <p className="text-sm text-muted-foreground">
-                      Exibir estrutura hierárquica de tarefas
-                    </p>
+                {getTableFields().map((field) => (
+                  <div key={field.key} className="flex items-center justify-between">
+                    <div>
+                      <h4 className="font-medium">{field.label}</h4>
+                      <p className="text-sm text-muted-foreground">
+                        {field.description}
+                      </p>
+                    </div>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => toggleFieldVisibility(field.key)}
+                    >
+                      {localVisibleFields.includes(field.key) ? (
+                        <>
+                          <Eye className="w-4 h-4 mr-2" />
+                          Visível
+                        </>
+                      ) : (
+                        <>
+                          <EyeOff className="w-4 h-4 mr-2" />
+                          Oculto
+                        </>
+                      )}
+                    </Button>
                   </div>
-                  <Button variant="outline" size="sm">
-                    <Eye className="w-4 h-4 mr-2" />
-                    Ativado
-                  </Button>
-                </div>
+                ))}
                 
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h4 className="font-medium">Mostrar progresso</h4>
-                    <p className="text-sm text-muted-foreground">
-                      Exibir barra de progresso nas tarefas
-                    </p>
-                  </div>
-                  <Button variant="outline" size="sm">
-                    <Eye className="w-4 h-4 mr-2" />
-                    Ativado
+                <div className="flex justify-between pt-4 border-t">
+                  <Button 
+                    variant="outline"
+                    onClick={() => setLocalVisibleFields(getTableFields().map(f => f.key))}
+                  >
+                    Mostrar Todos
                   </Button>
-                </div>
-                
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h4 className="font-medium">Mostrar datas</h4>
-                    <p className="text-sm text-muted-foreground">
-                      Exibir datas de início e fim
-                    </p>
-                  </div>
-                  <Button variant="outline" size="sm">
-                    <Eye className="w-4 h-4 mr-2" />
-                    Ativado
+                  <Button 
+                    variant="outline"
+                    onClick={() => setLocalVisibleFields([])}
+                  >
+                    Ocultar Todos
                   </Button>
                 </div>
               </CardContent>
@@ -433,6 +472,14 @@ export default function TableSettingsModal({ open, onClose, dashboardId }: Table
         <div className="flex justify-end space-x-2">
           <Button variant="outline" onClick={onClose}>
             Fechar
+          </Button>
+          <Button 
+            onClick={() => {
+              onVisibleFieldsChange?.(localVisibleFields);
+              onClose();
+            }}
+          >
+            Aplicar Alterações
           </Button>
         </div>
       </DialogContent>

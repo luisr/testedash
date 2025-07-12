@@ -31,6 +31,7 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [showCreateActivityModal, setShowCreateActivityModal] = useState(false);
+  const [visibleFields, setVisibleFields] = useState<string[]>([]);
 
   // Get dashboard data
   const regularDashboard = useDashboardData(dashboardId);
@@ -162,6 +163,8 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({
         onCreateSubActivity={() => {}}
         onBulkImport={() => {}}
         customColumns={customColumns}
+        visibleFields={visibleFields}
+        onVisibleFieldsChange={setVisibleFields}
       />
 
       {/* Project Views */}
