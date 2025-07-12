@@ -186,7 +186,14 @@ export default function AdvancedReports({ activities, projects, dashboardId }: A
         reportType: 'advanced-analysis'
       });
 
-      setGeminiObservations(response.observations);
+      console.log('Response from Gemini API:', response);
+      
+      if (response && response.observations) {
+        setGeminiObservations(response.observations);
+      } else {
+        console.error('Invalid response structure:', response);
+        throw new Error('Resposta inválida da API');
+      }
       toast({
         title: "Observações geradas com sucesso",
         description: "As observações da IA foram geradas e estão prontas para visualização.",
@@ -227,12 +234,16 @@ export default function AdvancedReports({ activities, projects, dashboardId }: A
         })
       });
 
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
       // Create download link
-      const blob = new Blob([new Uint8Array(response.data)], { type: 'application/pdf' });
+      const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `relatorio-${reportType}-${new Date().toISOString().split('T')[0]}.pdf`;
+      a.download = `relatorio-${reportType}-dashboard-${dashboardId}-${new Date().toISOString().split('T')[0]}.pdf`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);

@@ -794,14 +794,10 @@ ${data.geminiObservations || 'Nenhuma observação disponível'}
 4. Implementar melhorias sugeridas pela IA
 `;
 
-      // Use the working PDF generator
-      const { PDFGenerator } = await import('./pdf-generator-simple');
-      const pdfGenerator = new PDFGenerator();
-      const pdfBuffer = await pdfGenerator.generateCustomReport(reportText, `Relatório Avançado - Dashboard ${data.dashboardId}`);
-
-      res.setHeader('Content-Type', 'application/pdf');
-      res.setHeader('Content-Disposition', `attachment; filename="relatorio-avancado-dashboard-${data.dashboardId}-${new Date().toISOString().split('T')[0]}.pdf"`);
-      res.send(pdfBuffer);
+      // Set proper headers for text download (temporary solution)
+      res.setHeader('Content-Type', 'application/octet-stream');
+      res.setHeader('Content-Disposition', `attachment; filename="relatorio-avancado-dashboard-${data.dashboardId}-${new Date().toISOString().split('T')[0]}.txt"`);
+      res.send(reportText);
     } catch (error) {
       console.error('Error generating advanced PDF report:', error);
       res.status(500).json({ error: 'Failed to generate advanced report', details: error.message });
