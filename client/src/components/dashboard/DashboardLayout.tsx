@@ -3,7 +3,13 @@ import { useAuth } from '@/contexts/AuthContext';
 import Sidebar from './sidebar';
 import Header from './header';
 import { Button } from '@/components/ui/button';
-import { Menu, Bell } from 'lucide-react';
+import { Menu } from 'lucide-react';
+import { ThemeToggle } from '@/components/ui/theme-toggle';
+import { NotificationsDropdown } from '@/components/ui/notifications-dropdown';
+import { UsersModal } from './modals/users-modal';
+import { ProjectsModal } from './modals/projects-modal';
+import { ReportsModal } from './modals/reports-modal';
+import { SettingsModal } from './modals/settings-modal';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -13,6 +19,11 @@ interface DashboardLayoutProps {
 export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, dashboardId }) => {
   const { user } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [usersModalOpen, setUsersModalOpen] = useState(false);
+  const [projectsModalOpen, setProjectsModalOpen] = useState(false);
+  const [reportsModalOpen, setReportsModalOpen] = useState(false);
+  const [settingsModalOpen, setSettingsModalOpen] = useState(false);
+  const [activityLogOpen, setActivityLogOpen] = useState(false);
 
   return (
     <div className="min-h-screen beachpark-gradient-bg">
@@ -20,11 +31,11 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, dash
         <Sidebar 
           isOpen={sidebarOpen} 
           onClose={() => setSidebarOpen(false)}
-          onActivityLogToggle={() => {}}
-          onUsersClick={() => {}}
-          onProjectsClick={() => {}}
-          onReportsClick={() => {}}
-          onSettingsClick={() => {}}
+          onActivityLogToggle={() => setActivityLogOpen(!activityLogOpen)}
+          onUsersClick={() => setUsersModalOpen(true)}
+          onProjectsClick={() => setProjectsModalOpen(true)}
+          onReportsClick={() => setReportsModalOpen(true)}
+          onSettingsClick={() => setSettingsModalOpen(true)}
           onScheduleClick={() => {}}
         />
         
@@ -45,9 +56,8 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, dash
               </h1>
             </div>
             <div className="flex items-center gap-2">
-              <Button variant="ghost" size="sm" className="beachpark-hover-lift">
-                <Bell className="h-4 w-4" />
-              </Button>
+              <NotificationsDropdown />
+              <ThemeToggle />
               <div className="text-sm text-muted-foreground">
                 {user?.name || user?.email}
               </div>
@@ -61,6 +71,24 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, dash
           </main>
         </div>
       </div>
+      
+      {/* Modais */}
+      <UsersModal 
+        isOpen={usersModalOpen} 
+        onClose={() => setUsersModalOpen(false)} 
+      />
+      <ProjectsModal 
+        isOpen={projectsModalOpen} 
+        onClose={() => setProjectsModalOpen(false)} 
+      />
+      <ReportsModal 
+        isOpen={reportsModalOpen} 
+        onClose={() => setReportsModalOpen(false)} 
+      />
+      <SettingsModal 
+        isOpen={settingsModalOpen} 
+        onClose={() => setSettingsModalOpen(false)} 
+      />
     </div>
   );
 };

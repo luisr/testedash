@@ -391,6 +391,7 @@ export default function ActivityTable({
                 variant="default" 
                 size="sm"
                 onClick={onNewActivity}
+                className="beachpark-btn-primary"
               >
                 <Plus className="w-4 h-4 mr-2" />
                 Nova Atividade
@@ -401,18 +402,19 @@ export default function ActivityTable({
                 variant="outline" 
                 size="sm"
                 onClick={onManageDependencies}
+                className="beachpark-btn-secondary"
               >
                 <GitBranch className="w-4 h-4 mr-2" />
                 Dependências
               </Button>
             )}
-            <Button variant="ghost" size="icon">
+            <Button variant="ghost" size="icon" className="beachpark-hover-lift">
               <Filter className="w-5 h-5" />
             </Button>
             <Button 
               variant="ghost" 
               size="icon" 
-              className="hover-lift focus-ring"
+              className="beachpark-hover-lift beachpark-focus-ring"
               onClick={() => setConfigModalOpen(true)}
             >
               <Settings className="w-5 h-5" />
@@ -665,7 +667,7 @@ export default function ActivityTable({
                                   <Button
                                     variant="ghost"
                                     size="icon"
-                                    className="text-muted-foreground hover:text-foreground hover-lift focus-ring h-8 w-8"
+                                    className="text-muted-foreground hover:text-foreground beachpark-hover-lift h-8 w-8"
                                   >
                                     <Eye className="w-4 h-4" />
                                   </Button>
@@ -674,7 +676,7 @@ export default function ActivityTable({
                                       <Button
                                         variant="ghost"
                                         size="icon"
-                                        className="text-primary hover:text-primary/80 hover-lift focus-ring h-8 w-8"
+                                        className="text-primary hover:text-primary/80 beachpark-hover-lift h-8 w-8"
                                         onClick={() => {
                                           setSelectedActivity(activity);
                                           setEditModalOpen(true);
@@ -693,7 +695,7 @@ export default function ActivityTable({
                                       <Button
                                         variant="ghost"
                                         size="icon"
-                                        className="text-destructive hover:text-destructive/80 hover-lift focus-ring h-8 w-8"
+                                        className="text-destructive hover:text-destructive/80 beachpark-hover-lift h-8 w-8"
                                         onClick={() => onActivityDelete(activity.id)}
                                       >
                                         <Trash2 className="w-4 h-4" />
