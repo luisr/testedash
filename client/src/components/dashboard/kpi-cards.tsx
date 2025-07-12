@@ -93,7 +93,7 @@ export default function KPICards({ metrics, dashboardId, activities, projects, v
   return (
     <div className="space-y-6 animate-fade-in">
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold text-foreground">KPIs do Dashboard</h2>
+        <h2 className="beachpark-h3">KPIs do Dashboard</h2>
         <Dialog open={isKPIManagerOpen} onOpenChange={setIsKPIManagerOpen}>
           <DialogTrigger asChild>
             <Button variant="outline" className="flex items-center gap-2 hover-lift">
@@ -103,7 +103,7 @@ export default function KPICards({ metrics, dashboardId, activities, projects, v
           </DialogTrigger>
           <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle className="flex items-center gap-2">
+              <DialogTitle className="beachpark-h4 flex items-center gap-2">
                 <Settings2 className="w-5 h-5 text-primary" />
                 Gerenciar KPIs
               </DialogTitle>
@@ -128,10 +128,10 @@ export default function KPICards({ metrics, dashboardId, activities, projects, v
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div className="flex-1">
-                  <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
+                  <p className="beachpark-caption uppercase tracking-wide">
                     {kpi.title}
                   </p>
-                  <p className="text-3xl font-bold text-foreground mt-2 group-hover:bg-gradient-to-r group-hover:from-blue-600 group-hover:to-sky-500 group-hover:bg-clip-text group-hover:text-transparent transition-all">
+                  <p className="text-3xl font-bold beachpark-text-primary mt-2 group-hover:bg-gradient-to-r group-hover:from-blue-600 group-hover:to-sky-500 group-hover:bg-clip-text group-hover:text-transparent transition-all">
                     {kpi.value}
                   </p>
                 </div>

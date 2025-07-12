@@ -65,7 +65,7 @@ export default function Sidebar({ isOpen, onClose, onActivityLogToggle, onUsersC
             <div className="w-12 h-12 beachpark-card rounded-xl flex items-center justify-center beachpark-hover-lift">
               <img src={beachParkLogo} alt="BeachPark Logo" className="w-10 h-10 object-contain" />
             </div>
-            <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-sky-500 bg-clip-text text-transparent">Tô Sabendo</h1>
+            <h1 className="beachpark-h5 font-bold bg-gradient-to-r from-blue-600 to-sky-500 bg-clip-text text-transparent">Tô Sabendo</h1>
           </div>
           <Button 
             variant="ghost" 
@@ -95,12 +95,12 @@ export default function Sidebar({ isOpen, onClose, onActivityLogToggle, onUsersC
                 {item.onClick ? (
                   <>
                     <item.icon className="w-5 h-5" />
-                    <span>{item.name}</span>
+                    <span className="beachpark-nav-text">{item.name}</span>
                   </>
                 ) : (
                   <Link href={item.href}>
                     <item.icon className="w-5 h-5" />
-                    <span>{item.name}</span>
+                    <span className="beachpark-nav-text">{item.name}</span>
                   </Link>
                 )}
               </Button>
@@ -108,7 +108,7 @@ export default function Sidebar({ isOpen, onClose, onActivityLogToggle, onUsersC
           </div>
           
           <div className="space-y-3">
-            <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-3">
+            <h3 className="beachpark-caption font-semibold uppercase tracking-wider px-3">
               Administração
             </h3>
             <div className="space-y-1">
@@ -123,12 +123,12 @@ export default function Sidebar({ isOpen, onClose, onActivityLogToggle, onUsersC
                   {item.onClick ? (
                     <>
                       <item.icon className="w-5 h-5" />
-                      <span>{item.name}</span>
+                      <span className="beachpark-nav-text">{item.name}</span>
                     </>
                   ) : (
                     <Link href={item.href}>
                       <item.icon className="w-5 h-5" />
-                      <span>{item.name}</span>
+                      <span className="beachpark-nav-text">{item.name}</span>
                     </Link>
                   )}
                 </Button>

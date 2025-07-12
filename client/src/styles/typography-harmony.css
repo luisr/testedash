@@ -1,0 +1,311 @@
+/* BeachPark Typography Harmony System */
+
+/* Primary Typography Scale */
+.beachpark-h1 {
+  font-size: 2.25rem;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.025em;
+  color: rgb(30, 41, 59);
+}
+
+.beachpark-h2 {
+  font-size: 1.875rem;
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: -0.025em;
+  color: rgb(30, 41, 59);
+}
+
+.beachpark-h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: -0.025em;
+  color: rgb(30, 41, 59);
+}
+
+.beachpark-h4 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1.4;
+  color: rgb(30, 41, 59);
+}
+
+.beachpark-h5 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  line-height: 1.5;
+  color: rgb(30, 41, 59);
+}
+
+.beachpark-h6 {
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.5;
+  color: rgb(30, 41, 59);
+}
+
+/* Body Text */
+.beachpark-body-lg {
+  font-size: 1.125rem;
+  font-weight: 400;
+  line-height: 1.7;
+  color: rgb(51, 65, 85);
+}
+
+.beachpark-body {
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.6;
+  color: rgb(51, 65, 85);
+}
+
+.beachpark-body-sm {
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 1.6;
+  color: rgb(51, 65, 85);
+}
+
+/* Captions & Labels */
+.beachpark-caption {
+  font-size: 0.75rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: rgb(100, 116, 139);
+  letter-spacing: 0.05em;
+}
+
+.beachpark-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.5;
+  color: rgb(30, 41, 59);
+  letter-spacing: 0.025em;
+}
+
+/* Interactive Text */
+.beachpark-link {
+  color: rgb(14, 165, 233);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.beachpark-link:hover {
+  color: rgb(2, 132, 199);
+  text-decoration: underline;
+}
+
+/* Status & Accent Colors */
+.beachpark-text-success {
+  color: rgb(34, 197, 94);
+  font-weight: 500;
+}
+
+.beachpark-text-warning {
+  color: rgb(245, 158, 11);
+  font-weight: 500;
+}
+
+.beachpark-text-error {
+  color: rgb(239, 68, 68);
+  font-weight: 500;
+}
+
+.beachpark-text-info {
+  color: rgb(14, 165, 233);
+  font-weight: 500;
+}
+
+/* Dark Mode Typography */
+.dark .beachpark-h1,
+.dark .beachpark-h2,
+.dark .beachpark-h3,
+.dark .beachpark-h4,
+.dark .beachpark-h5,
+.dark .beachpark-h6 {
+  color: rgb(248, 250, 252);
+}
+
+.dark .beachpark-body-lg,
+.dark .beachpark-body,
+.dark .beachpark-body-sm {
+  color: rgb(203, 213, 225);
+}
+
+.dark .beachpark-caption {
+  color: rgb(148, 163, 184);
+}
+
+.dark .beachpark-label {
+  color: rgb(248, 250, 252);
+}
+
+.dark .beachpark-link {
+  color: rgb(56, 189, 248);
+}
+
+.dark .beachpark-link:hover {
+  color: rgb(125, 211, 252);
+}
+
+.dark .beachpark-text-success {
+  color: rgb(74, 222, 128);
+}
+
+.dark .beachpark-text-warning {
+  color: rgb(251, 191, 36);
+}
+
+.dark .beachpark-text-error {
+  color: rgb(248, 113, 113);
+}
+
+.dark .beachpark-text-info {
+  color: rgb(56, 189, 248);
+}
+
+/* Table Typography */
+.beachpark-table-header {
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.4;
+  color: rgb(30, 41, 59);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.beachpark-table-cell {
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: rgb(51, 65, 85);
+}
+
+.dark .beachpark-table-header {
+  color: rgb(203, 213, 225);
+}
+
+.dark .beachpark-table-cell {
+  color: rgb(203, 213, 225);
+}
+
+/* Form Typography */
+.beachpark-form-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.5;
+  color: rgb(30, 41, 59);
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.beachpark-form-description {
+  font-size: 0.75rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: rgb(100, 116, 139);
+  margin-top: 0.25rem;
+}
+
+.beachpark-form-error {
+  font-size: 0.75rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: rgb(239, 68, 68);
+  margin-top: 0.25rem;
+}
+
+.dark .beachpark-form-label {
+  color: rgb(248, 250, 252);
+}
+
+.dark .beachpark-form-description {
+  color: rgb(148, 163, 184);
+}
+
+.dark .beachpark-form-error {
+  color: rgb(248, 113, 113);
+}
+
+/* Button Typography */
+.beachpark-btn-text {
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.5;
+  letter-spacing: 0.025em;
+}
+
+.beachpark-btn-text-lg {
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.5;
+  letter-spacing: 0.025em;
+}
+
+.beachpark-btn-text-sm {
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1.5;
+  letter-spacing: 0.05em;
+}
+
+/* Navigation Typography */
+.beachpark-nav-text {
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.5;
+  letter-spacing: 0.025em;
+  color: rgb(51, 65, 85);
+}
+
+.beachpark-nav-text.active {
+  color: rgb(14, 165, 233);
+  font-weight: 600;
+}
+
+.dark .beachpark-nav-text {
+  color: rgb(148, 163, 184);
+}
+
+.dark .beachpark-nav-text.active {
+  color: rgb(56, 189, 248);
+}
+
+/* Card Typography */
+.beachpark-card-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1.4;
+  color: rgb(30, 41, 59);
+  margin-bottom: 0.5rem;
+}
+
+.beachpark-card-subtitle {
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.5;
+  color: rgb(51, 65, 85);
+  margin-bottom: 0.25rem;
+}
+
+.beachpark-card-description {
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 1.6;
+  color: rgb(100, 116, 139);
+}
+
+.dark .beachpark-card-title {
+  color: rgb(248, 250, 252);
+}
+
+.dark .beachpark-card-subtitle {
+  color: rgb(203, 213, 225);
+}
+
+.dark .beachpark-card-description {
+  color: rgb(148, 163, 184);
+}

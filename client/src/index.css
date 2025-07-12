@@ -1,5 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 @import './styles/theme.css';
+@import './styles/typography-harmony.css';
 @import './components/button-harmony.css';
 @tailwind base;
 @tailwind components;
@@ -7,13 +8,13 @@
 
 @layer base {
   :root {
-    /* Light Theme - Modern Professional Colors */
+    /* Light Theme - Harmonious Professional Colors */
     --background: 250 251 252;
-    --foreground: 15 23 42;
+    --foreground: 30 41 59;
     --card: 255 255 255;
-    --card-foreground: 15 23 42;
+    --card-foreground: 30 41 59;
     --popover: 255 255 255;
-    --popover-foreground: 15 23 42;
+    --popover-foreground: 30 41 59;
     --primary: 59 130 246;
     --primary-foreground: 255 255 255;
     --secondary: 241 245 249;
@@ -43,6 +44,14 @@
     --brand-danger: 239 68 68;
     --brand-gradient: linear-gradient(135deg, rgb(59, 130, 246), rgb(14, 165, 233));
     
+    /* Typography Colors - Harmonious Hierarchy */
+    --text-primary: 30 41 59;
+    --text-secondary: 51 65 85;
+    --text-muted: 100 116 139;
+    --text-accent: 14 165 233;
+    --text-on-primary: 255 255 255;
+    --text-on-secondary: 248 250 252;
+    
     /* Status Colors - Modern & Vibrant */
     --status-completed: 34 197 94;
     --status-in-progress: 59 130 246;
@@ -64,7 +73,7 @@
   }
 
   .dark {
-    /* Dark Theme - Professional Dark Mode */
+    /* Dark Theme - Harmonious Dark Mode */
     --background: 2 6 23;
     --foreground: 248 250 252;
     --card: 15 23 42;
@@ -89,6 +98,14 @@
     --chart-3: 6 182 212;
     --chart-4: 16 185 129;
     --chart-5: 245 158 11;
+    
+    /* Typography Colors - Dark Mode Hierarchy */
+    --text-primary: 248 250 252;
+    --text-secondary: 203 213 225;
+    --text-muted: 148 163 184;
+    --text-accent: 56 189 248;
+    --text-on-primary: 255 255 255;
+    --text-on-secondary: 15 23 42;
   }
 }
 
@@ -112,6 +129,39 @@
 }
 
 @layer components {
+  /* BeachPark Typography Harmony */
+  .beachpark-text-primary {
+    color: rgb(30, 41, 59);
+  }
+  
+  .beachpark-text-secondary {
+    color: rgb(51, 65, 85);
+  }
+  
+  .beachpark-text-muted {
+    color: rgb(100, 116, 139);
+  }
+  
+  .beachpark-text-accent {
+    color: rgb(14, 165, 233);
+  }
+  
+  .dark .beachpark-text-primary {
+    color: rgb(248, 250, 252);
+  }
+  
+  .dark .beachpark-text-secondary {
+    color: rgb(203, 213, 225);
+  }
+  
+  .dark .beachpark-text-muted {
+    color: rgb(148, 163, 184);
+  }
+  
+  .dark .beachpark-text-accent {
+    color: rgb(56, 189, 248);
+  }
+  
   /* BeachPark Modern Card Component */
   .beachpark-card {
     @apply backdrop-blur-sm border rounded-xl shadow-lg;
@@ -122,10 +172,44 @@
     box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
   }
   
+  .beachpark-card h1,
+  .beachpark-card h2,
+  .beachpark-card h3,
+  .beachpark-card h4,
+  .beachpark-card h5,
+  .beachpark-card h6 {
+    color: rgb(30, 41, 59);
+  }
+  
+  .beachpark-card p {
+    color: rgb(51, 65, 85);
+  }
+  
+  .beachpark-card .text-muted {
+    color: rgb(100, 116, 139);
+  }
+  
   .dark .beachpark-card {
     background: rgba(15, 23, 42, 0.98);
     border: 1px solid rgba(30, 41, 59, 0.4);
     box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+  }
+  
+  .dark .beachpark-card h1,
+  .dark .beachpark-card h2,
+  .dark .beachpark-card h3,
+  .dark .beachpark-card h4,
+  .dark .beachpark-card h5,
+  .dark .beachpark-card h6 {
+    color: rgb(248, 250, 252);
+  }
+  
+  .dark .beachpark-card p {
+    color: rgb(203, 213, 225);
+  }
+  
+  .dark .beachpark-card .text-muted {
+    color: rgb(148, 163, 184);
   }
   
   /* BeachPark Primary Button - Modern Gradient */
@@ -310,25 +394,109 @@
   
   /* BeachPark Navigation Items */
   .beachpark-nav-item {
-    @apply flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-700;
-    @apply transition-all duration-200 rounded-lg mx-2 cursor-pointer;
+    @apply flex items-center px-4 py-3 transition-all duration-200 rounded-lg mx-2 cursor-pointer;
+    color: rgb(51, 65, 85);
+  }
+  
+  .beachpark-nav-item:hover {
+    background: rgba(59, 130, 246, 0.08);
+    color: rgb(14, 165, 233);
   }
   
   .beachpark-nav-item.active {
-    @apply bg-blue-100 text-blue-700;
     background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(14, 165, 233, 0.1));
+    color: rgb(14, 165, 233);
+    font-weight: 500;
   }
   
   .dark .beachpark-nav-item {
-    @apply text-slate-300 hover:bg-slate-800 hover:text-slate-100;
+    color: rgb(148, 163, 184);
+  }
+  
+  .dark .beachpark-nav-item:hover {
+    background: rgba(99, 102, 241, 0.1);
+    color: rgb(56, 189, 248);
   }
   
   .dark .beachpark-nav-item.active {
-    @apply bg-slate-800 text-blue-400;
+    background: rgba(99, 102, 241, 0.15);
+    color: rgb(56, 189, 248);
+    font-weight: 500;
   }
 }
 
 @layer utilities {
+  /* BeachPark Typography Utilities */
+  .beachpark-heading {
+    color: rgb(30, 41, 59);
+    font-weight: 600;
+    letter-spacing: -0.025em;
+  }
+  
+  .beachpark-subheading {
+    color: rgb(51, 65, 85);
+    font-weight: 500;
+  }
+  
+  .beachpark-body {
+    color: rgb(51, 65, 85);
+    font-weight: 400;
+  }
+  
+  .beachpark-caption {
+    color: rgb(100, 116, 139);
+    font-weight: 400;
+    font-size: 0.875rem;
+  }
+  
+  .beachpark-label {
+    color: rgb(30, 41, 59);
+    font-weight: 500;
+    font-size: 0.875rem;
+  }
+  
+  .dark .beachpark-heading {
+    color: rgb(248, 250, 252);
+  }
+  
+  .dark .beachpark-subheading {
+    color: rgb(203, 213, 225);
+  }
+  
+  .dark .beachpark-body {
+    color: rgb(203, 213, 225);
+  }
+  
+  .dark .beachpark-caption {
+    color: rgb(148, 163, 184);
+  }
+  
+  .dark .beachpark-label {
+    color: rgb(248, 250, 252);
+  }
+  
+  /* BeachPark Table Typography */
+  .beachpark-table-header {
+    color: rgb(30, 41, 59);
+    font-weight: 600;
+    font-size: 0.875rem;
+    letter-spacing: 0.05em;
+  }
+  
+  .beachpark-table-cell {
+    color: rgb(51, 65, 85);
+    font-weight: 400;
+    font-size: 0.875rem;
+  }
+  
+  .dark .beachpark-table-header {
+    color: rgb(203, 213, 225);
+  }
+  
+  .dark .beachpark-table-cell {
+    color: rgb(203, 213, 225);
+  }
+  
   /* BeachPark Utility Classes */
   .beachpark-text-gradient {
     background: linear-gradient(135deg, rgb(59, 130, 246), rgb(14, 165, 233));
@@ -360,6 +528,56 @@
     background: rgba(15, 23, 42, 0.95);
     border: 1px solid rgba(30, 41, 59, 0.3);
   }
+}
+
+/* Global Typography Enhancement */
+h1, h2, h3, h4, h5, h6 {
+  color: rgb(30, 41, 59);
+  font-weight: 600;
+  letter-spacing: -0.025em;
+}
+
+p {
+  color: rgb(51, 65, 85);
+  line-height: 1.6;
+}
+
+.text-muted-foreground {
+  color: rgb(100, 116, 139) !important;
+}
+
+/* Dark mode global typography */
+.dark h1, .dark h2, .dark h3, .dark h4, .dark h5, .dark h6 {
+  color: rgb(248, 250, 252);
+}
+
+.dark p {
+  color: rgb(203, 213, 225);
+}
+
+.dark .text-muted-foreground {
+  color: rgb(148, 163, 184) !important;
+}
+
+/* Table Enhancement */
+table th {
+  color: rgb(30, 41, 59);
+  font-weight: 600;
+  font-size: 0.875rem;
+  letter-spacing: 0.05em;
+}
+
+table td {
+  color: rgb(51, 65, 85);
+  font-weight: 400;
+}
+
+.dark table th {
+  color: rgb(203, 213, 225);
+}
+
+.dark table td {
+  color: rgb(203, 213, 225);
 }
 
 /* Selection Styles */
