@@ -327,11 +327,11 @@ export default function ProjectCollaborators({ projectId }: ProjectCollaborators
               Adicionar Colaborador
             </Button>
           </DialogTrigger>
-          <DialogContent className="beachpark-card max-w-2xl">
+          <DialogContent className="beachpark-card max-w-2xl fixed-modal">
             <DialogHeader>
-              <DialogTitle>Adicionar Novo Colaborador</DialogTitle>
+              <DialogTitle>Adicionar Novo Colaborador ao Projeto</DialogTitle>
               <DialogDescription>
-                Selecione um usuário registrado no sistema para adicionar como colaborador deste projeto.
+                Selecione um usuário registrado no sistema para adicionar como colaborador deste projeto específico. As permissões definidas aqui são exclusivas para este projeto.
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4">
@@ -394,7 +394,10 @@ export default function ProjectCollaborators({ projectId }: ProjectCollaborators
               </div>
 
               <div>
-                <Label>Permissões</Label>
+                <Label>Permissões do Projeto</Label>
+                <p className="text-xs text-muted-foreground mb-2">
+                  Defina as permissões específicas para este projeto. O colaborador pode ter permissões diferentes em outros projetos.
+                </p>
                 <div className="grid grid-cols-2 gap-3 mt-2">
                   {Object.entries(newCollaborator.permissions).map(([key, value]) => (
                     <div key={key} className="flex items-center space-x-2">
@@ -531,9 +534,12 @@ export default function ProjectCollaborators({ projectId }: ProjectCollaborators
 
       {/* Edit Collaborator Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="beachpark-card max-w-2xl">
+        <DialogContent className="beachpark-card max-w-2xl fixed-modal">
           <DialogHeader>
-            <DialogTitle>Editar Colaborador</DialogTitle>
+            <DialogTitle>Editar Colaborador - Permissões do Projeto</DialogTitle>
+            <DialogDescription>
+              Defina as permissões específicas deste colaborador para este projeto. Estas permissões são independentes de outros projetos.
+            </DialogDescription>
           </DialogHeader>
           {selectedCollaborator && (
             <div className="space-y-4">
@@ -570,7 +576,10 @@ export default function ProjectCollaborators({ projectId }: ProjectCollaborators
               </div>
 
               <div>
-                <Label>Permissões</Label>
+                <Label>Permissões do Projeto</Label>
+                <p className="text-xs text-muted-foreground mb-2">
+                  Estas permissões são específicas para este projeto e não afetam outros projetos.
+                </p>
                 <div className="grid grid-cols-2 gap-3 mt-2">
                   {Object.entries({
                     canView: selectedCollaborator.canView,

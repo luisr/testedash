@@ -6,6 +6,39 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Fix modal positioning issues */
+.fixed-modal {
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  z-index: 9999 !important;
+  pointer-events: auto !important;
+}
+
+/* Prevent modal from moving on hover */
+.fixed-modal:hover {
+  transform: translate(-50%, -50%) !important;
+}
+
+/* Ensure modal overlay is properly positioned */
+[data-radix-dialog-overlay] {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 9998 !important;
+}
+
+/* Stable modal content positioning */
+[data-radix-dialog-content] {
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  z-index: 9999 !important;
+  max-height: 90vh !important;
+  overflow-y: auto !important;
+}
+
 @layer base {
   :root {
     /* Light Theme - Harmonious Professional Colors */
