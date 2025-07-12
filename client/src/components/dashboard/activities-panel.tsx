@@ -34,6 +34,7 @@ interface ActivitiesPanelProps {
   customColumns?: any[];
   visibleFields?: string[];
   onVisibleFieldsChange?: (fields: string[]) => void;
+  customStatuses?: any[];
 }
 
 const ActivitiesPanel: React.FC<ActivitiesPanelProps> = ({
@@ -49,7 +50,8 @@ const ActivitiesPanel: React.FC<ActivitiesPanelProps> = ({
   onBulkImport,
   customColumns = [],
   visibleFields = [],
-  onVisibleFieldsChange
+  onVisibleFieldsChange,
+  customStatuses = []
 }) => {
   const queryClient = useQueryClient();
   const [viewMode, setViewMode] = useState<'hierarchical' | 'table'>('hierarchical');
@@ -241,6 +243,7 @@ const ActivitiesPanel: React.FC<ActivitiesPanelProps> = ({
             console.log('Managing dependencies for activity:', activityId);
           }}
           visibleFields={visibleFields}
+          customStatuses={customStatuses}
         />
       </CardContent>
 

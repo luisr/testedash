@@ -911,9 +911,36 @@ table td {
   }
 }
 
-/* Drag and drop z-index fixes for Kanban */
+/* Kanban Drag and Drop Styles */
+.kanban-container {
+  position: relative;
+  z-index: 1;
+}
+
+.kanban-column {
+  position: relative;
+  z-index: 2;
+}
+
+.kanban-drop-zone {
+  position: relative;
+  z-index: 3;
+}
+
+.kanban-card {
+  position: relative;
+  z-index: 4;
+}
+
+.kanban-card-dragging {
+  z-index: 10000 !important;
+  transform: rotate(5deg) !important;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
+}
+
+/* React Beautiful DND overrides */
 .react-beautiful-dnd-dragging {
-  z-index: 9999 !important;
+  z-index: 10000 !important;
 }
 
 .react-beautiful-dnd-drag-handle {
@@ -922,15 +949,14 @@ table td {
 
 /* Ensure dragging items appear above everything */
 [data-rbd-drag-handle-dragging-id] {
-  z-index: 9999 !important;
+  z-index: 10000 !important;
 }
 
 [data-rbd-draggable-context-id] {
   z-index: 1;
 }
 
-/* Portal for dragging elements */
-.react-beautiful-dnd-dragging {
-  transform: rotate(5deg) !important;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
+/* Portal styles for dragging elements */
+[data-rbd-drag-handle-dragging-id] * {
+  z-index: 10000 !important;
 }

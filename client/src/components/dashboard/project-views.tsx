@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Activity } from '@/../shared/schema';
-import KanbanView from './kanban-view';
+import KanbanView from './kanban-view-new';
 import CalendarView from './calendar-view';
 import GanttView from './gantt-view';
 import DatalogView from './datalog-view';
@@ -22,9 +22,10 @@ interface ProjectViewsProps {
   activities: Activity[];
   projects: any[];
   onUpdateActivity: (id: number, data: Partial<Activity>) => void;
+  customStatuses?: any[];
 }
 
-export default function ProjectViews({ activities, projects, onUpdateActivity }: ProjectViewsProps) {
+export default function ProjectViews({ activities, projects, onUpdateActivity, customStatuses = [] }: ProjectViewsProps) {
   const [activeTab, setActiveTab] = useState('kanban');
 
   const tabs = [
@@ -100,6 +101,7 @@ export default function ProjectViews({ activities, projects, onUpdateActivity }:
                   activities={activities}
                   projects={projects}
                   onUpdateActivity={onUpdateActivity}
+                  customStatuses={customStatuses}
                 />
               </TabsContent>
             ))}

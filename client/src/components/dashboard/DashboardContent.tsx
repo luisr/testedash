@@ -52,6 +52,12 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({
   // Get dashboard data
   const regularDashboard = useDashboardData(dashboardId);
   const consolidatedDashboard = useConsolidatedDashboard(user?.id);
+  
+  // Get custom statuses
+  const { data: customStatuses = [] } = useQuery({
+    queryKey: [`/api/custom-statuses/${dashboardId}`],
+    enabled: !!dashboardId && !isConsolidatedDashboard
+  });
 
   // Check super user access for consolidated dashboard
   if (isConsolidatedDashboard && !user?.isSuperUser) {
@@ -238,6 +244,7 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({
         customColumns={customColumns}
         visibleFields={visibleFields}
         onVisibleFieldsChange={setVisibleFields}
+        customStatuses={customStatuses}
       />
 
       {/* Project Views */}
@@ -245,6 +252,7 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({
         activities={activities}
         projects={projects}
         onUpdateActivity={updateActivity}
+        customStatuses={customStatuses}
       />
 
       {/* Advanced Reports */}

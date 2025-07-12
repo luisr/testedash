@@ -19,6 +19,7 @@ import {
 interface KanbanViewProps {
   activities: Activity[];
   onUpdateActivity: (id: number, data: Partial<Activity>) => void;
+  customStatuses?: any[];
 }
 
 const statusColumns = [
@@ -43,8 +44,19 @@ const priorityLabels = {
   critical: 'Crítica'
 };
 
-export default function KanbanView({ activities, onUpdateActivity }: KanbanViewProps) {
+export default function KanbanView({ activities, onUpdateActivity, customStatuses = [] }: KanbanViewProps) {
   const [draggedItem, setDraggedItem] = useState<string | null>(null);
+  
+  // Combine default statuses with custom statuses
+  const allStatusColumns = [
+    ...statusColumns,
+    ...customStatuses.map(status => ({
+      id: status.key,
+      title: status.name,
+      icon: status.icon ? eval(status.icon) : AlertCircle,
+      color: `bg-${status.color}-100 border-${status.color}-300`
+    }))
+  ];
 
   const handleDragEnd = async (result: any) => {
     const { destination, source, draggableId } = result;
@@ -93,7 +105,7 @@ export default function KanbanView({ activities, onUpdateActivity }: KanbanViewP
     <div className="h-full overflow-hidden relative">
       <DragDropContext onDragEnd={handleDragEnd} onDragStart={handleDragStart}>
         <div className="flex gap-6 h-full overflow-x-auto p-4 relative">
-          {statusColumns.map(column => {
+          {allStatusColumns.map(column => {
             const columnActivities = (activities || []).filter(activity => activity?.status === column.id);
             const IconComponent = column.icon;
             

@@ -36,6 +36,7 @@ interface HierarchicalTaskTableProps {
   showDependencies?: boolean;
   onManageDependencies?: (activityId: number) => void;
   visibleFields?: string[];
+  customStatuses?: any[];
 }
 
 interface ActivityNode extends Activity {
@@ -67,12 +68,26 @@ export default function HierarchicalTaskTable({
   onEditActivity,
   showDependencies = false,
   onManageDependencies,
-  visibleFields = []
+  visibleFields = [],
+  customStatuses = []
 }: HierarchicalTaskTableProps) {
   const [expandedNodes, setExpandedNodes] = useState<Set<number>>(new Set());
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
   const [filterPriority, setFilterPriority] = useState('all');
+  
+  // Combine default statuses with custom statuses
+  const allStatusConfig = {
+    ...statusConfig,
+    ...customStatuses.reduce((acc, status) => {
+      acc[status.key] = {
+        label: status.name,
+        color: `bg-${status.color}-100 text-${status.color}-800`,
+        bgColor: `bg-${status.color}-50`
+      };
+      return acc;
+    }, {})
+  };
   
   // Função para verificar se um campo deve ser visível
   const isFieldVisible = (fieldKey: string) => {
@@ -169,7 +184,7 @@ export default function HierarchicalTaskTable({
   };
 
   const getStatusBadge = (status: string) => {
-    const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.not_started;
+    const config = allStatusConfig[status as keyof typeof allStatusConfig] || allStatusConfig.not_started;
     return (
       <Badge className={`${config.color} text-xs font-medium`}>
         {config.label}
@@ -243,6 +258,9 @@ export default function HierarchicalTaskTable({
             <option value="in_progress">Em Andamento</option>
             <option value="completed">Concluído</option>
             <option value="delayed">Atrasado</option>
+            {customStatuses.map(status => (
+              <option key={status.key} value={status.key}>{status.name}</option>
+            ))}
           </select>
 
           <select 
@@ -278,7 +296,7 @@ export default function HierarchicalTaskTable({
                 <TableRow 
                   key={activity.id} 
                   className={`hover:bg-muted/50 transition-colors ${
-                    statusConfig[activity.status as keyof typeof statusConfig]?.bgColor || ''
+                    allStatusConfig[activity.status as keyof typeof allStatusConfig]?.bgColor || ''
                   }`}
                 >
                   <TableCell>
